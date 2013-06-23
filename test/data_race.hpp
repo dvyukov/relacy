@@ -232,14 +232,14 @@ struct race_indirect_test : rl::test_suite<race_indirect_test, 2, rl::test_resul
         {
             x($) = 1;
             a.store(1, std::memory_order_release);
-            (int)x($);
+            (void)(int)x($);
         }
         else
         {
             rl::backoff b;
             while (0 == a.load(std::memory_order_acquire))
                 b.yield($);
-            (int)x($);
+            (void)(int)x($);
             x($) = 2;
         }
     }

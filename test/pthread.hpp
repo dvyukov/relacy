@@ -213,12 +213,12 @@ struct test_pthread_rwlock : rl::test_suite<test_pthread_rwlock, 3>
         }
 
         pthread_rwlock_rdlock(&mtx);
-        (int)VAR(data);
+        (void)(int)VAR(data);
         pthread_rwlock_unlock(&mtx);
 
         if (0 == pthread_rwlock_tryrdlock(&mtx))
         {
-            (int)VAR(data);
+            (void)(int)VAR(data);
             pthread_rwlock_unlock(&mtx);
         }
     }
