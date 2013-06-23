@@ -1253,7 +1253,7 @@ inline void operator delete (void* p, void(*dtor)(void*), rl::debug_info_param i
 }
 #endif
 
-inline void* operator new (size_t size) throw(std::bad_alloc)
+inline void* operator new (size_t size) RL_THROW_SPEC(std::bad_alloc)
 {
     if (&rl::ctx())
         return rl::ctx().alloc(size);
@@ -1261,7 +1261,7 @@ inline void* operator new (size_t size) throw(std::bad_alloc)
         return (::malloc)(size);
 }
 
-inline void* operator new [] (size_t size) throw(std::bad_alloc)
+inline void* operator new [] (size_t size) RL_THROW_SPEC(std::bad_alloc)
 {
     if (&rl::ctx())
         return rl::ctx().alloc(size);

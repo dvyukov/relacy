@@ -331,6 +331,8 @@ inline int rl_int_futex_impl(context& c,
                     int val3,
                     debug_info_param info)
 {
+    (void)uaddr2;
+    (void)val3;
     if (op == RL_FUTEX_WAIT)
     {
         c.sched();
