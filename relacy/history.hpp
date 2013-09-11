@@ -177,7 +177,7 @@ private:
 
     void output(size_t i)
     {
-        std::ostringstream stream;
+        std::basic_ostringstream<char, std::char_traits<char>, raw_allocator<char> > stream;
 
         history_entry const& ent = exec_history_[i];
 #ifdef RL_MSVC_OUTPUT
