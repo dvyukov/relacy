@@ -19,7 +19,7 @@
 
 namespace std
 {
-    using rl::memory_order;
+//    using rl::memory_order;
     using rl::mo_relaxed;
     using rl::mo_consume;
     using rl::mo_acquire;
