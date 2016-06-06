@@ -19,7 +19,8 @@
 
 namespace std
 {
-    namespace rlimp {
+    namespace rlimp 
+    {
       using namespace rl;
     }
 
