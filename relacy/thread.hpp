@@ -82,7 +82,8 @@ struct thread_info : thread_info_base
 
     void atomic_thread_fence_acquire()
     {
-        foreach<thread_count>(
+        foreach(
+            thread_count,
             acq_rel_order_,
             acquire_fence_order_,
             &assign_max);
@@ -90,7 +91,8 @@ struct thread_info : thread_info_base
 
     void atomic_thread_fence_release()
     {
-        foreach<thread_count>(
+        foreach(
+            thread_count,
             release_fence_order_,
             acq_rel_order_,
             &assign);
@@ -105,17 +107,19 @@ struct thread_info : thread_info_base
     void atomic_thread_fence_seq_cst(timestamp_t* seq_cst_fence_order)
     {
 #ifdef RL_IMPROVED_SEQ_CST_FENCE
-        foreach<thread_count>(acq_rel_order_, imp_seq_cst_order_, assign_max);
+        foreach(thread_count, acq_rel_order_, imp_seq_cst_order_, assign_max);
 #endif
 
         atomic_thread_fence_acquire();
 
-        foreach<thread_count>(
+        foreach(
+            thread_count,
             acq_rel_order_,
             seq_cst_fence_order,
             &assign_max);
 
-        foreach<thread_count>(
+        foreach(
+            thread_count,
             seq_cst_fence_order,
             acq_rel_order_,
             &assign);
@@ -282,7 +286,7 @@ private:
 
         timestamp_t* acq_rel_order = (synch ? acq_rel_order_ : acquire_fence_order_);
 
-        foreach<thread_count>(acq_rel_order, rec.acq_rel_order_, assign_max);
+        foreach(thread_count, acq_rel_order, rec.acq_rel_order_, assign_max);
 
         return index;
     }
@@ -302,7 +306,7 @@ private:
         rec.seq_cst_ = false;
         rec.acq_rel_timestamp_ = 0;
 
-        foreach<thread_count>(rec.acq_rel_order_, assign_zero);
+        foreach(thread_count, rec.acq_rel_order_, assign_zero);
 
         return idx;
     }
@@ -329,7 +333,7 @@ private:
         own_acq_rel_order_ += 1;
         rec.acq_rel_timestamp_ = own_acq_rel_order_;
 
-        foreach<thread_count>(rec.last_seen_order_, assign<(timestamp_t)-1>);
+        foreach(thread_count, rec.last_seen_order_, assign<(timestamp_t)-1>);
 
         rec.last_seen_order_[index_] = own_acq_rel_order_;
 
@@ -338,7 +342,7 @@ private:
 
 #ifdef RL_IMPROVED_SEQ_CST_FENCE
         if (val(mo) == mo_release && val(rmw) == false)
-            foreach<thread_count>(imp_seq_cst_order_, prev.acq_rel_order_, assign_max);
+            foreach(thread_count, imp_seq_cst_order_, prev.acq_rel_order_, assign_max);
 #endif
 
         bool const synch = 
@@ -353,12 +357,12 @@ private:
 
         if (preserve)
         {
-            foreach<thread_count>(rec.acq_rel_order_, prev.acq_rel_order_, assign);
-            foreach<thread_count>(rec.acq_rel_order_, acq_rel_order, assign_max);
+            foreach(thread_count, rec.acq_rel_order_, prev.acq_rel_order_, assign);
+            foreach(thread_count, rec.acq_rel_order_, acq_rel_order, assign_max);
         }
         else
         {
-            foreach<thread_count>(rec.acq_rel_order_, acq_rel_order, assign);
+            foreach(thread_count, rec.acq_rel_order_, acq_rel_order, assign);
         }
 
         return idx;

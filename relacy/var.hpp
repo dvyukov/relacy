@@ -338,8 +338,8 @@ struct var_data_impl : var_data
 
     var_data_impl()
     {
-        foreach<thread_count>(load_acq_rel_timestamp_, assign_zero);
-        foreach<thread_count>(store_acq_rel_timestamp_, assign_zero);
+        foreach(thread_count, load_acq_rel_timestamp_, assign_zero);
+        foreach(thread_count, store_acq_rel_timestamp_, assign_zero);
     }
 
     virtual void init(thread_info_base& th)

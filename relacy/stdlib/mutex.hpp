@@ -107,7 +107,7 @@ public:
         context& c = ctx();
         (void)c;
         RL_VERIFY(false == c.invariant_executing);
-        foreach<thread_count>(shared_owner_, &assign_zero);
+        foreach(thread_count, shared_owner_, &assign_zero);
     }
 
     ~generic_mutex_data_impl()

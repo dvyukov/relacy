@@ -33,8 +33,8 @@ struct tree_search_scheduler_thread_info : scheduler_thread_info
     void reset(test_params& params)
     {
         scheduler_thread_info::reset(params);
-        foreach<thread_count>(yield_sched_count_, &assign_zero_u);
-        foreach<thread_count>(yield_priority_, &assign_zero_u);
+        foreach(thread_count, yield_sched_count_, &assign_zero_u);
+        foreach(thread_count, yield_priority_, &assign_zero_u);
         total_yield_priority_ = 0;
         //subsequent_timed_waits_ = 0;
     }

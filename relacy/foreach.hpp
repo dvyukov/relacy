@@ -18,81 +18,40 @@
 namespace rl
 {
 
-
-template<typename T, thread_id_t i, thread_id_t index>
-struct foreach_thread_impl
-{
-    template<typename F>
-    RL_INLINE static void exec(
-        T* v1,
-        F func)
-    {
-        (*func)(v1[i]);
-        foreach_thread_impl<T, i + 1, index - 1>::exec(v1, func);
-    }
-
-    RL_INLINE static void exec(
-        T* v1, T* v2,
-        void (*func)(T& e1, T& e2))
-    {
-        (*func)(v1[i], v2[i]);
-        foreach_thread_impl<T, i + 1, index - 1>::exec(v1, v2, func);
-    }
-
-    RL_INLINE static void exec(
-        T* v1, T* v2, T* v3,
-        void (*func)(T& e1, T& e2, T& e3))
-    {
-        (*func)(v1[i], v2[i], v3[i]);
-        foreach_thread_impl<T, i + 1, index - 1>::exec(v1, v2, v3, func);
-    }
-};
-
-template<typename T, thread_id_t i>
-struct foreach_thread_impl<T, i, 0>
-{
-    template<typename F>
-    RL_INLINE static void exec(
-        T*,
-        F)
-    {
-    }
-
-    RL_INLINE static void exec(
-        T*, T*,
-        void (*)(T&, T&))
-    {
-    }
-
-    RL_INLINE static void exec(
-        T*, T*, T*,
-        void (*)(T&, T&, T&))
-    {
-    }
-};
-
-template<thread_id_t count, typename T, typename F>
+template<typename T, typename F>
 RL_INLINE void foreach(
+    thread_id_t count,
     T* v1,
     F func)
 {
-    foreach_thread_impl<T, 0, count>::exec(v1, func);
+    for (thread_id_t i = 0; i < count; i++)
+    {
+        (*func)(v1[i]);
+    }
 }
 
-template<thread_id_t count, typename T>
+template<typename T>
 RL_INLINE void foreach(
+    thread_id_t count,
     T* v1, T* v2,
     void (*func)(T& e1, T& e2))
 {
-    foreach_thread_impl<T, 0, count>::exec(v1, v2, func);
+    for (thread_id_t i = 0; i < count; i++)
+    {
+        (*func)(v1[i], v2[i]);
+    }
 }
 
-template<thread_id_t count, typename T>
+template<typename T>
 RL_INLINE void foreach(
+    thread_id_t count,
     T* v1, T* v2, T* v3,
     void (*func)(T& e1, T& e2, T& e3))
 {
-    foreach_thread_impl<T, 0, count>::exec(v1, v2, v3, func);
+    for (thread_id_t i = 0; i < count; i++)
+    {
+        (*func)(v1[i], v2[i], v3[i]);
+    }
 }
 
 RL_INLINE void assign_zero(timestamp_t& elem)

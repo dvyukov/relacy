@@ -709,8 +709,8 @@ struct atomic_data_impl : atomic_data
         th.own_acq_rel_order_ += 1;
         rec.acq_rel_timestamp_ = th.own_acq_rel_order_;
 
-        foreach<thread_count>(rec.acq_rel_order_, assign_zero);
-        foreach<thread_count>(rec.last_seen_order_, assign<(timestamp_t)-1>);
+        foreach(thread_count, rec.acq_rel_order_, assign_zero);
+        foreach(thread_count, rec.last_seen_order_, assign<(timestamp_t)-1>);
         rec.last_seen_order_[th.index_] = th.own_acq_rel_order_;
     }
 };

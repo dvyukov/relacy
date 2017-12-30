@@ -651,15 +651,17 @@ public:
 
     RL_INLINE static void reset_thread(thread_info<thread_count>& ti)
     {
-        foreach<thread_count>(
+        foreach(
+            thread_count,
             ti.acquire_fence_order_,
             &assign_zero);
-        foreach<thread_count>(
+        foreach(
+            thread_count,
             ti.release_fence_order_,
             &assign_zero);
 
 #ifdef RL_IMPROVED_SEQ_CST_FENCE
-        foreach<thread_count>(ti.imp_seq_cst_order_, &assign_zero);
+        foreach(thread_count, ti.imp_seq_cst_order_, &assign_zero);
 #endif
     }
 
@@ -669,11 +671,13 @@ public:
         disable_preemption_ = 0;
         sched_count_ = 0;
 
-        foreach<thread_count>(
+        foreach(
+            thread_count,
             threads_,
             &context_impl::reset_thread);
 
-        foreach<thread_count>(
+        foreach(
+            thread_count,
             seq_cst_fence_order_,
             &assign_zero);
 
