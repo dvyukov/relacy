@@ -101,6 +101,8 @@ public:
         , failing_try_lock_(failing_try_lock)
         , exclusive_owner_(state_free)
         , exclusive_recursion_count_(0)
+        , exclusive_waitset_(thread_count)
+        , shared_waitset_(thread_count)
         , shared_lock_count_(0)
         , try_lock_failed_()
     {
@@ -475,8 +477,8 @@ private:
     sync_var<thread_count> sync_;
     thread_id_t exclusive_owner_;
     unsigned exclusive_recursion_count_;
-    waitset<thread_count> exclusive_waitset_;
-    waitset<thread_count> shared_waitset_;
+    waitset<> exclusive_waitset_;
+    waitset<> shared_waitset_;
     timestamp_t shared_owner_ [thread_count];
     unsigned shared_lock_count_;
     bool try_lock_failed_;

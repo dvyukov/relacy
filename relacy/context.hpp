@@ -173,7 +173,7 @@ private:
         static_cast<var_data_impl<thread_count>*>(data)->~var_data_impl<thread_count>();
         var_alloc_->free(static_cast<var_data_impl<thread_count>*>(data));
     }
-	
+
     virtual unpark_reason wfmo_park(void** ws,
                                     win_waitable_object** wo,
                                     size_t count,
@@ -181,8 +181,8 @@ private:
                                     bool is_timed,
                                     debug_info_param info)
     {
-			  return waitset<thread_count>::park_current(*this,
-                                                         reinterpret_cast<waitset<thread_count>**>(ws),
+              return waitset<>::park_current(thread_count, *this,
+                                                         reinterpret_cast<waitset<>**>(ws),
                                                          wo, count, wait_all, is_timed, true, info);
     }
 

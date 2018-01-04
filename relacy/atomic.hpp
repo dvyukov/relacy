@@ -682,10 +682,11 @@ struct atomic_data_impl : atomic_data
     static size_t const history_size = atomic_history_size;
     aligned<history_record> history_ [history_size];
     unsigned current_index_;
-    waitset<thread_count> futex_ws_;
+    waitset<>              futex_ws_;
     sync_var<thread_count> futex_sync_;
 
     atomic_data_impl()
+        : futex_ws_(thread_count)
     {
         current_index_ = 0;
         history_record& rec = history_[0];
@@ -697,6 +698,7 @@ struct atomic_data_impl : atomic_data
     }
 
     atomic_data_impl(thread_info_t& th)
+        : futex_ws_(thread_count)
     {
         current_index_ = 0;
         history_[atomic_history_size - 1].busy_ = false;

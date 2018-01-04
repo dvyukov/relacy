@@ -46,6 +46,7 @@ public:
     event_data_impl(bool manual_reset, bool initial_state)
         : manual_reset_(manual_reset)
         , state_(initial_state)
+        , ws_(thread_count)
     {
     }
 
@@ -58,7 +59,7 @@ private:
     signature<0xdada1234> sign_;
     bool const manual_reset_;
     bool state_;
-    waitset<thread_count> ws_;
+    waitset<> ws_;
     sync_var<thread_count> sync_;
 
     struct state_event

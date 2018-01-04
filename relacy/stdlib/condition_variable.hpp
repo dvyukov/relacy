@@ -95,6 +95,7 @@ class condvar_data_impl : public condvar_data
 {
 public:
     condvar_data_impl(bool allow_spurious_wakeups)
+        : ws_(thread_count)
     {
         spurious_wakeup_limit_ = 0;
         if (allow_spurious_wakeups && ctx().is_random_sched())
@@ -107,7 +108,7 @@ public:
     }
 
 private:
-    waitset<thread_count>           ws_;
+    waitset<>                       ws_;
     signature<0xc0ffe3ad>           sign_;
     int                             spurious_wakeup_limit_;
 

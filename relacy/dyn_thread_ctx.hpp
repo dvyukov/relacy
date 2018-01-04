@@ -29,6 +29,7 @@ class thread_sync_object : public win_waitable_object
 {
 public:
     thread_sync_object()
+        : ws_(thread_count)
     {
     }
 
@@ -62,7 +63,7 @@ public:
 
 private:
     bool finished_;
-    waitset<thread_count> ws_;
+    waitset<>              ws_;
     sync_var<thread_count> sync_;
 
     virtual void deinit(debug_info_param info)
