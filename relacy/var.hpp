@@ -314,13 +314,15 @@ private:
     var& operator = (var const& r);
 };
 
-template<thread_id_t thread_count>
 struct var_data_impl : var_data
 {
-    timestamp_t load_acq_rel_timestamp_ [thread_count];
-    timestamp_t store_acq_rel_timestamp_ [thread_count];
+    timestamp_t* load_acq_rel_timestamp_;
+    timestamp_t* store_acq_rel_timestamp_;
 
-    var_data_impl()
+    var_data_impl(thread_id_t thread_count)
+        : load_acq_rel_timestamp_(static_cast<timestamp_t*>(calloc(thread_count, sizeof(timestamp_t))))
+        , store_acq_rel_timestamp_ (static_cast<timestamp_t*>(calloc(thread_count, sizeof(timestamp_t))))
+        , thread_count_(thread_count)
     {
         foreach(thread_count, load_acq_rel_timestamp_, assign_zero);
         foreach(thread_count, store_acq_rel_timestamp_, assign_zero);
@@ -334,7 +336,7 @@ struct var_data_impl : var_data
 
     virtual bool store(thread_info_base& th)
     {
-        for (thread_id_t i = 0; i != thread_count; ++i)
+        for (thread_id_t i = 0; i != thread_count_; ++i)
         {
             if (th.acq_rel_order_[i] < store_acq_rel_timestamp_[i])
                 return false;
@@ -349,7 +351,7 @@ struct var_data_impl : var_data
 
     virtual bool load(thread_info_base& th)
     {
-        for (thread_id_t i = 0; i != thread_count; ++i)
+        for (thread_id_t i = 0; i != thread_count_; ++i)
         {
             if (th.acq_rel_order_[i] < store_acq_rel_timestamp_[i])
                 return false;
@@ -360,7 +362,14 @@ struct var_data_impl : var_data
         return true;
     }
 
-    virtual ~var_data_impl() {} // just to calm down gcc
+    virtual ~var_data_impl()
+    {
+        free(load_acq_rel_timestamp_);
+        free(store_acq_rel_timestamp_);
+    }
+
+private:
+    thread_id_t const thread_count_;
 };
 
 }

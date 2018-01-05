@@ -26,6 +26,7 @@
 #include "foreach.hpp"
 #include "stdlib/event.hpp"
 #include "atomic.hpp"
+#include "var.hpp"
 
 #include "random_scheduler.hpp"
 #include "full_search_scheduler.hpp"
@@ -147,7 +148,7 @@ private:
     }
 
     slab_allocator<atomic_data_impl<> >*        atomic_alloc_;
-    slab_allocator<var_data_impl<thread_count> >*           var_alloc_;
+    slab_allocator<var_data_impl >*           var_alloc_;
     slab_allocator<generic_mutex_data_impl<thread_count> >* mutex_alloc_;
     slab_allocator<condvar_data_impl<thread_count> >*       condvar_alloc_;
     slab_allocator<sema_data_impl>*                         sema_alloc_;
@@ -166,13 +167,13 @@ private:
 
     virtual var_data* var_ctor()
     {
-        return new (var_alloc_->alloc()) var_data_impl<thread_count> ();
+        return new (var_alloc_->alloc()) var_data_impl(thread_count);
     }
 
     virtual void var_dtor(var_data* data)
     {
-        static_cast<var_data_impl<thread_count>*>(data)->~var_data_impl<thread_count>();
-        var_alloc_->free(static_cast<var_data_impl<thread_count>*>(data));
+        static_cast<var_data_impl*>(data)->~var_data_impl();
+        var_alloc_->free(static_cast<var_data_impl*>(data));
     }
 
     virtual unpark_reason wfmo_park(void** ws,
@@ -215,7 +216,7 @@ public:
         }
 
         atomic_alloc_ = new slab_allocator<atomic_data_impl<> >();
-        var_alloc_ = new slab_allocator<var_data_impl<thread_count> >();
+        var_alloc_ = new slab_allocator<var_data_impl>();
         mutex_alloc_ = new slab_allocator<generic_mutex_data_impl<thread_count> >();
         condvar_alloc_ = new slab_allocator<condvar_data_impl<thread_count> >();
         sema_alloc_ = new slab_allocator<sema_data_impl>();

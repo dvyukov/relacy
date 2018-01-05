@@ -28,7 +28,7 @@ namespace rl
 struct atomic_data;
 struct var_data;
 template<typename Void> struct atomic_data_impl;
-template<thread_id_t thread_count> struct var_data_impl;
+struct var_data_impl;
 
 
 class thread_info_base
