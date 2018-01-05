@@ -24,6 +24,7 @@
 #include "test_params.hpp"
 #include "random.hpp"
 #include "foreach.hpp"
+#include "stdlib/event.hpp"
 
 #include "random_scheduler.hpp"
 #include "full_search_scheduler.hpp"
@@ -37,7 +38,6 @@ namespace rl
 template<thread_id_t thread_count> class generic_mutex_data_impl;
 template<thread_id_t thread_count> class condvar_data_impl;
 class sema_data_impl;
-template<thread_id_t thread_count> class event_data_impl;
 
 
 struct park_event
@@ -150,7 +150,7 @@ private:
     slab_allocator<generic_mutex_data_impl<thread_count> >* mutex_alloc_;
     slab_allocator<condvar_data_impl<thread_count> >*       condvar_alloc_;
     slab_allocator<sema_data_impl>*                         sema_alloc_;
-    slab_allocator<event_data_impl<thread_count> >*         event_alloc_;
+    slab_allocator<event_data_impl>*                        event_alloc_;
 
     virtual atomic_data* atomic_ctor(void* ctx)
     {
@@ -217,7 +217,7 @@ public:
         mutex_alloc_ = new slab_allocator<generic_mutex_data_impl<thread_count> >();
         condvar_alloc_ = new slab_allocator<condvar_data_impl<thread_count> >();
         sema_alloc_ = new slab_allocator<sema_data_impl>();
-        event_alloc_ = new slab_allocator<event_data_impl<thread_count> >();
+        event_alloc_ = new slab_allocator<event_data_impl>();
 
         for (thread_id_t i = 0; i != thread_count; ++i)
         {
@@ -840,13 +840,13 @@ private:
 
     virtual event_data* event_ctor(bool manual_reset, bool initial_state)
     {
-        return new (event_alloc_->alloc()) event_data_impl<thread_count>(manual_reset, initial_state);
+        return new (event_alloc_->alloc()) event_data_impl(thread_count, manual_reset, initial_state);
     }
 
     virtual void event_dtor(event_data* cv)
     {
-        event_data_impl<thread_count>* mm = static_cast<event_data_impl<thread_count>*>(cv);
-        mm->~event_data_impl<thread_count>();
+        event_data_impl* mm = static_cast<event_data_impl*>(cv);
+        mm->~event_data_impl();
         event_alloc_->free(mm);
     }
 
