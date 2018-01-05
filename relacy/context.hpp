@@ -27,6 +27,8 @@
 #include "stdlib/event.hpp"
 #include "atomic.hpp"
 #include "var.hpp"
+#include "stdlib/condition_variable.hpp"
+#include "stdlib/mutex.hpp"
 
 #include "random_scheduler.hpp"
 #include "full_search_scheduler.hpp"
@@ -37,8 +39,8 @@
 namespace rl
 {
 
-template<thread_id_t thread_count> class generic_mutex_data_impl;
-template<thread_id_t thread_count> class condvar_data_impl;
+class generic_mutex_data_impl;
+class condvar_data_impl;
 class sema_data_impl;
 
 
@@ -149,8 +151,8 @@ private:
 
     slab_allocator<atomic_data_impl<> >*        atomic_alloc_;
     slab_allocator<var_data_impl >*           var_alloc_;
-    slab_allocator<generic_mutex_data_impl<thread_count> >* mutex_alloc_;
-    slab_allocator<condvar_data_impl<thread_count> >*       condvar_alloc_;
+    slab_allocator<generic_mutex_data_impl>* mutex_alloc_;
+    slab_allocator<condvar_data_impl>*       condvar_alloc_;
     slab_allocator<sema_data_impl>*                         sema_alloc_;
     slab_allocator<event_data_impl>*                        event_alloc_;
 
@@ -217,8 +219,8 @@ public:
 
         atomic_alloc_ = new slab_allocator<atomic_data_impl<> >();
         var_alloc_ = new slab_allocator<var_data_impl>();
-        mutex_alloc_ = new slab_allocator<generic_mutex_data_impl<thread_count> >();
-        condvar_alloc_ = new slab_allocator<condvar_data_impl<thread_count> >();
+        mutex_alloc_ = new slab_allocator<generic_mutex_data_impl>();
+        condvar_alloc_ = new slab_allocator<condvar_data_impl>();
         sema_alloc_ = new slab_allocator<sema_data_impl>();
         event_alloc_ = new slab_allocator<event_data_impl>();
 
@@ -807,25 +809,25 @@ private:
 
     virtual generic_mutex_data* mutex_ctor(bool is_rw, bool is_exclusive_recursive, bool is_shared_recursive, bool failing_try_lock)
     {
-        return new (mutex_alloc_->alloc()) generic_mutex_data_impl<thread_count>(is_rw, is_exclusive_recursive, is_shared_recursive, failing_try_lock);
+        return new (mutex_alloc_->alloc()) generic_mutex_data_impl(thread_count, is_rw, is_exclusive_recursive, is_shared_recursive, failing_try_lock);
     }
 
     virtual void mutex_dtor(generic_mutex_data* m)
     {
-        generic_mutex_data_impl<thread_count>* mm = static_cast<generic_mutex_data_impl<thread_count>*>(m);
-        mm->~generic_mutex_data_impl<thread_count>();
+        generic_mutex_data_impl* mm = static_cast<generic_mutex_data_impl*>(m);
+        mm->~generic_mutex_data_impl();
         mutex_alloc_->free(mm);
     }
 
     virtual condvar_data* condvar_ctor(bool allow_spurious_wakeups)
     {
-        return new (condvar_alloc_->alloc()) condvar_data_impl<thread_count>(allow_spurious_wakeups);
+        return new (condvar_alloc_->alloc()) condvar_data_impl(thread_count, allow_spurious_wakeups);
     }
 
     virtual void condvar_dtor(condvar_data* cv)
     {
-        condvar_data_impl<thread_count>* mm = static_cast<condvar_data_impl<thread_count>*>(cv);
-        mm->~condvar_data_impl<thread_count>();
+        condvar_data_impl* mm = static_cast<condvar_data_impl*>(cv);
+        mm->~condvar_data_impl();
         condvar_alloc_->free(mm);
     }
 
