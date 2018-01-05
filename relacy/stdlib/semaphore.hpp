@@ -58,11 +58,10 @@ struct sema_data
     virtual ~sema_data() {} // just to calm down gcc
 };
 
-template<thread_id_t thread_count>
 class sema_data_impl : public sema_data
 {
 public:
-    sema_data_impl(bool spurious_wakeups, unsigned initial_count, unsigned max_count)
+    sema_data_impl(thread_id_t thread_count, bool spurious_wakeups, unsigned initial_count, unsigned max_count)
         : spurious_wakeups_(spurious_wakeups)
         , count_(initial_count)
         , max_count_(max_count)
