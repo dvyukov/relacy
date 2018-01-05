@@ -67,6 +67,7 @@ public:
         , count_(initial_count)
         , max_count_(max_count)
         , ws_(thread_count)
+        , sync_(thread_count)
     {
         RL_VERIFY(max_count <= INT_MAX);
     }
@@ -247,7 +248,7 @@ private:
     unsigned count_;
     unsigned const max_count_;
     waitset<> ws_;
-    sync_var<thread_count> sync_;
+    sync_var  sync_;
 
     virtual bool is_signaled(debug_info_param info)
     {

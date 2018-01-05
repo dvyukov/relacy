@@ -99,6 +99,7 @@ public:
         , is_exclusive_recursive_(is_exclusive_recursive)
         , is_shared_recursive_(is_shared_recursive)
         , failing_try_lock_(failing_try_lock)
+        , sync_(thread_count)
         , exclusive_owner_(state_free)
         , exclusive_recursion_count_(0)
         , exclusive_waitset_(thread_count)
@@ -474,7 +475,7 @@ private:
     bool is_exclusive_recursive_;
     bool is_shared_recursive_;
     bool failing_try_lock_;
-    sync_var<thread_count> sync_;
+    sync_var sync_;
     thread_id_t exclusive_owner_;
     unsigned exclusive_recursion_count_;
     waitset<> exclusive_waitset_;
