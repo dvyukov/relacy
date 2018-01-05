@@ -30,9 +30,9 @@
 #include "stdlib/condition_variable.hpp"
 #include "stdlib/mutex.hpp"
 
-#include "random_scheduler.hpp"
-#include "full_search_scheduler.hpp"
-#include "context_bound_scheduler.hpp"
+#include "schedulers/random_scheduler.hpp"
+#include "schedulers/full_search_scheduler.hpp"
+#include "schedulers/context_bound_scheduler.hpp"
 
 
 

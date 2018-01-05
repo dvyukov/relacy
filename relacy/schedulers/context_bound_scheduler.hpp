@@ -13,9 +13,9 @@
 #   pragma once
 #endif
 
-#include "base.hpp"
+#include "../base.hpp"
 #include "full_search_scheduler.hpp"
-#include "foreach.hpp"
+#include "../foreach.hpp"
 
 
 namespace rl

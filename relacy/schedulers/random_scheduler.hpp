@@ -13,9 +13,9 @@
 #   pragma once
 #endif
 
-#include "base.hpp"
+#include "../base.hpp"
 #include "scheduler.hpp"
-#include "random.hpp"
+#include "../random.hpp"
 
 
 namespace rl
