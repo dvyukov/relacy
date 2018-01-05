@@ -25,8 +25,6 @@ namespace rl
 template<typename T>
 class var;
 
-
-
 template<typename T>
 class var_proxy_const
 {
@@ -59,9 +57,6 @@ protected:
 private:
     var_proxy_const& operator = (var_proxy_const const&);
 };
-
-
-
 
 template<typename T>
 class var_proxy : public var_proxy_const<T>
@@ -177,9 +172,6 @@ public:
     }
 };
 
-
-
-
 template<typename T>
 struct var_event
 {
@@ -206,9 +198,6 @@ struct var_event
             << (load_ ? "load" : "store") << ", value=" << (typename map_type<T>::result)value_;
     }
 };
-
-
-
 
 template<typename T>
 class var
@@ -325,14 +314,9 @@ private:
     var& operator = (var const& r);
 };
 
-
-
-
 template<thread_id_t thread_count>
 struct var_data_impl : var_data
 {
-    typedef thread_info<thread_count> thread_info_t;
-
     timestamp_t load_acq_rel_timestamp_ [thread_count];
     timestamp_t store_acq_rel_timestamp_ [thread_count];
 
@@ -379,10 +363,6 @@ struct var_data_impl : var_data
     virtual ~var_data_impl() {} // just to calm down gcc
 };
 
-
-
 }
-
-
 
 #endif

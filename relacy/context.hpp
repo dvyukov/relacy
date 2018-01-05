@@ -25,6 +25,7 @@
 #include "random.hpp"
 #include "foreach.hpp"
 #include "stdlib/event.hpp"
+#include "atomic.hpp"
 
 #include "random_scheduler.hpp"
 #include "full_search_scheduler.hpp"
@@ -138,14 +139,14 @@ private:
     bool                            first_thread_;
     timestamp_t                     seq_cst_fence_order_ [thread_count];
 
-    aligned<thread_info<thread_count> > threads_ [thread_count];
+    thread_info<>* threads_;
 
-    thread_info<thread_count>& threadi()
+    thread_info<>& threadi()
     {
-        return *static_cast<thread_info<thread_count>*>(threadx_);
+        return *static_cast<thread_info<>*>(threadx_);
     }
 
-    slab_allocator<atomic_data_impl<thread_count> >*        atomic_alloc_;
+    slab_allocator<atomic_data_impl<> >*        atomic_alloc_;
     slab_allocator<var_data_impl<thread_count> >*           var_alloc_;
     slab_allocator<generic_mutex_data_impl<thread_count> >* mutex_alloc_;
     slab_allocator<condvar_data_impl<thread_count> >*       condvar_alloc_;
@@ -154,13 +155,13 @@ private:
 
     virtual atomic_data* atomic_ctor(void* ctx)
     {
-        return new (atomic_alloc_->alloc(ctx)) atomic_data_impl<thread_count> ();
+        return new (atomic_alloc_->alloc(ctx)) atomic_data_impl<>(thread_count);
     }
 
     virtual void atomic_dtor(atomic_data* data)
     {
-        static_cast<atomic_data_impl<thread_count>*>(data)->~atomic_data_impl<thread_count>();
-        atomic_alloc_->free(static_cast<atomic_data_impl<thread_count>*>(data));
+        static_cast<atomic_data_impl<>*>(data)->~atomic_data_impl<>();
+        atomic_alloc_->free(static_cast<atomic_data_impl<>*>(data));
     }
 
     virtual var_data* var_ctor()
@@ -193,6 +194,7 @@ public:
         , start_iteration_(1)
         , sched_(params, sctx, dynamic_thread_count)
         , sctx_(sctx)
+        , threads_(static_cast<thread_info<>*>(calloc(thread_count, sizeof(thread_info<>))))
     {
         this->context::seq_cst_fence_order_ = this->seq_cst_fence_order_;
 
@@ -212,7 +214,7 @@ public:
             throw std::logic_error("no threads created");
         }
 
-        atomic_alloc_ = new slab_allocator<atomic_data_impl<thread_count> >();
+        atomic_alloc_ = new slab_allocator<atomic_data_impl<> >();
         var_alloc_ = new slab_allocator<var_data_impl<thread_count> >();
         mutex_alloc_ = new slab_allocator<generic_mutex_data_impl<thread_count> >();
         condvar_alloc_ = new slab_allocator<condvar_data_impl<thread_count> >();
@@ -221,7 +223,7 @@ public:
 
         for (thread_id_t i = 0; i != thread_count; ++i)
         {
-            new (&threads_[i]) thread_info<thread_count> (i);
+            new (&threads_[i]) thread_info<> (thread_count, i);
             threads_[i].ctx_ = this;
         }
 
@@ -649,7 +651,7 @@ public:
         return test_result_success;
     }
 
-    RL_INLINE static void reset_thread(thread_info<thread_count>& ti)
+    RL_INLINE static void reset_thread(thread_info<>& ti)
     {
         foreach(
             thread_count,

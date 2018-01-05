@@ -20,7 +20,7 @@
 namespace rl
 {
 
-template<typename T = void> // CRTP
+template<typename Void = void>
 class waitset
 {
     struct thread_desc
