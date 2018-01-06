@@ -968,9 +968,9 @@ bool simulate(test_params& params)
     if (random_scheduler_type == params.search_type)
         res = run_test<test_t, random_scheduler >(params, oss, false);
     else if (fair_full_search_scheduler_type == params.search_type)
-        res = run_test<test_t, full_search_scheduler<test_t::params::thread_count> >(params, oss, false);
+        res = run_test<test_t, full_search_scheduler>(params, oss, false);
     else if (fair_context_bound_scheduler_type == params.search_type)
-        res = run_test<test_t, context_bound_scheduler<test_t::params::thread_count> >(params, oss, false);
+        res = run_test<test_t, context_bound_scheduler>(params, oss, false);
     else
         RL_VERIFY(false);
 
@@ -997,9 +997,9 @@ bool simulate(test_params& params)
         if (random_scheduler_type == params.search_type)
             res2 = run_test<test_t, random_scheduler >(params, oss2, true);
         else if (fair_full_search_scheduler_type == params.search_type)
-            res2 = run_test<test_t, full_search_scheduler<test_t::params::thread_count> >(params, oss2, true);
+            res2 = run_test<test_t, full_search_scheduler>(params, oss2, true);
         else if (fair_context_bound_scheduler_type == params.search_type)
-            res2 = run_test<test_t, context_bound_scheduler<test_t::params::thread_count> >(params, oss2, true);
+            res2 = run_test<test_t, context_bound_scheduler>(params, oss2, true);
         else
             RL_VERIFY(false);
 

@@ -17,7 +17,6 @@
 #include "scheduler.hpp"
 #include "../foreach.hpp"
 
-
 namespace rl
 {
 
@@ -60,7 +59,7 @@ private:
 
 
 
-template<typename derived_t, typename thread_info_type, thread_id_t thread_count>
+template<typename derived_t, typename thread_info_type>
 class tree_search_scheduler
     : public scheduler<derived_t, thread_info_type>
 {
@@ -73,11 +72,12 @@ public:
     {
     };
 
-    tree_search_scheduler(test_params& params, shared_context_t& ctx, thread_id_t dynamic_thread_count)
+    tree_search_scheduler(test_params& params, shared_context_t& ctx, thread_id_t dynamic_thread_count, thread_id_t thread_count)
         : base_t(params, ctx, dynamic_thread_count, thread_count)
         , stree_depth_()
         , iteration_count_mean_()
         , iteration_count_probe_count_()
+        , thread_count_(thread_count)
     {
         stree_.reserve(128);
     }
@@ -116,7 +116,7 @@ public:
         thread_info_t& t = *this->thread_;
         thread_id_t const& running_thread_count = this->running_threads_count;
 
-        for (thread_id_t i = 0; i != thread_count; ++i)
+        for (thread_id_t i = 0; i != thread_count_; ++i)
         {
             thread_info_t& y = this->threads_[i];
             RL_VERIFY(0 == y.yield_priority_[t.index_]);
@@ -144,7 +144,7 @@ public:
 #ifdef _DEBUG
         {
             unsigned tmp = 0;
-            for (thread_id_t i = 0; i != thread_count; ++i)
+            for (thread_id_t i = 0; i != thread_count_; ++i)
                 tmp += t.yield_priority_[i];
             RL_VERIFY(t.total_yield_priority_ == tmp);
         }
@@ -152,7 +152,7 @@ public:
 
         if (t.total_yield_priority_)
         {
-            for (thread_id_t i = 0; i != thread_count; ++i)
+            for (thread_id_t i = 0; i != thread_count_; ++i)
             {
                 unsigned& prio = t.yield_priority_[i];
                 if (prio)
@@ -263,7 +263,7 @@ public:
 
     void purge_blocked_threads()
     {
-        for (thread_id_t i = 0; i != thread_count; ++i)
+        for (thread_id_t i = 0; i != thread_count_; ++i)
         {
             on_thread_block(i, false);
         }
@@ -348,7 +348,7 @@ public:
         thread_info_t& t = this->threads_[th];
         if (t.total_yield_priority_)
         {
-            for (thread_id_t i = 0; i != thread_count; ++i)
+            for (thread_id_t i = 0; i != thread_count_; ++i)
             {
                 if (t.yield_priority_[i])
                 {
@@ -380,6 +380,7 @@ protected:
 private:
     double          iteration_count_mean_;
     unsigned        iteration_count_probe_count_;
+    thread_id_t const thread_count_;
 
     derived_t& self()
     {
@@ -389,22 +390,16 @@ private:
     RL_NOCOPY(tree_search_scheduler);
 };
 
-
-
-
-template<thread_id_t thread_count>
 class full_search_scheduler
-    : public tree_search_scheduler<full_search_scheduler<thread_count>
-        , tree_search_scheduler_thread_info, thread_count>
+    : public tree_search_scheduler<full_search_scheduler, tree_search_scheduler_thread_info>
 {
 public:
-    typedef tree_search_scheduler<full_search_scheduler<thread_count>
-        , tree_search_scheduler_thread_info, thread_count> base_t;
+    typedef tree_search_scheduler<full_search_scheduler, tree_search_scheduler_thread_info> base_t;
     typedef typename base_t::thread_info_t thread_info_t;
     typedef typename base_t::shared_context_t shared_context_t;
 
-    full_search_scheduler(test_params& params, shared_context_t& ctx, thread_id_t dynamic_thread_count, thread_id_t)
-        : base_t(params, ctx, dynamic_thread_count)
+    full_search_scheduler(test_params& params, shared_context_t& ctx, thread_id_t dynamic_thread_count, thread_id_t thread_count)
+        : base_t(params, ctx, dynamic_thread_count, thread_count)
     {
     }
 
@@ -431,8 +426,6 @@ public:
     RL_NOCOPY(full_search_scheduler);
 };
 
-
 }
 
 #endif
-
