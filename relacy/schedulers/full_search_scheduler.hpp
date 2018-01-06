@@ -21,23 +21,40 @@
 namespace rl
 {
 
-
-template<thread_id_t thread_count>
 struct tree_search_scheduler_thread_info : scheduler_thread_info
 {
-    unsigned                    yield_sched_count_ [thread_count];
-    unsigned                    yield_priority_ [thread_count];
+    unsigned*                   yield_sched_count_;
+    unsigned*                   yield_priority_;
     unsigned                    total_yield_priority_;
     //unsigned                    subsequent_timed_waits_;
+
+    tree_search_scheduler_thread_info(thread_id_t thread_count)
+        : scheduler_thread_info(thread_count)
+        , yield_sched_count_(static_cast<unsigned*>(calloc(thread_count, sizeof(unsigned))))
+        , yield_priority_(static_cast<unsigned*>(calloc(thread_count, sizeof(unsigned))))
+        , thread_count_(thread_count)
+    {
+    }
+
+    ~tree_search_scheduler_thread_info()
+    {
+        free(yield_sched_count_);
+        free(yield_priority_);
+    }
 
     void reset(test_params& params)
     {
         scheduler_thread_info::reset(params);
-        foreach(thread_count, yield_sched_count_, &assign_zero_u);
-        foreach(thread_count, yield_priority_, &assign_zero_u);
+        foreach(thread_count_, yield_sched_count_, &assign_zero_u);
+        foreach(thread_count_, yield_priority_, &assign_zero_u);
         total_yield_priority_ = 0;
         //subsequent_timed_waits_ = 0;
     }
+
+private:
+    tree_search_scheduler_thread_info(const tree_search_scheduler_thread_info&);
+    tree_search_scheduler_thread_info operator=(const tree_search_scheduler_thread_info&);
+    thread_id_t const thread_count_;
 };
 
 
@@ -378,11 +395,11 @@ private:
 template<thread_id_t thread_count>
 class full_search_scheduler
     : public tree_search_scheduler<full_search_scheduler<thread_count>
-        , tree_search_scheduler_thread_info<thread_count>, thread_count>
+        , tree_search_scheduler_thread_info, thread_count>
 {
 public:
     typedef tree_search_scheduler<full_search_scheduler<thread_count>
-        , tree_search_scheduler_thread_info<thread_count>, thread_count> base_t;
+        , tree_search_scheduler_thread_info, thread_count> base_t;
     typedef typename base_t::thread_info_t thread_info_t;
     typedef typename base_t::shared_context_t shared_context_t;
 

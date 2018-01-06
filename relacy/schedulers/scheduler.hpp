@@ -41,6 +41,10 @@ struct scheduler_thread_info
     unsigned                block_count_;
     thread_state_e          state_;
 
+    scheduler_thread_info(thread_id_t thread_count)
+    {
+    }
+
     void reset(test_params& /*params*/)
     {
         block_count_ = 0;
@@ -73,6 +77,11 @@ public:
         , dynamic_threads_(static_cast<thread_info_t**>(calloc(thread_count, sizeof(thread_info_t*))))
         , thread_count_(thread_count)
     {
+        for (thread_id_t i = 0; i != thread_count_; ++i)
+        {
+            new (threads_ + i) thread_info_t (thread_count);
+        }
+
         for (thread_id_t i = 0; i != thread_count_; ++i)
         {
             threads_[i].index_ = i;
@@ -241,6 +250,11 @@ retry:
 
     ~scheduler()
     {
+        for (thread_id_t i = 0; i != thread_count_; ++i)
+        {
+            threads_[i].~thread_info_t();
+        }
+
         free(threads_);
         free(timed_threads_);
         free(spurious_threads_);

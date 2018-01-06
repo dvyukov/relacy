@@ -23,14 +23,20 @@ namespace rl
 
 
 template<thread_id_t thread_count>
-struct context_bound_scheduler_thread_info : tree_search_scheduler_thread_info<thread_count>
+struct context_bound_scheduler_thread_info : tree_search_scheduler_thread_info
 {
     unsigned sched_count_;
     unsigned forced_context_switch_count_;
 
+    context_bound_scheduler_thread_info(thread_id_t tc)
+        : tree_search_scheduler_thread_info(thread_count)
+    {
+
+    }
+
     void reset(test_params& params)
     {
-        tree_search_scheduler_thread_info<thread_count>::reset(params);
+        tree_search_scheduler_thread_info::reset(params);
         sched_count_ = 0;
         forced_context_switch_count_ = 0;
     }
