@@ -50,7 +50,7 @@ public:
     typedef typename base_t::thread_info_t thread_info_t;
     typedef typename base_t::shared_context_t shared_context_t;
 
-    context_bound_scheduler(test_params& params, shared_context_t& ctx, thread_id_t dynamic_thread_count)
+    context_bound_scheduler(test_params& params, shared_context_t& ctx, thread_id_t dynamic_thread_count, thread_id_t)
         : base_t(params, ctx, dynamic_thread_count)
     {
     }

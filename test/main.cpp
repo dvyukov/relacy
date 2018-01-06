@@ -10,7 +10,7 @@
 #include "condvar.hpp"
 #include "semaphore.hpp"
 #include "event.hpp"
-#include "schedulers/scheduler.hpp"
+#include "scheduler.hpp"
 #include "compare_swap.hpp"
 #include "wfmo.hpp"
 #include "thread_local.hpp"

@@ -195,7 +195,7 @@ public:
         : base_t(thread_count, params)
         , current_iter_(0)
         , start_iteration_(1)
-        , sched_(params, sctx, dynamic_thread_count)
+        , sched_(params, sctx, dynamic_thread_count, thread_count)
         , sctx_(sctx)
         , threads_(static_cast<thread_info<>*>(calloc(thread_count, sizeof(thread_info<>))))
     {
@@ -966,7 +966,7 @@ bool simulate(test_params& params)
     //istringstream iss (params.initial_state);
     test_result_e res = test_result_success;
     if (random_scheduler_type == params.search_type)
-        res = run_test<test_t, random_scheduler<test_t::params::thread_count> >(params, oss, false);
+        res = run_test<test_t, random_scheduler >(params, oss, false);
     else if (fair_full_search_scheduler_type == params.search_type)
         res = run_test<test_t, full_search_scheduler<test_t::params::thread_count> >(params, oss, false);
     else if (fair_context_bound_scheduler_type == params.search_type)
@@ -995,7 +995,7 @@ bool simulate(test_params& params)
         iteration_t const stop_iter = params.stop_iteration;
         test_result_e res2 = test_result_success;
         if (random_scheduler_type == params.search_type)
-            res2 = run_test<test_t, random_scheduler<test_t::params::thread_count> >(params, oss2, true);
+            res2 = run_test<test_t, random_scheduler >(params, oss2, true);
         else if (fair_full_search_scheduler_type == params.search_type)
             res2 = run_test<test_t, full_search_scheduler<test_t::params::thread_count> >(params, oss2, true);
         else if (fair_context_bound_scheduler_type == params.search_type)
