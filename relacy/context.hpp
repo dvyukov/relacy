@@ -104,14 +104,10 @@ struct context_persistent
 
 
 template<typename test_t, typename scheduler_t>
-class context_impl
-    : thread_local_contxt_impl<context_addr_hash_impl<context, test_t::params::thread_count>, test_t::params::thread_count>
+class context_impl : thread_local_contxt_impl<context_addr_hash_impl<context> >
 {
 private:
-    typedef thread_local_contxt_impl
-        <context_addr_hash_impl<context, test_t::params::thread_count>,
-            test_t::params::thread_count>
-                base_t;
+    typedef thread_local_contxt_impl<context_addr_hash_impl<context> > base_t;
     typedef typename scheduler_t::shared_context_t shared_context_t;
 
     using base_t::params_;
@@ -192,7 +188,7 @@ private:
 
 public:
     context_impl(test_params& params, shared_context_t& sctx)
-        : base_t(thread_count, params)
+        : base_t(thread_count, params, thread_count)
         , current_iter_(0)
         , start_iteration_(1)
         , sched_(params, sctx, dynamic_thread_count, thread_count)

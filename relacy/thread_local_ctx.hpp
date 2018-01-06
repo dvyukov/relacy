@@ -33,12 +33,13 @@ struct thread_local_context_iface
 
 
 
-template<typename base_t, thread_id_t thread_count>
+template<typename base_t>
 class thread_local_contxt_impl : protected base_t
 {
 public:
-    thread_local_contxt_impl(thread_id_t thread_count_param, test_params& params)
+    thread_local_contxt_impl(thread_id_t thread_count_param, test_params& params, thread_id_t thread_count)
         : base_t(thread_count_param, params)
+        , thread_count_(thread_count)
     {
     }
 
@@ -48,7 +49,7 @@ public:
 
         for (size_t ent = 0; ent != entries_.size(); ent += 1)
         {
-            for (size_t th = 0; th != thread_count; th += 1)
+            for (size_t th = 0; th != thread_count_; th += 1)
             {
                 entries_[ent].value_[th] = 0;
             }
@@ -59,21 +60,51 @@ private:
     struct entry
     {
         bool            alive_;
-        intptr_t        value_ [thread_count];
+        intptr_t*       value_;
         void            (*dtor_) (intptr_t);
+        size_t const    thread_count_;
+
+        entry(size_t thread_count)
+            : value_(static_cast<intptr_t*>(calloc(thread_count, sizeof(intptr_t))))
+            , thread_count_(thread_count)
+        {
+        }
+
+        entry(const entry& other)
+            : value_(static_cast<intptr_t*>(calloc(other.thread_count_, sizeof(intptr_t))))
+            , thread_count_(other.thread_count_)
+        {
+            alive_ = other.alive_;
+            dtor_ = other.dtor_;
+            std::copy(other.value_, other.value_ + thread_count_, value_);
+        }
+
+        entry& operator=(entry other)
+        {
+            std::swap(alive_, other.alive_);
+            std::swap(value_, other.value_);
+            std::swap(dtor_, other.dtor_);
+            return *this;
+        }
+
+        ~entry()
+        {
+            free(value_);
+        }
     };
 
     typename vector<entry>::type            entries_;
     using base_t::current_thread;
+    size_t const thread_count_;
 
     virtual int         thread_local_alloc          (void (*dtor)(intptr_t))
     {
         int index = (int)entries_.size();
-        entries_.resize(index + 1);
+        entries_.push_back(entry(thread_count_));
         entry& ent = entries_[index];
         ent.alive_ = true;
         ent.dtor_ = dtor;
-        for (size_t i = 0; i != thread_count; ++i)
+        for (size_t i = 0; i != thread_count_; ++i)
         {
             ent.value_[i] = 0;
         }
@@ -88,7 +119,7 @@ private:
         ent.alive_ = false;
         if (ent.dtor_)
         {
-            for (size_t i = 0; i != thread_count; ++i)
+            for (size_t i = 0; i != thread_count_; ++i)
             {
                 if (ent.value_[i])
                 {
