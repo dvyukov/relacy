@@ -45,10 +45,10 @@ struct tree_search_scheduler_thread_info : scheduler_thread_info
 
 template<typename derived_t, typename thread_info_type, thread_id_t thread_count>
 class tree_search_scheduler
-    : public scheduler<derived_t, thread_info_type, thread_count>
+    : public scheduler<derived_t, thread_info_type>
 {
 public:
-    typedef scheduler<derived_t, thread_info_type, thread_count> base_t;
+    typedef scheduler<derived_t, thread_info_type> base_t;
     typedef typename base_t::thread_info_t thread_info_t;
     typedef typename base_t::shared_context_t shared_context_t;
 
@@ -57,7 +57,7 @@ public:
     };
 
     tree_search_scheduler(test_params& params, shared_context_t& ctx, thread_id_t dynamic_thread_count)
-        : base_t(params, ctx, dynamic_thread_count)
+        : base_t(params, ctx, dynamic_thread_count, thread_count)
         , stree_depth_()
         , iteration_count_mean_()
         , iteration_count_probe_count_()
