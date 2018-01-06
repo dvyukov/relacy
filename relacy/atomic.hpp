@@ -683,9 +683,14 @@ struct atomic_data_impl : atomic_data
 
         ~history_record()
         {
-            free(acq_rel_order_);
-            free(last_seen_order_);
+            //free(acq_rel_order_);
+            //free(last_seen_order_);
         }
+
+    private:
+        history_record(const history_record&);
+        history_record& operator=(const history_record&);
+
     };
 
     static size_t const history_size = atomic_history_size;
@@ -745,13 +750,13 @@ struct atomic_data_impl : atomic_data
         {
             history_[i].~history_record();
         }
+        //free(history_);
     }
 
 private:
     atomic_data_impl(const atomic_data_impl&);
     atomic_data_impl& operator = (const atomic_data_impl&);
 };
-
 
 }
 
