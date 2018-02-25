@@ -161,7 +161,7 @@ private:
         //??? do I need this scheduler call?
         c.sched();
         sign_.check(info);
-        RL_HIST(event_t) {this, event_t::type_notify_one, ws_.size()} RL_HIST_END();
+        RL_HIST(event_t) {this, event_t::type_notify_one, ws_.size(), unpark_reason_unknown} RL_HIST_END();
         ws_.unpark_one(c, info);
     }
 
@@ -171,7 +171,7 @@ private:
         //??? do I need this scheduler call?
         c.sched();
         sign_.check(info);
-        RL_HIST(event_t) {this, event_t::type_notify_all, ws_.size()} RL_HIST_END();
+        RL_HIST(event_t) {this, event_t::type_notify_all, ws_.size(), unpark_reason_unknown} RL_HIST_END();
         ws_.unpark_all(c, info);
     }
 
@@ -180,7 +180,7 @@ private:
         //!!! detect whether mutex is the same
         context& c = ctx();
         sign_.check(info);
-        RL_HIST(event_t) {this, event_t::type_wait_enter} RL_HIST_END();
+        RL_HIST(event_t) {this, event_t::type_wait_enter, ws_.size(), unpark_reason_unknown} RL_HIST_END();
         lock.unlock(info);
         sign_.check(info);
         bool allow_spurious_wakeup = (spurious_wakeup_limit_ > 0);
@@ -202,17 +202,17 @@ private:
     {
         context& c = ctx();
         sign_.check(info);
-        RL_HIST(event_t) {this, event_t::type_wait_pred_enter} RL_HIST_END();
+        RL_HIST(event_t) {this, event_t::type_wait_pred_enter, ws_.size(), unpark_reason_unknown} RL_HIST_END();
         while (!pred.exec())
         {
             sema_wakeup_reason reason = wait(lock, is_timed, info);
             if (reason == sema_wakeup_reason_timeout)
             {
-                RL_HIST(event_t) {this, event_t::type_wait_pred_exit} RL_HIST_END();
+                RL_HIST(event_t) {this, event_t::type_wait_pred_exit, ws_.size(), unpark_reason_unknown} RL_HIST_END();
                 return pred.exec();
             }
         }
-        RL_HIST(event_t) {this, event_t::type_wait_pred_exit} RL_HIST_END();
+        RL_HIST(event_t) {this, event_t::type_wait_pred_exit, ws_.size(), unpark_reason_unknown} RL_HIST_END();
         return true;
     }
 };

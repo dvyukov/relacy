@@ -214,6 +214,7 @@ inline void create_fiber(fiber_t& fib, void(*ufnc)(void*), void* uctx)
 
 inline void delete_fiber(fiber_t& fib)
 {
+    (void)fib;
     //(::free)(fib.uc_stack.ss_sp);
 }
 

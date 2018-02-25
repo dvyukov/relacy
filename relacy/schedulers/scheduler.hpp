@@ -43,6 +43,7 @@ struct scheduler_thread_info
 
     scheduler_thread_info(thread_id_t thread_count)
     {
+        (void)thread_count;
     }
 
     void reset(test_params& /*params*/)

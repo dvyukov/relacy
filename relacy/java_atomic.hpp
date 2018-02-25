@@ -122,6 +122,7 @@ public:
     }
 
     jatomic(jatomic const& r)
+        : generic_atomic<T, true>()
     {
         T const value = r.load(mo_seq_cst, $);
         //??? whether here must be mo_relaxed or mo_release?
