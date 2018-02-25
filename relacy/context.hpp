@@ -1233,6 +1233,11 @@ inline void systemwide_fence(debug_info_param info)
 } // namespace rl
 
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Winline-new-delete"
+#endif
+
 #ifndef RL_GC
 inline void* operator new (size_t size, rl::debug_info_param info)
 {
@@ -1302,6 +1307,10 @@ inline void operator delete [] (void* p) throw()
     else
         (::free)(p);
 }
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 #define RL_NEW_PROXY rl::new_proxy($) % new
 #define RL_DELETE_PROXY rl::delete_proxy($) , delete
