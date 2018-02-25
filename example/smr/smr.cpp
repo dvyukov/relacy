@@ -36,6 +36,7 @@ struct smr_test : rl::test_suite<smr_test, thread_count>
 
     void push(unsigned index, int data)
     {
+        (void)index;
         node* n = new node ();
         n->VAR(data_) = data;
         node* next = head_.load(std::memory_order_relaxed);

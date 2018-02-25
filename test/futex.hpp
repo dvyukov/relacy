@@ -51,6 +51,7 @@ struct test_futex_deadlock : rl::test_suite<test_futex_deadlock, 1, rl::test_res
 	
 	void thread(unsigned index)
 	{
+    (void)index;
 		state.store(0, rl::memory_order_relaxed);
 		int rv = futex(&state, FUTEX_WAIT, 0, 0, 0, 0);
 		assert(rv == EINTR);
