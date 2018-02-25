@@ -47,9 +47,6 @@ struct win_waitable_object : win_object
     virtual void* prepare_wait(debug_info_param info) = 0;
 };
 
-
-
-
 struct sema_data
 {
     virtual sema_wakeup_reason wait(bool try_wait, bool is_timed, debug_info_param info) = 0;
@@ -61,17 +58,15 @@ struct sema_data
     virtual ~sema_data() {} // just to calm down gcc
 };
 
-
-
-
-template<thread_id_t thread_count>
 class sema_data_impl : public sema_data
 {
 public:
-    sema_data_impl(bool spurious_wakeups, unsigned initial_count, unsigned max_count)
+    sema_data_impl(thread_id_t thread_count, bool spurious_wakeups, unsigned initial_count, unsigned max_count)
         : spurious_wakeups_(spurious_wakeups)
         , count_(initial_count)
         , max_count_(max_count)
+        , ws_(thread_count)
+        , sync_(thread_count)
     {
         RL_VERIFY(max_count <= INT_MAX);
     }
@@ -251,8 +246,8 @@ private:
     bool const spurious_wakeups_;
     unsigned count_;
     unsigned const max_count_;
-    waitset<thread_count> ws_;
-    sync_var<thread_count> sync_;
+    waitset<> ws_;
+    sync_var  sync_;
 
     virtual bool is_signaled(debug_info_param info)
     {

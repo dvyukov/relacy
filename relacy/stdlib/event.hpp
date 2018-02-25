@@ -36,16 +36,14 @@ struct event_data
     virtual ~event_data() {} // just to calm down gcc
 };
 
-
-
-
-template<thread_id_t thread_count>
 class event_data_impl : public event_data
 {
 public:
-    event_data_impl(bool manual_reset, bool initial_state)
+    event_data_impl(thread_id_t thread_count, bool manual_reset, bool initial_state)
         : manual_reset_(manual_reset)
         , state_(initial_state)
+        , ws_(thread_count)
+        , sync_(thread_count)
     {
     }
 
@@ -58,8 +56,8 @@ private:
     signature<0xdada1234> sign_;
     bool const manual_reset_;
     bool state_;
-    waitset<thread_count> ws_;
-    sync_var<thread_count> sync_;
+    waitset<> ws_;
+    sync_var  sync_;
 
     struct state_event
     {

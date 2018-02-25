@@ -23,12 +23,12 @@
 namespace rl
 {
 
-
-template<thread_id_t thread_count>
 class thread_sync_object : public win_waitable_object
 {
 public:
-    thread_sync_object()
+    thread_sync_object(thread_id_t thread_count)
+        : ws_(thread_count)
+        , sync_(thread_count)
     {
     }
 
@@ -62,8 +62,8 @@ public:
 
 private:
     bool finished_;
-    waitset<thread_count> ws_;
-    sync_var<thread_count> sync_;
+    waitset<>              ws_;
+    sync_var               sync_;
 
     virtual void deinit(debug_info_param info)
     {
