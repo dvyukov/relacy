@@ -13,8 +13,8 @@
 #   pragma once
 #endif
 
-#include "base.hpp"
-#include "context_base.hpp"
+#include "../base.hpp"
+#include "../context_base.hpp"
 
 
 namespace rl
@@ -35,13 +35,15 @@ enum thread_finish_result
     thread_finish_result_deadlock,
 };
 
-
-
 struct scheduler_thread_info
 {
     thread_id_t             index_;
     unsigned                block_count_;
     thread_state_e          state_;
+
+    scheduler_thread_info(thread_id_t thread_count)
+    {
+    }
 
     void reset(test_params& /*params*/)
     {
@@ -50,10 +52,7 @@ struct scheduler_thread_info
     }
 };
 
-
-
-
-template<typename derived_t, typename thread_info_type, thread_id_t thread_count>
+template<typename derived_t, typename thread_info_type>
 class scheduler : nocopy<>
 {
 public:
@@ -66,14 +65,24 @@ public:
         queue<task_t>                           queue_;
     };
 
-    scheduler(test_params& params, shared_context_t& ctx, thread_id_t dynamic_thread_count)
+    scheduler(test_params& params, shared_context_t& ctx, thread_id_t dynamic_thread_count, thread_id_t thread_count)
         : params_(params)
         , ctx_(ctx)
         , total_dynamic_threads_(dynamic_thread_count)
         , iter_()
+        , threads_(static_cast<thread_info_t*>(calloc(thread_count, sizeof(thread_info_t))))
         , thread_()
+        , timed_threads_(static_cast<thread_info_t**>(calloc(thread_count, sizeof(thread_info_t*))))
+        , spurious_threads_(static_cast<thread_info_t**>(calloc(thread_count, sizeof(thread_info_t*))))
+        , dynamic_threads_(static_cast<thread_info_t**>(calloc(thread_count, sizeof(thread_info_t*))))
+        , thread_count_(thread_count)
     {
-        for (thread_id_t i = 0; i != thread_count; ++i)
+        for (thread_id_t i = 0; i != thread_count_; ++i)
+        {
+            new (threads_ + i) thread_info_t (thread_count);
+        }
+
+        for (thread_id_t i = 0; i != thread_count_; ++i)
         {
             threads_[i].index_ = i;
         }
@@ -82,19 +91,19 @@ public:
     thread_id_t iteration_begin(iteration_t iter)
     {
         iter_ = iter;
-        running_threads_count = thread_count;
+        running_threads_count = thread_count_;
         finished_thread_count_ = 0;
         timed_thread_count_ = 0;
         spurious_thread_count_ = 0;
         dynamic_thread_count_ = 0;
 
-        for (thread_id_t i = 0; i != thread_count; ++i)
+        for (thread_id_t i = 0; i != thread_count_; ++i)
         {
             running_threads.push_back(i);
             threads_[i].reset(params_);
         }
 
-        for (thread_id_t i = thread_count - total_dynamic_threads_; i != thread_count; ++i)
+        for (thread_id_t i = thread_count_ - total_dynamic_threads_; i != thread_count_; ++i)
         {
             dynamic_threads_[dynamic_thread_count_++] = &threads_[i];
             block_thread(i, false);
@@ -143,13 +152,13 @@ public:
         if (is_timed)
         {
             timed_threads_[timed_thread_count_++] = thread_;
-            RL_VERIFY(timed_thread_count_ <= thread_count);
+            RL_VERIFY(timed_thread_count_ <= thread_count_);
         }
 
         if (allow_spurious_wakeup)
         {
             spurious_threads_[spurious_thread_count_++] = thread_;
-            RL_VERIFY(spurious_thread_count_ <= thread_count);
+            RL_VERIFY(spurious_thread_count_ <= thread_count_);
         }
 
         block_thread(thread_->index_, true);
@@ -198,7 +207,7 @@ public:
         finished_thread_count_ += 1;
         self().thread_finished_impl();
 retry:
-        if (finished_thread_count_ == thread_count)
+        if (finished_thread_count_ == thread_count_)
         {
             return thread_finish_result_last;
         }
@@ -239,13 +248,26 @@ retry:
         self().set_state_impl(ss);
     }
 
+    ~scheduler()
+    {
+        for (thread_id_t i = 0; i != thread_count_; ++i)
+        {
+            threads_[i].~thread_info_t();
+        }
+
+        free(threads_);
+        free(timed_threads_);
+        free(spurious_threads_);
+        free(dynamic_threads_);
+    }
+
 protected:
     test_params&                    params_;
     shared_context_t&               ctx_;
     thread_id_t const               total_dynamic_threads_;
     iteration_t                     iter_;
 
-    aligned<thread_info_t>          threads_ [thread_count];
+    thread_info_t*                  threads_;
     thread_info_t*                  thread_;
 
     vector<thread_id_t>::type       running_threads;
@@ -255,18 +277,19 @@ protected:
     //!!! doesn't timed/spurious waits must belong to full scheduler?
     // hyphotesis: random scheduler can ignore timed/spurious waits
     // (however must detect deadlock with spurious threads)
-    thread_info_t*                  timed_threads_ [thread_count];
+    thread_info_t**                 timed_threads_;
     thread_id_t                     timed_thread_count_;
 
-    thread_info_t*                  spurious_threads_ [thread_count];
+    thread_info_t**                 spurious_threads_;
     thread_id_t                     spurious_thread_count_;
 
-    thread_info_t*                  dynamic_threads_ [thread_count];
+    thread_info_t**                 dynamic_threads_;
     thread_id_t                     dynamic_thread_count_;
+    thread_id_t const               thread_count_;
 
     void block_thread(thread_id_t th, bool yield)
     {
-        RL_VERIFY(th < thread_count);
+        RL_VERIFY(th < thread_count_);
         thread_info_t& t = threads_[th];
         RL_VERIFY(t.state_ != thread_state_finished);
         if (t.block_count_++)
@@ -288,7 +311,7 @@ protected:
 
     bool unblock_thread(thread_id_t th)
     {
-        RL_VERIFY(th < thread_count);
+        RL_VERIFY(th < thread_count_);
         thread_info_t& t = threads_[th];
         RL_VERIFY(t.state_ == thread_state_blocked);
         if (--t.block_count_)
@@ -301,6 +324,9 @@ protected:
     }
 
 private:
+    scheduler(const scheduler&);
+    scheduler& operator=(const scheduler&);
+
     derived_t& self()
     {
         return *static_cast<derived_t*>(this);

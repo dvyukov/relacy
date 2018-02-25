@@ -43,8 +43,6 @@ struct generic_mutex_data : nocopy<>
     virtual ~generic_mutex_data() {} // just to calm down gcc
 };
 
-
-template<thread_id_t thread_count>
 class generic_mutex_data_impl : public generic_mutex_data
 {
 public:
@@ -94,20 +92,24 @@ public:
         }
     };
 
-    generic_mutex_data_impl(bool is_rw, bool is_exclusive_recursive, bool is_shared_recursive, bool failing_try_lock)
+    generic_mutex_data_impl(thread_id_t thread_count, bool is_rw, bool is_exclusive_recursive, bool is_shared_recursive, bool failing_try_lock)
         : is_rw_(is_rw)
         , is_exclusive_recursive_(is_exclusive_recursive)
         , is_shared_recursive_(is_shared_recursive)
         , failing_try_lock_(failing_try_lock)
+        , sync_(thread_count)
         , exclusive_owner_(state_free)
         , exclusive_recursion_count_(0)
+        , exclusive_waitset_(thread_count)
+        , shared_waitset_(thread_count)
+        , shared_owner_(static_cast<timestamp_t*>(calloc(thread_count, sizeof(timestamp_t))))
         , shared_lock_count_(0)
         , try_lock_failed_()
     {
         context& c = ctx();
         (void)c;
         RL_VERIFY(false == c.invariant_executing);
-        foreach<thread_count>(shared_owner_, &assign_zero);
+        foreach(thread_count, shared_owner_, &assign_zero);
     }
 
     ~generic_mutex_data_impl()
@@ -122,6 +124,7 @@ public:
             RL_HIST(event_t) {this, event_t::type_destroying_owned_mutex} RL_HIST_END();
             RL_ASSERT_IMPL(false, test_result_destroying_owned_mutex, "", $);
         }
+        free(shared_owner_);
     }
 
     virtual bool lock_exclusive(bool is_timed, debug_info_param info)
@@ -472,12 +475,12 @@ private:
     bool is_exclusive_recursive_;
     bool is_shared_recursive_;
     bool failing_try_lock_;
-    sync_var<thread_count> sync_;
+    sync_var sync_;
     thread_id_t exclusive_owner_;
     unsigned exclusive_recursion_count_;
-    waitset<thread_count> exclusive_waitset_;
-    waitset<thread_count> shared_waitset_;
-    timestamp_t shared_owner_ [thread_count];
+    waitset<> exclusive_waitset_;
+    waitset<> shared_waitset_;
+    timestamp_t* shared_owner_;
     unsigned shared_lock_count_;
     bool try_lock_failed_;
 

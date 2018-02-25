@@ -13,20 +13,17 @@
 #   pragma once
 #endif
 
-#include "base.hpp"
+#include "../base.hpp"
 #include "scheduler.hpp"
-#include "random.hpp"
-
+#include "../random.hpp"
 
 namespace rl
 {
 
-
-template<thread_id_t thread_count>
-class random_scheduler : public scheduler<random_scheduler<thread_count>, scheduler_thread_info, thread_count>
+class random_scheduler : public scheduler<random_scheduler, scheduler_thread_info>
 {
 public:
-    typedef scheduler<random_scheduler<thread_count>, scheduler_thread_info, thread_count> base_t;
+    typedef scheduler<random_scheduler, scheduler_thread_info> base_t;
     typedef typename base_t::thread_info_t thread_info_t;
     typedef typename base_t::shared_context_t shared_context_t;
 
@@ -34,8 +31,8 @@ public:
     {
     };
 
-    random_scheduler(test_params& params, shared_context_t& ctx, thread_id_t dynamic_thread_count)
-        : base_t(params, ctx, dynamic_thread_count)
+    random_scheduler(test_params& params, shared_context_t& ctx, thread_id_t dynamic_thread_count, thread_id_t thread_count)
+        : base_t(params, ctx, dynamic_thread_count, thread_count)
     {
     }
 

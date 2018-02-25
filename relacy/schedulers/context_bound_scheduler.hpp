@@ -13,45 +13,42 @@
 #   pragma once
 #endif
 
-#include "base.hpp"
+#include "../base.hpp"
 #include "full_search_scheduler.hpp"
-#include "foreach.hpp"
-
+#include "../foreach.hpp"
 
 namespace rl
 {
 
-
-template<thread_id_t thread_count>
-struct context_bound_scheduler_thread_info : tree_search_scheduler_thread_info<thread_count>
+struct context_bound_scheduler_thread_info : tree_search_scheduler_thread_info
 {
     unsigned sched_count_;
     unsigned forced_context_switch_count_;
 
+    context_bound_scheduler_thread_info(thread_id_t thread_count)
+        : tree_search_scheduler_thread_info(thread_count)
+    {
+
+    }
+
     void reset(test_params& params)
     {
-        tree_search_scheduler_thread_info<thread_count>::reset(params);
+        tree_search_scheduler_thread_info::reset(params);
         sched_count_ = 0;
         forced_context_switch_count_ = 0;
     }
 };
 
-
-
-
-template<thread_id_t thread_count>
 class context_bound_scheduler
-    : public tree_search_scheduler<context_bound_scheduler<thread_count>
-        , context_bound_scheduler_thread_info<thread_count>, thread_count>
+    : public tree_search_scheduler<context_bound_scheduler, context_bound_scheduler_thread_info>
 {
 public:
-    typedef tree_search_scheduler<context_bound_scheduler<thread_count>
-        , context_bound_scheduler_thread_info<thread_count>, thread_count> base_t;
+    typedef tree_search_scheduler<context_bound_scheduler, context_bound_scheduler_thread_info> base_t;
     typedef typename base_t::thread_info_t thread_info_t;
     typedef typename base_t::shared_context_t shared_context_t;
 
-    context_bound_scheduler(test_params& params, shared_context_t& ctx, thread_id_t dynamic_thread_count)
-        : base_t(params, ctx, dynamic_thread_count)
+    context_bound_scheduler(test_params& params, shared_context_t& ctx, thread_id_t dynamic_thread_count, thread_id_t thread_count)
+        : base_t(params, ctx, dynamic_thread_count, thread_count)
     {
     }
 

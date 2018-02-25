@@ -15,10 +15,8 @@
 
 #include "base.hpp"
 
-
 namespace rl
 {
-
 
 struct context_addr_hash_iface
 {
@@ -26,10 +24,7 @@ struct context_addr_hash_iface
     virtual             ~context_addr_hash_iface    () {} // to calm down g++
 };
 
-
-
-
-template<typename base_t, thread_id_t thread_count>
+template<typename base_t>
 class context_addr_hash_impl : protected base_t
 {
 public:
@@ -74,7 +69,6 @@ private:
         }
     }
 };
-
 
 }
 
