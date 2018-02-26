@@ -32,8 +32,7 @@ struct test_suite : nocopy<>
     struct params
     {
         static thread_id_t const static_thread_count = static_thread_count_param;
-        static thread_id_t const dynamic_thread_count = derived_t::dynamic_thread_count;
-        static thread_id_t const thread_count = static_thread_count + dynamic_thread_count;
+        static thread_id_t const thread_count = static_thread_count;
         static test_result_e const expected_result = result;
     };
 

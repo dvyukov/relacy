@@ -513,7 +513,8 @@ int main()
             //!!! make it work under sched_full
             if (sched == rl::sched_full
                 && (tests[i] == (rl::simulate_f)&rl::simulate<test_pthread_condvar>
-                    || tests[i] == (rl::simulate_f)&rl::simulate<test_win_condvar>))
+                    || tests[i] == (rl::simulate_f)&rl::simulate<test_win_condvar>
+                    || tests[i] == (rl::simulate_f)&rl::simulate<test_pthread_rwlock>))
                 continue;
 
             rl::ostringstream stream;
@@ -525,6 +526,21 @@ int main()
             params.progress_stream = &stream;
             params.context_bound = 2;
             params.execution_depth_limit = 500;
+
+            if (tests[i] == (rl::simulate_f)&rl::simulate<test_pthread_thread> || tests[i] == (rl::simulate_f)&rl::simulate<test_win_thread>)
+            {
+                params.dynamic_thread_count = 2;
+            }
+
+            if (tests[i] == (rl::simulate_f)&rl::simulate<dyn_thread_basic_test> || tests[i] == (rl::simulate_f)&rl::simulate<dyn_thread_win32_test>)
+            {
+                params.dynamic_thread_count = 4;
+            }
+
+            if (tests[i] == (rl::simulate_f)&rl::simulate<dyn_thread_visibility_test>)
+            {
+                params.dynamic_thread_count = 1;
+            }
 
             if (false == tests[i](params))
             {
@@ -539,6 +555,7 @@ int main()
                 std::cout << params.test_name << "...OK" << std::endl;
             }
         }
+
         std::cout << std::endl;
     }
 

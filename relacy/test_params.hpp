@@ -67,6 +67,9 @@ struct test_params
     string                      test_name;
     string                      final_state;
 
+    // threads
+    thread_id_t                 dynamic_thread_count;
+
     test_params()
     {
         iteration_count         = 1000;
@@ -81,6 +84,7 @@ struct test_params
 
         test_result             = test_result_success;
         stop_iteration          = 0;
+        dynamic_thread_count    = 0;
     }
 };
 
