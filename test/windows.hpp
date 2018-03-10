@@ -5,8 +5,6 @@
 
 struct test_win_thread : rl::test_suite<test_win_thread, 1>
 {
-    static size_t const dynamic_thread_count = 2;
-
     VAR_T(int) data;
 
     static unsigned long RL_STDCALL win_func(void* param)

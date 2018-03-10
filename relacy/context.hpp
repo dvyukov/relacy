@@ -1034,7 +1034,6 @@ bool simulate(thread_id_t thread_count)
 template<void(*func)(), size_t thread_count>
 struct simulate_thunk : test_suite<simulate_thunk<func, thread_count>, 1>
 {
-    static size_t const dynamic_thread_count = thread_count;
     void thread(unsigned)
     {
         func();

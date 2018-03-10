@@ -27,8 +27,6 @@ template<
     test_result_e result = test_result_success>
 struct test_suite : nocopy<>
 {
-    static thread_id_t const dynamic_thread_count = 0;
-
     struct params
     {
         static thread_id_t const static_thread_count = static_thread_count_param;

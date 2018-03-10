@@ -7,8 +7,6 @@
 
 struct dyn_thread_basic_test : rl::test_suite<dyn_thread_basic_test, 2>
 {
-    static unsigned const dynamic_thread_count = 4;
-
     rl::var<int> data1;
     rl::var<int> data2;
     rl::atomic<int> data3;
@@ -72,8 +70,6 @@ struct dyn_thread_basic_test : rl::test_suite<dyn_thread_basic_test, 2>
 
 struct dyn_thread_win32_test : rl::test_suite<dyn_thread_win32_test, 2>
 {
-    static unsigned const dynamic_thread_count = 4;
-
     rl::var<int> data1;
     rl::var<int> data2;
     rl::atomic<int> data3;
@@ -132,8 +128,6 @@ struct dyn_thread_win32_test : rl::test_suite<dyn_thread_win32_test, 2>
 
 struct dyn_thread_visibility_test : rl::test_suite<dyn_thread_visibility_test, 1>
 {
-    static unsigned const dynamic_thread_count = 1;
-
     rl::var<int> data;
 
     static unsigned long RL_STDCALL thread(void* p)
