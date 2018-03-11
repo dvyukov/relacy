@@ -193,7 +193,7 @@ private:
 };
 
 
-struct test_mpmc : rl::test_suite<test_mpmc, 6>
+struct test_mpmc : rl::test_suite<> // thread count = 6
 {
     mpmcq<int> q;
 
@@ -439,7 +439,7 @@ struct eventcount
 
 
 
-struct test_ec : rl::test_suite<test_ec, 8>
+struct test_ec : rl::test_suite<>
 {
     std::atomic<int> x [2];
     eventcount ec;
@@ -506,6 +506,7 @@ int main()
     rl::test_params p;
     p.iteration_count = 20000000;
     p.initial_state = "10000000";
+    p.static_thread_count = 8;
     rl::simulate<test_ec>(p);
 }
 

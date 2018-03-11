@@ -129,7 +129,7 @@ private:
 
 
 
-struct ws_deque_test : rl::test_suite<ws_deque_test>
+struct ws_deque_test : rl::test_suite<>
 {
     ws_deque<int> q;
     bool state [2];

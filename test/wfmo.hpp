@@ -4,7 +4,7 @@
 
 
 
-struct test_wfmo_all : rl::test_suite<test_wfmo_all>
+struct test_wfmo_all : rl::test_suite<>
 {
     HANDLE sema1;
     HANDLE sema2;
@@ -44,7 +44,7 @@ struct test_wfmo_all : rl::test_suite<test_wfmo_all>
 
 
 
-struct test_wfmo_single : rl::test_suite<test_wfmo_single, rl::test_result_until_condition_hit>
+struct test_wfmo_single : rl::test_suite<rl::test_result_until_condition_hit>
 {
     HANDLE sema1;
     HANDLE sema2;
@@ -86,7 +86,7 @@ struct test_wfmo_single : rl::test_suite<test_wfmo_single, rl::test_result_until
 
 
 
-struct test_wfmo_timeout : rl::test_suite<test_wfmo_timeout, rl::test_result_until_condition_hit>
+struct test_wfmo_timeout : rl::test_suite<rl::test_result_until_condition_hit>
 {
     HANDLE sema1;
     HANDLE sema2;
@@ -128,7 +128,7 @@ struct test_wfmo_timeout : rl::test_suite<test_wfmo_timeout, rl::test_result_unt
 
 
 
-struct test_wfmo_try : rl::test_suite<test_wfmo_try>
+struct test_wfmo_try : rl::test_suite<>
 {
     HANDLE sema1;
     HANDLE sema2;
@@ -172,7 +172,7 @@ struct test_wfmo_try : rl::test_suite<test_wfmo_try>
 
 
 
-struct test_wfmo_mixed : rl::test_suite<test_wfmo_mixed>
+struct test_wfmo_mixed : rl::test_suite<>
 {
 	HANDLE sem [2];
 	
@@ -212,7 +212,7 @@ struct test_wfmo_mixed : rl::test_suite<test_wfmo_mixed>
 
 
 
-struct test_wfmo_mixed2 : rl::test_suite<test_wfmo_mixed2>
+struct test_wfmo_mixed2 : rl::test_suite<>
 {
 	HANDLE sem [2];
 	
@@ -252,7 +252,7 @@ struct test_wfmo_mixed2 : rl::test_suite<test_wfmo_mixed2>
 
 
 
-struct test_wfmo_event_all : rl::test_suite<test_wfmo_event_all>
+struct test_wfmo_event_all : rl::test_suite<>
 {
 	HANDLE ev [2];
 	rl::atomic<int> state;
@@ -290,7 +290,7 @@ struct test_wfmo_event_all : rl::test_suite<test_wfmo_event_all>
 
 
 
-struct test_wfmo_event_any : rl::test_suite<test_wfmo_event_any>
+struct test_wfmo_event_any : rl::test_suite<>
 {
 	HANDLE ev [2];
 	rl::atomic<int> state;
@@ -328,7 +328,7 @@ struct test_wfmo_event_any : rl::test_suite<test_wfmo_event_any>
 
 
 
-struct test_wfmo_atomic : rl::test_suite<test_wfmo_atomic, rl::test_result_until_condition_hit>
+struct test_wfmo_atomic : rl::test_suite<rl::test_result_until_condition_hit>
 {
 	HANDLE ev [2];
 	rl::atomic<int> state;

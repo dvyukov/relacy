@@ -687,7 +687,7 @@ public:
 }; 
 
 
-struct eventcount_test : rl::test_suite<eventcount_test, 2>
+struct eventcount_test : rl::test_suite<>
 {
     void thread(unsigned index)
     {
@@ -701,6 +701,7 @@ struct eventcount_test : rl::test_suite<eventcount_test, 2>
 int main()
 {
     rl::test_params p;
+    p.static_thread_count = 2;
     //p.iteration_count = 1000000;
     rl::simulate<eventcount_test>(p);
 }

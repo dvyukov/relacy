@@ -9,5 +9,7 @@ add_subdirectory(jtest)
 add_subdirectory(ntest)
 
 add_executable(main main.cpp)
+add_executable(iriw iriw.cpp)
 
 add_test(main main)
+add_test(iriw iriw)

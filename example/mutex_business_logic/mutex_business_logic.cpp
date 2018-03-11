@@ -97,7 +97,7 @@ private:
 
 
 
-struct business_logic_test : rl::test_suite<business_logic_test>
+struct business_logic_test : rl::test_suite<>
 {
     business_logic bl;
 

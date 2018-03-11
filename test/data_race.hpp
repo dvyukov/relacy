@@ -5,7 +5,7 @@
 
 
 
-struct race_ld_ld_test : rl::test_suite<race_ld_ld_test>
+struct race_ld_ld_test : rl::test_suite<>
 {
     rl::var<int> x;
 
@@ -26,7 +26,7 @@ struct race_ld_ld_test : rl::test_suite<race_ld_ld_test>
 
 
 
-struct race_ld_st_test : rl::test_suite<race_ld_st_test, rl::test_result_data_race>
+struct race_ld_st_test : rl::test_suite<rl::test_result_data_race>
 {
     rl::var<int> x;
 
@@ -47,7 +47,7 @@ struct race_ld_st_test : rl::test_suite<race_ld_st_test, rl::test_result_data_ra
 
 
 
-struct race_st_st_test : rl::test_suite<race_st_st_test, rl::test_result_data_race>
+struct race_st_st_test : rl::test_suite<rl::test_result_data_race>
 {
     rl::var<int> x;
 
@@ -63,7 +63,7 @@ struct race_st_st_test : rl::test_suite<race_st_st_test, rl::test_result_data_ra
 
 
 
-struct race_seq_ld_ld_test : rl::test_suite<race_seq_ld_ld_test>
+struct race_seq_ld_ld_test : rl::test_suite<>
 {
     std::atomic<int> a;
     rl::var<int> x;
@@ -94,7 +94,7 @@ struct race_seq_ld_ld_test : rl::test_suite<race_seq_ld_ld_test>
 
 
 
-struct race_seq_ld_st_test : rl::test_suite<race_seq_ld_st_test, rl::test_result_data_race>
+struct race_seq_ld_st_test : rl::test_suite<rl::test_result_data_race>
 {
     std::atomic<int> a;
     rl::var<int> x;
@@ -125,7 +125,7 @@ struct race_seq_ld_st_test : rl::test_suite<race_seq_ld_st_test, rl::test_result
 
 
 
-struct race_seq_st_ld_test : rl::test_suite<race_seq_st_ld_test, rl::test_result_data_race>
+struct race_seq_st_ld_test : rl::test_suite<rl::test_result_data_race>
 {
     std::atomic<int> a;
     rl::var<int> x;
@@ -155,7 +155,7 @@ struct race_seq_st_ld_test : rl::test_suite<race_seq_st_ld_test, rl::test_result
 
 
 
-struct race_seq_st_st_test : rl::test_suite<race_seq_st_st_test, rl::test_result_data_race>
+struct race_seq_st_st_test : rl::test_suite<rl::test_result_data_race>
 {
     std::atomic<int> a;
     rl::var<int> x;
@@ -185,7 +185,7 @@ struct race_seq_st_st_test : rl::test_suite<race_seq_st_st_test, rl::test_result
 
 
 
-struct race_uninit_test : rl::test_suite<race_uninit_test, rl::test_result_unitialized_access>
+struct race_uninit_test : rl::test_suite<rl::test_result_unitialized_access>
 {
     std::atomic<int> a;
     std::atomic<int> x;
@@ -215,7 +215,7 @@ struct race_uninit_test : rl::test_suite<race_uninit_test, rl::test_result_uniti
 
 
 
-struct race_indirect_test : rl::test_suite<race_indirect_test, rl::test_result_data_race>
+struct race_indirect_test : rl::test_suite<rl::test_result_data_race>
 {
     std::atomic<int> a;
     rl::var<int> x;

@@ -65,7 +65,7 @@ private:
 
 
 
-struct stack_test : rl::test_suite<stack_test>
+struct stack_test : rl::test_suite<>
 {
     stack s_;
 

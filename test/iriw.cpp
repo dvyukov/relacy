@@ -1,6 +1,6 @@
 #include "../relacy/relacy_std.hpp"
 
-struct test : rl::test_suite<test, 4> {
+struct test : rl::test_suite<> {
   std::atomic<int> x_;
   std::atomic<int> y_;
   int r2x, r2y, r3x, r3y;
@@ -41,6 +41,7 @@ struct test : rl::test_suite<test, 4> {
 
 int main() {
   rl::test_params p;
+  p.static_thread_count = 4;
   p.iteration_count = 1000000;
   rl::simulate<test>(p);
 }

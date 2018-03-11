@@ -5,7 +5,7 @@
 
 
 
-struct dyn_thread_basic_test : rl::test_suite<dyn_thread_basic_test>
+struct dyn_thread_basic_test : rl::test_suite<>
 {
     rl::var<int> data1;
     rl::var<int> data2;
@@ -68,7 +68,7 @@ struct dyn_thread_basic_test : rl::test_suite<dyn_thread_basic_test>
 
 
 
-struct dyn_thread_win32_test : rl::test_suite<dyn_thread_win32_test>
+struct dyn_thread_win32_test : rl::test_suite<>
 {
     rl::var<int> data1;
     rl::var<int> data2;
@@ -126,7 +126,7 @@ struct dyn_thread_win32_test : rl::test_suite<dyn_thread_win32_test>
 };
 
 
-struct dyn_thread_visibility_test : rl::test_suite<dyn_thread_visibility_test>
+struct dyn_thread_visibility_test : rl::test_suite<>
 {
     rl::var<int> data;
 

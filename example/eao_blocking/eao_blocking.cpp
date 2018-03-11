@@ -152,7 +152,7 @@ private:
 */
 
 /*
-struct business_logic_test : rl::test_suite<business_logic_test, 2>
+struct business_logic_test : rl::test_suite<> // thread count = 2
 {
     business_logic bl;
 

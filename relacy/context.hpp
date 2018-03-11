@@ -1019,7 +1019,7 @@ bool simulate(test_params& params)
 }
 
 template<void(*func)()>
-struct simulate_thunk : test_suite<simulate_thunk<func> >
+struct simulate_thunk : test_suite<>
 {
     void thread(unsigned)
     {

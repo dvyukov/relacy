@@ -21,9 +21,7 @@ namespace rl
 {
 
 
-template<
-    typename derived_t,
-    test_result_e result = test_result_success>
+template<test_result_e result = test_result_success>
 struct test_suite : nocopy<>
 {
     struct params

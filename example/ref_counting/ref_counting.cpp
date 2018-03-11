@@ -54,7 +54,7 @@ rc_object* get_from_channel(rl::atomic<rc_object*>& ch)
 
 
 
-struct ref_counting_test : rl::test_suite<ref_counting_test>
+struct ref_counting_test : rl::test_suite<>
 {
     std::atomic<rc_object*> channel;
 
@@ -98,7 +98,7 @@ struct ref_counting_test : rl::test_suite<ref_counting_test>
 
 
 
-struct ref_counting_test2 : rl::test_suite<ref_counting_test2> // thread count = 3
+struct ref_counting_test2 : rl::test_suite<> // thread count = 3
 {
     std::atomic<rc_object*> channel01;
     std::atomic<rc_object*> channel02;
@@ -215,7 +215,7 @@ struct ref_counting_test2 : rl::test_suite<ref_counting_test2> // thread count =
 
 
 
-struct ref_counting_test3 : rl::test_suite<ref_counting_test3> // thread count = 3
+struct ref_counting_test3 : rl::test_suite<> // thread count = 3
 {
     std::atomic<rc_object*> channel;
 

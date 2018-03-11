@@ -292,7 +292,7 @@ public:
 
 
 
-struct dlist_trx_test : rl::test_suite<dlist_trx_test, 4>
+struct dlist_trx_test : rl::test_suite<> // thread count = 4
 {
     dlist_trx list;
 

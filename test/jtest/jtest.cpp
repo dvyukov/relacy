@@ -65,7 +65,7 @@ private:
 
 
 
-struct stack_test : rl::test_suite<stack_test>
+struct stack_test : rl::test_suite<>
 {
     stack s_;
 
@@ -95,7 +95,7 @@ struct stack_test : rl::test_suite<stack_test>
 };
 
 
-struct test_api : rl::test_suite<test_api>
+struct test_api : rl::test_suite<>
 {
     void thread(unsigned)
     {
@@ -124,7 +124,7 @@ struct test_api : rl::test_suite<test_api>
     }
 };
 
-struct test_seq_cst_volatiles : rl::test_suite<test_seq_cst_volatiles>
+struct test_seq_cst_volatiles : rl::test_suite<>
 {
     rl::jvolatile<int> flag0;
     rl::jvolatile<int> flag1;
@@ -155,7 +155,7 @@ struct test_seq_cst_volatiles : rl::test_suite<test_seq_cst_volatiles>
     }
 };
 
-struct test_seq_cst_volatiles2 : rl::test_suite<test_seq_cst_volatiles2>
+struct test_seq_cst_volatiles2 : rl::test_suite<>
 {
     rl::jvolatile<int> x;
     rl::jvolatile<int> y;
@@ -196,7 +196,7 @@ struct test_seq_cst_volatiles2 : rl::test_suite<test_seq_cst_volatiles2>
 };
 
 template<int expected>
-struct test_unitialized_var : rl::test_suite<test_unitialized_var<expected>, rl::test_result_until_condition_hit>
+struct test_unitialized_var : rl::test_suite<rl::test_result_until_condition_hit>
 {
     rl::jvar<rl::jvar<int>*> www;
 

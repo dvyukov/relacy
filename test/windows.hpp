@@ -3,7 +3,7 @@
 #include "../relacy/windows.h"
 
 
-struct test_win_thread : rl::test_suite<test_win_thread>
+struct test_win_thread : rl::test_suite<>
 {
     VAR_T(int) data;
 
@@ -36,7 +36,7 @@ struct test_win_thread : rl::test_suite<test_win_thread>
 
 
 
-struct test_win_mutex : rl::test_suite<test_win_mutex>
+struct test_win_mutex : rl::test_suite<>
 {
     HANDLE mtx;
     VAR_T(int) data;
@@ -71,7 +71,7 @@ struct test_win_mutex : rl::test_suite<test_win_mutex>
 
 
 
-struct test_win_cs : rl::test_suite<test_win_cs>
+struct test_win_cs : rl::test_suite<>
 {
     CRITICAL_SECTION mtx;
     VAR_T(int) data;
@@ -102,7 +102,7 @@ struct test_win_cs : rl::test_suite<test_win_cs>
 };
 
 
-struct test_win_condvar : rl::test_suite<test_win_condvar>
+struct test_win_condvar : rl::test_suite<>
 {
     CONDITION_VARIABLE cv;
     CRITICAL_SECTION mtx;
@@ -154,7 +154,7 @@ struct test_win_condvar : rl::test_suite<test_win_condvar>
 
 
 
-struct test_win_condvar_srw : rl::test_suite<test_win_condvar_srw>
+struct test_win_condvar_srw : rl::test_suite<>
 {
     CONDITION_VARIABLE cv;
     SRWLOCK mtx;
@@ -206,7 +206,7 @@ struct test_win_condvar_srw : rl::test_suite<test_win_condvar_srw>
 
 
 
-struct test_win_sem : rl::test_suite<test_win_sem>
+struct test_win_sem : rl::test_suite<>
 {
     HANDLE sem1, sem2;
     VAR_T(int) data;
@@ -261,7 +261,7 @@ struct test_win_sem : rl::test_suite<test_win_sem>
 
 
 
-struct test_win_event : rl::test_suite<test_win_event>
+struct test_win_event : rl::test_suite<>
 {
 	HANDLE ev;
 	VAR_T(int) data;
@@ -300,7 +300,7 @@ struct test_win_event : rl::test_suite<test_win_event>
 
 
 
-struct test_FlushProcessWriteBuffers : rl::test_suite<test_FlushProcessWriteBuffers>
+struct test_FlushProcessWriteBuffers : rl::test_suite<>
 {
     std::atomic<int> x1;
     std::atomic<int> x2;

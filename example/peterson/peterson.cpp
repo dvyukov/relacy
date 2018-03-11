@@ -3,7 +3,7 @@
 #include "../../relacy/windows.h"
 
 
-struct peterson_mutex_test : rl::test_suite<peterson_mutex_test>
+struct peterson_mutex_test : rl::test_suite<>
 {
     std::atomic<int> flag0;
     std::atomic<int> flag1;
@@ -50,7 +50,7 @@ struct peterson_mutex_test : rl::test_suite<peterson_mutex_test>
 
 
 
-struct peterson_mutex_test2 : rl::test_suite<peterson_mutex_test2>
+struct peterson_mutex_test2 : rl::test_suite<>
 {
     std::atomic<int> flag0;
     std::atomic<int> flag1;
@@ -99,7 +99,7 @@ struct peterson_mutex_test2 : rl::test_suite<peterson_mutex_test2>
 
 
 
-struct peterson_mutex_test3 : rl::test_suite<peterson_mutex_test3>
+struct peterson_mutex_test3 : rl::test_suite<>
 {
     std::atomic<int> flag0;
     std::atomic<int> flag1;
@@ -150,7 +150,7 @@ struct peterson_mutex_test3 : rl::test_suite<peterson_mutex_test3>
 
 
 // FAILS WITH DATA RACE
-struct peterson_mutex_test4 : rl::test_suite<peterson_mutex_test4>
+struct peterson_mutex_test4 : rl::test_suite<>
 {
     std::atomic<int> flag0;
     std::atomic<int> flag1;
@@ -311,7 +311,7 @@ private:
 
 
 
-struct signaling_test : rl::test_suite<signaling_test> // thread count = 6
+struct signaling_test : rl::test_suite<> // thread count = 6
 {
     //rl::HANDLE              var_wait_for_items;
     //rl::CRITICAL_SECTION    mtx_items_avail;
