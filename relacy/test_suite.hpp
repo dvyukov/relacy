@@ -20,15 +20,8 @@
 namespace rl
 {
 
-
-template<test_result_e result = test_result_success>
 struct test_suite : nocopy<>
 {
-    struct params
-    {
-        static test_result_e const expected_result = result;
-    };
-
     void invariant() {}
     void before() {}
     void after() {}

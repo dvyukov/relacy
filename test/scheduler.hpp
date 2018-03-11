@@ -4,7 +4,7 @@
 
 
 
-struct livelock_test : rl::test_suite<rl::test_result_livelock>
+struct livelock_test : rl::test_suite
 {
     std::atomic<int> x;
 
@@ -34,7 +34,7 @@ struct livelock_test : rl::test_suite<rl::test_result_livelock>
 
 
 
-struct yield_livelock_test : rl::test_suite<rl::test_result_livelock>
+struct yield_livelock_test : rl::test_suite
 {
     std::atomic<int> x, y;
 
@@ -98,7 +98,7 @@ struct yield_livelock_test : rl::test_suite<rl::test_result_livelock>
 
 
 
-struct sched_load_test : rl::test_suite<>
+struct sched_load_test : rl::test_suite
 {
     std::recursive_mutex mtx1, mtx2;
     std::condition_variable_any cv1, cv2;

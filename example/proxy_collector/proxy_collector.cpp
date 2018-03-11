@@ -217,7 +217,7 @@ struct foo_list
     }
 };
 
-struct proxy_collector_test : rl::test_suite<>
+struct proxy_collector_test : rl::test_suite
 {
     foo_list m_list;
 

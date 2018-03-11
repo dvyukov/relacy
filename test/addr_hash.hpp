@@ -4,7 +4,7 @@
 
 
 
-struct test_addr_hash : rl::test_suite<>
+struct test_addr_hash : rl::test_suite
 {
     void* p1;
     void* p2;
@@ -36,7 +36,7 @@ struct test_addr_hash : rl::test_suite<>
 };
 
 
-struct test_addr_hash2 : rl::test_suite<rl::test_result_until_condition_hit>
+struct test_addr_hash2 : rl::test_suite
 {
     static size_t const table_size = 4;
     std::atomic<int> table [table_size];

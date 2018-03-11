@@ -62,10 +62,9 @@ private:
     stack& operator = (stack const&);
 };
 
+int count_threads = 0;
 
-
-
-struct stack_test : rl::test_suite<>
+struct stack_test : rl::test_suite
 {
     stack s_;
 
@@ -80,8 +79,8 @@ struct stack_test : rl::test_suite<>
 
     void after()
     {
-        RL_ASSERT(20 == produced_count_);
-        RL_ASSERT(20 == consumed_count_);
+        RL_ASSERT(count_threads == produced_count_);
+        RL_ASSERT(count_threads == consumed_count_);
     }
 
     void thread(unsigned /*index*/)
@@ -107,7 +106,7 @@ int main(int argc, char **argv)
 
     try
     {
-        const int count_threads = std::atoi(argv[1]);
+        count_threads = std::atoi(argv[1]);
         if (count_threads <= 0)
         {
             std::cerr << "The number of threads must be a positive number" << std::endl;

@@ -193,7 +193,7 @@ private:
 };
 
 
-struct test_mpmc : rl::test_suite<> // thread count = 6
+struct test_mpmc : rl::test_suite // thread count = 6
 {
     mpmcq<int> q;
 
@@ -439,7 +439,7 @@ struct eventcount
 
 
 
-struct test_ec : rl::test_suite<>
+struct test_ec : rl::test_suite
 {
     std::atomic<int> x [2];
     eventcount ec;

@@ -1,18 +1,22 @@
 #include "../relacy/relacy_std.hpp"
 
-struct test : rl::test_suite<> {
+struct test : rl::test_suite
+{
   std::atomic<int> x_;
   std::atomic<int> y_;
   int r2x, r2y, r3x, r3y;
 
-  void before() {
+  void before()
+  {
     x_.store(0, std::memory_order_relaxed);
     y_.store(0, std::memory_order_relaxed);
     r2x = r2y = r3x = r3y = 0;
   }
 
-  void thread(unsigned thread_index) {
-    switch (thread_index) {
+  void thread(unsigned thread_index)
+  {
+    switch (thread_index)
+    {
       case 0:;
         x_.store(1, std::memory_order_relaxed);
         break;
@@ -32,14 +36,16 @@ struct test : rl::test_suite<> {
     }
   }
 
-  void after() {
+  void after()
+  {
     // This assert should fire according to C++ memory model,
     // however it does not in the current relacy implementation.
     RL_ASSERT(!(r2x == 1 && r3y == 1 && r2y == 0 && r3x == 0));
   }
 };
 
-int main() {
+int main()
+{
   rl::test_params p;
   p.static_thread_count = 4;
   p.iteration_count = 1000000;

@@ -604,7 +604,7 @@ private:
 
 int x = 0;
 
-struct ws_deque_test : rl::test_suite<>
+struct ws_deque_test : rl::test_suite
 {
     ws_deque q;
     pdr p;

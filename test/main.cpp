@@ -291,7 +291,7 @@ private:
 
 
 
-struct recursive_timed_mutex_test : rl::test_suite<> // thread count = 3
+struct recursive_timed_mutex_test : rl::test_suite // thread count = 3
 {
     recursive_timed_mutex mtx;
     VAR_T(int) data;
@@ -534,6 +534,7 @@ int main()
             params.execution_depth_limit = 500;
             params.dynamic_thread_count = tests[i].dynamic_thread_count;
             params.static_thread_count = tests[i].static_thread_count;
+            params.expected_result = tests[i].expected_result;
 
             if (false == tests[i].f(params))
             {
@@ -570,6 +571,7 @@ int main()
         params.execution_depth_limit = 500;
         params.dynamic_thread_count = tests[i].dynamic_thread_count;
         params.static_thread_count = tests[i].static_thread_count;
+        params.expected_result = scheduler_tests[i].expected_result;
 
         if (false == scheduler_tests[i].f(params))
         {

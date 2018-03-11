@@ -60,6 +60,7 @@ struct test_params
     unsigned                    context_bound;
     unsigned                    execution_depth_limit;
     string                      initial_state;
+    test_result_e               expected_result;
 
     // output params
     test_result_e               test_result;
@@ -82,6 +83,7 @@ struct test_params
         search_type             = random_scheduler_type;
         context_bound           = 1;
         execution_depth_limit   = 2000;
+        expected_result         = test_result_success;
 
         test_result             = test_result_success;
         stop_iteration          = 0;

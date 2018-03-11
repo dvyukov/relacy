@@ -132,7 +132,7 @@ private:
     mutex m_foreignLock;
 };
 
-struct ws_deque_test : rl::test_suite<>
+struct ws_deque_test : rl::test_suite
 {
     ws_deque<int> q;
     bool state [2];
@@ -190,7 +190,7 @@ struct ws_deque_test : rl::test_suite<>
 
 
 
-struct test_api : rl::test_suite<>
+struct test_api : rl::test_suite
 {
     void thread(unsigned)
     {
@@ -224,7 +224,7 @@ struct test_api : rl::test_suite<>
 
 
 
-struct ws_deque_test0 : rl::test_suite<>
+struct ws_deque_test0 : rl::test_suite
 {
     ws_deque<int> q;
 

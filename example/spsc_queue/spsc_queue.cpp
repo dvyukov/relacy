@@ -53,7 +53,7 @@ private:
     VAR_T(node*) tail;
 };
 
-struct nonblocking_spsc_queue_test : rl::test_suite<>
+struct nonblocking_spsc_queue_test : rl::test_suite
 {
     nonblocking_spsc_queue<int> q;
 
@@ -175,7 +175,7 @@ private:
 };
 
 
-struct spsc_queue_test : rl::test_suite<>
+struct spsc_queue_test : rl::test_suite
 {
     spsc_queue<int> q;
 

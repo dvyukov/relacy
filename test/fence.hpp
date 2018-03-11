@@ -4,7 +4,7 @@
 
 
 template<int index, int mo_index>
-struct fence_synch_test : rl::test_suite<>
+struct fence_synch_test : rl::test_suite
 {
     std::atomic<int> x;
     rl::var<int> data;
@@ -63,7 +63,7 @@ struct fence_synch_test : rl::test_suite<>
 
 
 
-struct two_fence_synch_test : rl::test_suite<>
+struct two_fence_synch_test : rl::test_suite
 {
     std::atomic<int> x0;
     std::atomic<int> x1;
@@ -110,9 +110,7 @@ struct two_fence_synch_test : rl::test_suite<>
 
 
 template<int index>
-struct seq_cst_fence_test : rl::test_suite<
-    (rl::test_result_e)((0 == index) * rl::test_result_success
-    + (1 == index) * rl::test_result_until_condition_hit)>
+struct seq_cst_fence_test : rl::test_suite
 {
     std::atomic<int> x0;
     std::atomic<int> x1;

@@ -4,7 +4,7 @@
 
 
 
-struct test_condvar : rl::test_suite<>
+struct test_condvar : rl::test_suite
 {
     std::mutex mtx;
     std::condition_variable cv;
@@ -39,7 +39,7 @@ struct test_condvar : rl::test_suite<>
 
 
 
-struct test_condvar2 : rl::test_suite<>
+struct test_condvar2 : rl::test_suite
 {
     rl::var<int> stage;
     std::mutex mtx;

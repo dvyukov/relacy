@@ -65,7 +65,7 @@ private:
 
 
 
-struct stack_test : rl::test_suite<>
+struct stack_test : rl::test_suite
 {
     stack s_;
 
@@ -95,7 +95,7 @@ struct stack_test : rl::test_suite<>
 };
 
 
-struct test_api : rl::test_suite<>
+struct test_api : rl::test_suite
 {
     void thread(unsigned)
     {
@@ -124,7 +124,7 @@ struct test_api : rl::test_suite<>
     }
 };
 
-struct test_seq_cst_volatiles : rl::test_suite<>
+struct test_seq_cst_volatiles : rl::test_suite
 {
     rl::jvolatile<int> flag0;
     rl::jvolatile<int> flag1;
@@ -155,7 +155,7 @@ struct test_seq_cst_volatiles : rl::test_suite<>
     }
 };
 
-struct test_seq_cst_volatiles2 : rl::test_suite<>
+struct test_seq_cst_volatiles2 : rl::test_suite
 {
     rl::jvolatile<int> x;
     rl::jvolatile<int> y;
@@ -196,7 +196,7 @@ struct test_seq_cst_volatiles2 : rl::test_suite<>
 };
 
 template<int expected>
-struct test_unitialized_var : rl::test_suite<rl::test_result_until_condition_hit>
+struct test_unitialized_var : rl::test_suite
 {
     rl::jvar<rl::jvar<int>*> www;
 
@@ -247,6 +247,7 @@ int main()
         params.execution_depth_limit = 500;
         params.static_thread_count = tests[i].static_thread_count;
         params.dynamic_thread_count = tests[i].dynamic_thread_count;
+        params.expected_result = tests[i].expected_result;
 
         if (false == tests[i].f(params))
         {

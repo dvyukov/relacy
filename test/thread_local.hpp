@@ -4,7 +4,7 @@
 
 
 
-struct tls_basic_test : rl::test_suite<>
+struct tls_basic_test : rl::test_suite
 {
     rl::thread_local_var<unsigned> x;
 
@@ -17,7 +17,7 @@ struct tls_basic_test : rl::test_suite<>
 };
 
 
-struct tls_basic_test2 : rl::test_suite<>
+struct tls_basic_test2 : rl::test_suite
 {
     TLS_T(unsigned) x;
 
@@ -30,7 +30,7 @@ struct tls_basic_test2 : rl::test_suite<>
 };
 
 
-struct tls_reset_test : rl::test_suite<rl::test_result_user_assert_failed>
+struct tls_reset_test : rl::test_suite
 {
     rl::thread_local_var<unsigned> x;
 
@@ -45,7 +45,7 @@ struct tls_reset_test : rl::test_suite<rl::test_result_user_assert_failed>
 
 
 rl::thread_local_var<unsigned> tls_global_test_x;
-struct tls_global_test : rl::test_suite<rl::test_result_user_assert_failed>
+struct tls_global_test : rl::test_suite
 {
     void thread(unsigned index)
     {
@@ -57,7 +57,7 @@ struct tls_global_test : rl::test_suite<rl::test_result_user_assert_failed>
 };
 
 
-struct tls_win32_test : rl::test_suite<>
+struct tls_win32_test : rl::test_suite
 {
     unsigned long slot;
 

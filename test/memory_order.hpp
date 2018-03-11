@@ -5,7 +5,7 @@
 
 
 template<int index>
-struct order_relaxed_test : rl::test_suite<>
+struct order_relaxed_test : rl::test_suite
 {
     std::atomic<int> x1;
     std::atomic<int> x2;
@@ -50,7 +50,7 @@ struct order_relaxed_test : rl::test_suite<>
 
 
 
-struct reorder_single_var_test : rl::test_suite<>
+struct reorder_single_var_test : rl::test_suite
 {
     std::atomic<int> x;
 
@@ -77,7 +77,7 @@ struct reorder_single_var_test : rl::test_suite<>
 
 
 
-struct acq_rel_test : rl::test_suite<>
+struct acq_rel_test : rl::test_suite
 {
     std::atomic<int> x;
     rl::var<int> y;
@@ -110,8 +110,7 @@ struct acq_rel_test : rl::test_suite<>
 
 
 template<int index>
-struct seq_cst_test : rl::test_suite<
-    (rl::test_result_e)((1 - index) * rl::test_result_until_condition_hit)>
+struct seq_cst_test : rl::test_suite
 {
     std::atomic<int> x1;
     std::atomic<int> x2;
@@ -172,7 +171,7 @@ struct seq_cst_test : rl::test_suite<
     }
 };
 
-struct modification_order_test : rl::test_suite<>
+struct modification_order_test : rl::test_suite
 {
     std::atomic<int> a;
     rl::var<int> x;
@@ -199,7 +198,7 @@ struct modification_order_test : rl::test_suite<>
     }
 };
 
-struct reordering_test : rl::test_suite<>
+struct reordering_test : rl::test_suite
 {
     std::atomic<int> x;
     std::atomic<int> y;
@@ -237,7 +236,7 @@ struct reordering_test : rl::test_suite<>
     }
 };
 
-struct reordering_test2 : rl::test_suite<rl::test_result_until_condition_hit>
+struct reordering_test2 : rl::test_suite
 {
     std::atomic<int> x1;
     std::atomic<int> x2;
@@ -282,7 +281,7 @@ struct reordering_test2 : rl::test_suite<rl::test_result_until_condition_hit>
     }
 };
 
-struct transitive_test : rl::test_suite<>
+struct transitive_test : rl::test_suite
 {
     std::atomic<int> x;
     rl::var<int> y;
@@ -316,7 +315,7 @@ struct transitive_test : rl::test_suite<>
 };
 
 
-struct cc_transitive_test : rl::test_suite<>
+struct cc_transitive_test : rl::test_suite
 {
     std::atomic<int> x;
     std::atomic<int> y;
@@ -347,7 +346,7 @@ struct cc_transitive_test : rl::test_suite<>
 };
 
 
-struct occasional_test : rl::test_suite<rl::test_result_until_condition_hit>
+struct occasional_test : rl::test_suite
 {
     std::atomic<int> x, y, z;
 

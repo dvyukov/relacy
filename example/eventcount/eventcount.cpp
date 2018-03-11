@@ -687,7 +687,7 @@ public:
 }; 
 
 
-struct eventcount_test : rl::test_suite<>
+struct eventcount_test : rl::test_suite
 {
     void thread(unsigned index)
     {

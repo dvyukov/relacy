@@ -765,7 +765,7 @@ public:
 }; 
 
 
-struct queue_test : rl::test_suite<>
+struct queue_test : rl::test_suite
 {
     ec_thread threads_ [6];
     queue q_;
@@ -787,7 +787,7 @@ struct queue_test : rl::test_suite<>
     }
 };
 
-struct condvar_test : rl::test_suite<> // thread count = 3
+struct condvar_test : rl::test_suite // thread count = 3
 {
     rl::var<int> stage;
     condition_variable cv;

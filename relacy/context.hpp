@@ -1009,7 +1009,7 @@ bool simulate(test_params& params, thread_id_t thread_count)
         (void)stop_iter;
         (void)res2;
     }
-    return test_t::params::expected_result == res;
+    return params.expected_result == res;
 }
 
 template<typename test_t>
@@ -1019,7 +1019,7 @@ bool simulate(test_params& params)
 }
 
 template<void(*func)()>
-struct simulate_thunk : test_suite<>
+struct simulate_thunk : test_suite
 {
     void thread(unsigned)
     {

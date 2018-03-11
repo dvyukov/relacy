@@ -131,7 +131,7 @@ void CondVar::Leave()
     } 
 }
 
-struct CondVarTest : rl::test_suite<>
+struct CondVarTest : rl::test_suite
 {
     VAR_T(int) stage;
     CondVar cv;
