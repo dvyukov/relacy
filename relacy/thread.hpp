@@ -17,7 +17,6 @@
 #include "context_base.hpp"
 #include "dyn_thread_ctx.hpp"
 #include "thread_base.hpp"
-#include "test_suite.hpp"
 #include "memory_order.hpp"
 #include "foreach.hpp"
 

@@ -211,7 +211,7 @@ int amp_raw_condition_variable_wait(amp_raw_condition_variable_t cond,
 }
 
 
-struct amp_condvar_test : rl::test_suite<amp_condvar_test, 2>
+struct amp_condvar_test // thread count = 2
 {
     VAR_T(int) data;
     amp_raw_mutex_s mtx;
@@ -229,6 +229,8 @@ struct amp_condvar_test : rl::test_suite<amp_condvar_test, 2>
         amp_raw_mutex_finalize(&mtx);
         amp_raw_condition_variable_finalize(&cv);
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -254,7 +256,7 @@ struct amp_condvar_test : rl::test_suite<amp_condvar_test, 2>
 
 
 
-struct amp_condvar_test2 : rl::test_suite<amp_condvar_test2, 4>
+struct amp_condvar_test2 // thread count = 4
 {
     VAR_T(int) stage;
     amp_raw_mutex_s mtx;
@@ -272,6 +274,8 @@ struct amp_condvar_test2 : rl::test_suite<amp_condvar_test2, 4>
         amp_raw_mutex_finalize(&mtx);
         amp_raw_condition_variable_finalize(&cv);
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {

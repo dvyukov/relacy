@@ -82,6 +82,7 @@ public:
                                       bool do_switch,
                                       debug_info_param info)
     {
+        (void)thread_count;
         thread_info_base* th = c.threadx_;
         thread_desc desc = {th, (unsigned)count, ws, wo, wait_all, do_switch};
         for (unsigned wsi = 0; wsi != count; ++wsi)

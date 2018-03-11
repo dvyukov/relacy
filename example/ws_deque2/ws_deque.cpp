@@ -604,7 +604,7 @@ private:
 
 int x = 0;
 
-struct ws_deque_test : rl::test_suite<ws_deque_test, 4>
+struct ws_deque_test
 {
     ws_deque q;
     pdr p;
@@ -618,6 +618,8 @@ struct ws_deque_test : rl::test_suite<ws_deque_test, 4>
     {
         p.fini();
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -684,6 +686,7 @@ struct ws_deque_test : rl::test_suite<ws_deque_test, 4>
 int main()
 {
     rl::test_params p;
+    p.static_thread_count = 4;
     p.iteration_count = 1000000;
     rl::simulate<ws_deque_test>(p);
 }

@@ -131,6 +131,7 @@ public:
     }
 
     nvar(nvar const& r)
+        : generic_atomic<T, true>()
     {
         T const value = r.load(mo_relaxed, $);
         this->store(value, mo_relaxed, $);

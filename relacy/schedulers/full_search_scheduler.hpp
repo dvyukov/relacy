@@ -275,7 +275,7 @@ public:
         size_t const size = stree_.size();
         if (stree_depth_ == size)
         {
-            stree_node n = {limit, 0, t};
+            stree_node n = {limit, 0, t, 0};
             stree_.push_back(n);
         }
         else

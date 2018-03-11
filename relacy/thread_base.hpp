@@ -15,7 +15,6 @@
 
 #include "base.hpp"
 #include "context_base.hpp"
-//#include "test_suite.hpp"
 //#include "memory_order.hpp"
 //#include "foreach.hpp"
 

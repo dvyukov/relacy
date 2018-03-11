@@ -3,11 +3,13 @@
 #include "../relacy/windows.h"
 
 
-struct test_win_thread : rl::test_suite<test_win_thread, 1>
+struct test_win_thread
 {
-    static size_t const dynamic_thread_count = 2;
-
     VAR_T(int) data;
+
+    void before() { }
+    void after() { }
+    void invariant() { }
 
     static unsigned long RL_STDCALL win_func(void* param)
     {
@@ -38,7 +40,7 @@ struct test_win_thread : rl::test_suite<test_win_thread, 1>
 
 
 
-struct test_win_mutex : rl::test_suite<test_win_mutex, 2>
+struct test_win_mutex
 {
     HANDLE mtx;
     VAR_T(int) data;
@@ -53,6 +55,8 @@ struct test_win_mutex : rl::test_suite<test_win_mutex, 2>
     {
         CloseHandle(mtx);
     }
+
+    void invariant() { }
 
     void thread(unsigned)
     {
@@ -73,7 +77,7 @@ struct test_win_mutex : rl::test_suite<test_win_mutex, 2>
 
 
 
-struct test_win_cs : rl::test_suite<test_win_cs, 2>
+struct test_win_cs
 {
     CRITICAL_SECTION mtx;
     VAR_T(int) data;
@@ -88,6 +92,8 @@ struct test_win_cs : rl::test_suite<test_win_cs, 2>
     {
         DeleteCriticalSection(&mtx);
     }
+
+    void invariant() { }
 
     void thread(unsigned)
     {
@@ -104,7 +110,7 @@ struct test_win_cs : rl::test_suite<test_win_cs, 2>
 };
 
 
-struct test_win_condvar : rl::test_suite<test_win_condvar, 3>
+struct test_win_condvar
 {
     CONDITION_VARIABLE cv;
     CRITICAL_SECTION mtx;
@@ -122,6 +128,8 @@ struct test_win_condvar : rl::test_suite<test_win_condvar, 3>
         DeleteCriticalSection(&mtx);
         DeleteConditionVariable(&cv);
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -156,7 +164,7 @@ struct test_win_condvar : rl::test_suite<test_win_condvar, 3>
 
 
 
-struct test_win_condvar_srw : rl::test_suite<test_win_condvar_srw, 2>
+struct test_win_condvar_srw
 {
     CONDITION_VARIABLE cv;
     SRWLOCK mtx;
@@ -174,6 +182,8 @@ struct test_win_condvar_srw : rl::test_suite<test_win_condvar_srw, 2>
         DeleteSRWLock(&mtx);
         DeleteConditionVariable(&cv);
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -208,7 +218,7 @@ struct test_win_condvar_srw : rl::test_suite<test_win_condvar_srw, 2>
 
 
 
-struct test_win_sem : rl::test_suite<test_win_sem, 2>
+struct test_win_sem
 {
     HANDLE sem1, sem2;
     VAR_T(int) data;
@@ -225,6 +235,8 @@ struct test_win_sem : rl::test_suite<test_win_sem, 2>
         CloseHandle(sem1);
         CloseHandle(sem2);
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -263,7 +275,7 @@ struct test_win_sem : rl::test_suite<test_win_sem, 2>
 
 
 
-struct test_win_event : rl::test_suite<test_win_event, 2>
+struct test_win_event
 {
 	HANDLE ev;
 	VAR_T(int) data;
@@ -278,6 +290,8 @@ struct test_win_event : rl::test_suite<test_win_event, 2>
 	{
 		CloseHandle(ev);
 	}
+
+    void invariant() { }
 	
 	void thread(unsigned index)
 	{
@@ -302,7 +316,7 @@ struct test_win_event : rl::test_suite<test_win_event, 2>
 
 
 
-struct test_FlushProcessWriteBuffers : rl::test_suite<test_FlushProcessWriteBuffers, 2>
+struct test_FlushProcessWriteBuffers
 {
     std::atomic<int> x1;
     std::atomic<int> x2;
@@ -320,6 +334,8 @@ struct test_FlushProcessWriteBuffers : rl::test_suite<test_FlushProcessWriteBuff
     {
         assert(r1 == 1 || r2 == 1);
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {

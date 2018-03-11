@@ -4,7 +4,7 @@
 
 
 
-struct test_mutex : rl::test_suite<test_mutex, 3>
+struct test_mutex
 {
     rl::mutex mtx;
     rl::var<int> data;
@@ -19,6 +19,8 @@ struct test_mutex : rl::test_suite<test_mutex, 3>
         RL_ASSERT(data($) == 3);
     }
 
+    void invariant() { }
+
     void thread(unsigned /*index*/)
     {
         mtx.lock($);
@@ -30,10 +32,14 @@ struct test_mutex : rl::test_suite<test_mutex, 3>
 
 
 
-struct test_deadlock : rl::test_suite<test_deadlock, 2, rl::test_result_deadlock>
+struct test_deadlock
 {
     rl::mutex mtx1;
     rl::mutex mtx2;
+
+    void before() { }
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -56,7 +62,7 @@ struct test_deadlock : rl::test_suite<test_deadlock, 2, rl::test_result_deadlock
 
 
 
-struct test_deadlock2 : rl::test_suite<test_deadlock2, 2, rl::test_result_deadlock>
+struct test_deadlock2
 {
     std::mutex m;
     std::atomic<int> f;
@@ -65,6 +71,9 @@ struct test_deadlock2 : rl::test_suite<test_deadlock2, 2, rl::test_result_deadlo
     {
         f($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -86,8 +95,11 @@ struct test_deadlock2 : rl::test_suite<test_deadlock2, 2, rl::test_result_deadlo
 
 
 
-struct test_mutex_destuction : rl::test_suite<test_mutex_destuction, 1, rl::test_result_destroying_owned_mutex>
+struct test_mutex_destuction
 {
+    void before() { }
+    void after() { }
+    void invariant() { }
     void thread(unsigned)
     {
         std::mutex* m = new std::mutex;
@@ -97,7 +109,7 @@ struct test_mutex_destuction : rl::test_suite<test_mutex_destuction, 1, rl::test
 };
 
 
-struct test_mutex_destuction2 : rl::test_suite<test_mutex_destuction2, 2, rl::test_result_destroying_owned_mutex>
+struct test_mutex_destuction2
 {
     std::mutex* m;
     std::atomic<int> f;
@@ -107,6 +119,9 @@ struct test_mutex_destuction2 : rl::test_suite<test_mutex_destuction2, 2, rl::te
         m = new std::mutex;
         f($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -129,7 +144,7 @@ struct test_mutex_destuction2 : rl::test_suite<test_mutex_destuction2, 2, rl::te
 };
 
 
-struct test_mutex_recursion : rl::test_suite<test_mutex_recursion, 2>
+struct test_mutex_recursion
 {
     std::recursive_mutex mtx;
     rl::var<int> data;
@@ -143,6 +158,8 @@ struct test_mutex_recursion : rl::test_suite<test_mutex_recursion, 2>
     {
         RL_ASSERT(data($) == 2);
     }
+
+    void invariant() { }
 
     void thread(unsigned /*index*/)
     {
@@ -156,7 +173,7 @@ struct test_mutex_recursion : rl::test_suite<test_mutex_recursion, 2>
 
 
 
-struct test_mutex_try_lock : rl::test_suite<test_mutex_try_lock, 2>
+struct test_mutex_try_lock
 {
     std::recursive_mutex mtx;
     rl::var<int> data;
@@ -170,6 +187,8 @@ struct test_mutex_try_lock : rl::test_suite<test_mutex_try_lock, 2>
     {
         RL_ASSERT(data($) == 2);
     }
+
+    void invariant() { }
 
     void thread(unsigned /*index*/)
     {
@@ -184,8 +203,12 @@ struct test_mutex_try_lock : rl::test_suite<test_mutex_try_lock, 2>
 
 
 
-struct test_mutex_recursion_error : rl::test_suite<test_mutex_recursion_error, 1, rl::test_result_recursion_on_nonrecursive_mutex>
+struct test_mutex_recursion_error
 {
+    void before() { }
+    void after() { }
+    void invariant() { }
+
     void thread(unsigned)
     {
         std::mutex m;
@@ -196,8 +219,12 @@ struct test_mutex_recursion_error : rl::test_suite<test_mutex_recursion_error, 1
 
 
 
-struct test_mutex_unlock_error : rl::test_suite<test_mutex_unlock_error, 1, rl::test_result_unlocking_mutex_wo_ownership>
+struct test_mutex_unlock_error
 {
+    void before() { }
+    void after() { }
+    void invariant() { }
+
     void thread(unsigned)
     {
         std::mutex m;
@@ -208,8 +235,12 @@ struct test_mutex_unlock_error : rl::test_suite<test_mutex_unlock_error, 1, rl::
 };
 
 
-struct test_mutex_leak : rl::test_suite<test_mutex_leak, 1, rl::test_result_resource_leak>
+struct test_mutex_leak
 {
+    void before() { }
+    void after() { }
+    void invariant() { }
+
     void thread(unsigned)
     {
         char* p = new char [sizeof(std::mutex)];

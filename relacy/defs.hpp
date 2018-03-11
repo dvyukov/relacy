@@ -44,6 +44,7 @@ enum unpark_reason
     unpark_reason_normal,
     unpark_reason_timeout,
     unpark_reason_spurious,
+    unpark_reason_unknown
 };
 
 struct debug_info

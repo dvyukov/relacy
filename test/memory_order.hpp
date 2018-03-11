@@ -5,7 +5,7 @@
 
 
 template<int index>
-struct order_relaxed_test : rl::test_suite<order_relaxed_test<index>, 2>
+struct order_relaxed_test
 {
     std::atomic<int> x1;
     std::atomic<int> x2;
@@ -15,6 +15,9 @@ struct order_relaxed_test : rl::test_suite<order_relaxed_test<index>, 2>
         x1($) = 0;
         x2($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned th)
     {
@@ -50,7 +53,7 @@ struct order_relaxed_test : rl::test_suite<order_relaxed_test<index>, 2>
 
 
 
-struct reorder_single_var_test : rl::test_suite<reorder_single_var_test, 2>
+struct reorder_single_var_test
 {
     std::atomic<int> x;
 
@@ -58,6 +61,9 @@ struct reorder_single_var_test : rl::test_suite<reorder_single_var_test, 2>
     {
         x($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -77,7 +83,7 @@ struct reorder_single_var_test : rl::test_suite<reorder_single_var_test, 2>
 
 
 
-struct acq_rel_test : rl::test_suite<acq_rel_test, 2>
+struct acq_rel_test
 {
     std::atomic<int> x;
     rl::var<int> y;
@@ -86,6 +92,9 @@ struct acq_rel_test : rl::test_suite<acq_rel_test, 2>
     {
         x($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -110,8 +119,7 @@ struct acq_rel_test : rl::test_suite<acq_rel_test, 2>
 
 
 template<int index>
-struct seq_cst_test : rl::test_suite<seq_cst_test<index>, 4, 
-    (rl::test_result_e)((1 - index) * rl::test_result_until_condition_hit)>
+struct seq_cst_test
 {
     std::atomic<int> x1;
     std::atomic<int> x2;
@@ -124,6 +132,8 @@ struct seq_cst_test : rl::test_suite<seq_cst_test<index>, 4,
         x2($) = 0;
         res = 0;
     }
+
+    void invariant() { }
 
     void thread(unsigned th)
     {
@@ -172,7 +182,7 @@ struct seq_cst_test : rl::test_suite<seq_cst_test<index>, 4,
     }
 };
 
-struct modification_order_test : rl::test_suite<modification_order_test, 2>
+struct modification_order_test
 {
     std::atomic<int> a;
     rl::var<int> x;
@@ -182,6 +192,9 @@ struct modification_order_test : rl::test_suite<modification_order_test, 2>
         a($) = 0;
         x($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -199,7 +212,7 @@ struct modification_order_test : rl::test_suite<modification_order_test, 2>
     }
 };
 
-struct reordering_test : rl::test_suite<reordering_test, 3>
+struct reordering_test
 {
     std::atomic<int> x;
     std::atomic<int> y;
@@ -211,6 +224,9 @@ struct reordering_test : rl::test_suite<reordering_test, 3>
         y($) = 0;
         r($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -237,7 +253,7 @@ struct reordering_test : rl::test_suite<reordering_test, 3>
     }
 };
 
-struct reordering_test2 : rl::test_suite<reordering_test2, 3, rl::test_result_until_condition_hit>
+struct reordering_test2
 {
     std::atomic<int> x1;
     std::atomic<int> x2;
@@ -255,6 +271,9 @@ struct reordering_test2 : rl::test_suite<reordering_test2, 3, rl::test_result_un
         y($) = 0;
         r($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -282,7 +301,7 @@ struct reordering_test2 : rl::test_suite<reordering_test2, 3, rl::test_result_un
     }
 };
 
-struct transitive_test : rl::test_suite<transitive_test, 3>
+struct transitive_test
 {
     std::atomic<int> x;
     rl::var<int> y;
@@ -291,6 +310,9 @@ struct transitive_test : rl::test_suite<transitive_test, 3>
     {
         x($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -316,7 +338,7 @@ struct transitive_test : rl::test_suite<transitive_test, 3>
 };
 
 
-struct cc_transitive_test : rl::test_suite<cc_transitive_test, 3>
+struct cc_transitive_test
 {
     std::atomic<int> x;
     std::atomic<int> y;
@@ -326,6 +348,9 @@ struct cc_transitive_test : rl::test_suite<cc_transitive_test, 3>
         x.store(0, std::memory_order_relaxed);
         y.store(0, std::memory_order_relaxed);
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -347,7 +372,7 @@ struct cc_transitive_test : rl::test_suite<cc_transitive_test, 3>
 };
 
 
-struct occasional_test : rl::test_suite<occasional_test, 3, rl::test_result_until_condition_hit>
+struct occasional_test
 {
     std::atomic<int> x, y, z;
 
@@ -357,6 +382,9 @@ struct occasional_test : rl::test_suite<occasional_test, 3, rl::test_result_unti
         y.store(0, std::memory_order_relaxed);
         z.store(0, std::memory_order_relaxed);
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {

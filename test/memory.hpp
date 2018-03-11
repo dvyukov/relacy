@@ -3,8 +3,12 @@
 #include "../relacy/relacy_std.hpp"
 
 
-struct test_memory_allocation : rl::test_suite<test_memory_allocation, 2>
+struct test_memory_allocation
 {
+    void before() { }
+    void after() { }
+    void invariant() { }
+
     void thread(unsigned /*index*/)
     {
         VAR_T(int)* p1 = new VAR_T(int) (5), i1 = 5, * p11 = new VAR_T(int) (6);

@@ -97,7 +97,7 @@ private:
 
 
 
-struct business_logic_test : rl::test_suite<business_logic_test, 2>
+struct business_logic_test
 {
     business_logic bl;
 
@@ -111,6 +111,9 @@ struct business_logic_test : rl::test_suite<business_logic_test, 2>
             RL_ASSERT(rv);
         }
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned /*index*/)
     {
@@ -126,6 +129,8 @@ struct business_logic_test : rl::test_suite<business_logic_test, 2>
 
 int main()
 {    
-    rl::simulate<business_logic_test>();
+    rl::test_params p;
+    p.static_thread_count = 2;
+    rl::simulate<business_logic_test>(p);
 }
 

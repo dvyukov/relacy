@@ -4,7 +4,7 @@
 
 
 
-struct test_futex : rl::test_suite<test_futex, 2>
+struct test_futex
 {
 	rl::atomic<int> state;
 	int wakeres;
@@ -23,6 +23,8 @@ struct test_futex : rl::test_suite<test_futex, 2>
 					 || (waitres == EWOULDBLOCK && wakeres == 0)
 					 || (waitres == EINTR && wakeres == 0));
 	}
+
+    void invariant() { }
 	
 	void thread(unsigned index)
 	{
@@ -45,12 +47,17 @@ struct test_futex : rl::test_suite<test_futex, 2>
 
 
 
-struct test_futex_deadlock : rl::test_suite<test_futex_deadlock, 1, rl::test_result_deadlock>
+struct test_futex_deadlock
 {
 	rl::atomic<int> state;
+
+    void before() { }
+    void after() { }
+    void invariant() { }
 	
 	void thread(unsigned index)
 	{
+    (void)index;
 		state.store(0, rl::memory_order_relaxed);
 		int rv = futex(&state, FUTEX_WAIT, 0, 0, 0, 0);
 		assert(rv == EINTR);
@@ -60,7 +67,7 @@ struct test_futex_deadlock : rl::test_suite<test_futex_deadlock, 1, rl::test_res
 
 
 
-struct test_futex_sync1 : rl::test_suite<test_futex_sync1, 2, rl::test_result_until_condition_hit>
+struct test_futex_sync1
 {
 	rl::atomic<int> state;
 	VAR_T(int) data;
@@ -70,6 +77,9 @@ struct test_futex_sync1 : rl::test_suite<test_futex_sync1, 2, rl::test_result_un
 		state.store(0, rl::memory_order_relaxed);
 		VAR(data) = 0;
 	}
+
+    void after() { }
+    void invariant() { }
 	
 	void thread(unsigned index)
 	{
@@ -96,7 +106,7 @@ struct test_futex_sync1 : rl::test_suite<test_futex_sync1, 2, rl::test_result_un
 
 
 
-struct test_futex_sync2 : rl::test_suite<test_futex_sync2, 2, rl::test_result_until_condition_hit>
+struct test_futex_sync2
 {
 	rl::atomic<int> state;
 	VAR_T(int) data;
@@ -106,6 +116,9 @@ struct test_futex_sync2 : rl::test_suite<test_futex_sync2, 2, rl::test_result_un
 		state.store(0, rl::memory_order_relaxed);
 		VAR(data) = 0;
 	}
+
+    void after() { }
+    void invariant() { }
 	
 	void thread(unsigned index)
 	{
@@ -132,7 +145,7 @@ struct test_futex_sync2 : rl::test_suite<test_futex_sync2, 2, rl::test_result_un
 
 
 
-struct test_futex_intr : rl::test_suite<test_futex_intr, 2, rl::test_result_until_condition_hit>
+struct test_futex_intr
 {
 	rl::atomic<int> state;
 	VAR_T(int) data;
@@ -142,6 +155,9 @@ struct test_futex_intr : rl::test_suite<test_futex_intr, 2, rl::test_result_unti
 		state.store(0, rl::memory_order_relaxed);
 		VAR(data) = 0;
 	}
+
+    void after() { }
+    void invariant() { }
 	
 	void thread(unsigned index)
 	{
