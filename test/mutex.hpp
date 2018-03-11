@@ -4,7 +4,7 @@
 
 
 
-struct test_mutex : rl::test_suite<test_mutex, 3>
+struct test_mutex : rl::test_suite<test_mutex>
 {
     rl::mutex mtx;
     rl::var<int> data;
@@ -30,7 +30,7 @@ struct test_mutex : rl::test_suite<test_mutex, 3>
 
 
 
-struct test_deadlock : rl::test_suite<test_deadlock, 2, rl::test_result_deadlock>
+struct test_deadlock : rl::test_suite<test_deadlock, rl::test_result_deadlock>
 {
     rl::mutex mtx1;
     rl::mutex mtx2;
@@ -56,7 +56,7 @@ struct test_deadlock : rl::test_suite<test_deadlock, 2, rl::test_result_deadlock
 
 
 
-struct test_deadlock2 : rl::test_suite<test_deadlock2, 2, rl::test_result_deadlock>
+struct test_deadlock2 : rl::test_suite<test_deadlock2, rl::test_result_deadlock>
 {
     std::mutex m;
     std::atomic<int> f;
@@ -86,7 +86,7 @@ struct test_deadlock2 : rl::test_suite<test_deadlock2, 2, rl::test_result_deadlo
 
 
 
-struct test_mutex_destuction : rl::test_suite<test_mutex_destuction, 1, rl::test_result_destroying_owned_mutex>
+struct test_mutex_destuction : rl::test_suite<test_mutex_destuction, rl::test_result_destroying_owned_mutex>
 {
     void thread(unsigned)
     {
@@ -97,7 +97,7 @@ struct test_mutex_destuction : rl::test_suite<test_mutex_destuction, 1, rl::test
 };
 
 
-struct test_mutex_destuction2 : rl::test_suite<test_mutex_destuction2, 2, rl::test_result_destroying_owned_mutex>
+struct test_mutex_destuction2 : rl::test_suite<test_mutex_destuction2, rl::test_result_destroying_owned_mutex>
 {
     std::mutex* m;
     std::atomic<int> f;
@@ -129,7 +129,7 @@ struct test_mutex_destuction2 : rl::test_suite<test_mutex_destuction2, 2, rl::te
 };
 
 
-struct test_mutex_recursion : rl::test_suite<test_mutex_recursion, 2>
+struct test_mutex_recursion : rl::test_suite<test_mutex_recursion>
 {
     std::recursive_mutex mtx;
     rl::var<int> data;
@@ -156,7 +156,7 @@ struct test_mutex_recursion : rl::test_suite<test_mutex_recursion, 2>
 
 
 
-struct test_mutex_try_lock : rl::test_suite<test_mutex_try_lock, 2>
+struct test_mutex_try_lock : rl::test_suite<test_mutex_try_lock>
 {
     std::recursive_mutex mtx;
     rl::var<int> data;
@@ -184,7 +184,7 @@ struct test_mutex_try_lock : rl::test_suite<test_mutex_try_lock, 2>
 
 
 
-struct test_mutex_recursion_error : rl::test_suite<test_mutex_recursion_error, 1, rl::test_result_recursion_on_nonrecursive_mutex>
+struct test_mutex_recursion_error : rl::test_suite<test_mutex_recursion_error, rl::test_result_recursion_on_nonrecursive_mutex>
 {
     void thread(unsigned)
     {
@@ -196,7 +196,7 @@ struct test_mutex_recursion_error : rl::test_suite<test_mutex_recursion_error, 1
 
 
 
-struct test_mutex_unlock_error : rl::test_suite<test_mutex_unlock_error, 1, rl::test_result_unlocking_mutex_wo_ownership>
+struct test_mutex_unlock_error : rl::test_suite<test_mutex_unlock_error, rl::test_result_unlocking_mutex_wo_ownership>
 {
     void thread(unsigned)
     {
@@ -208,7 +208,7 @@ struct test_mutex_unlock_error : rl::test_suite<test_mutex_unlock_error, 1, rl::
 };
 
 
-struct test_mutex_leak : rl::test_suite<test_mutex_leak, 1, rl::test_result_resource_leak>
+struct test_mutex_leak : rl::test_suite<test_mutex_leak, rl::test_result_resource_leak>
 {
     void thread(unsigned)
     {

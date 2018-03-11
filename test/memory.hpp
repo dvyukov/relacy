@@ -3,7 +3,7 @@
 #include "../relacy/relacy_std.hpp"
 
 
-struct test_memory_allocation : rl::test_suite<test_memory_allocation, 2>
+struct test_memory_allocation : rl::test_suite<test_memory_allocation>
 {
     void thread(unsigned /*index*/)
     {

@@ -53,7 +53,7 @@ private:
     VAR_T(node*) tail;
 };
 
-struct nonblocking_spsc_queue_test : rl::test_suite<nonblocking_spsc_queue_test, 2>
+struct nonblocking_spsc_queue_test : rl::test_suite<nonblocking_spsc_queue_test>
 {
     nonblocking_spsc_queue<int> q;
 
@@ -175,7 +175,7 @@ private:
 };
 
 
-struct spsc_queue_test : rl::test_suite<spsc_queue_test, 2>
+struct spsc_queue_test : rl::test_suite<spsc_queue_test>
 {
     spsc_queue<int> q;
 
@@ -196,7 +196,10 @@ struct spsc_queue_test : rl::test_suite<spsc_queue_test, 2>
 
 int main()
 {
-    rl::simulate<nonblocking_spsc_queue_test>();
-    rl::simulate<spsc_queue_test>();
+    rl::test_params p;
+    p.static_thread_count = 2;
+
+    rl::simulate<nonblocking_spsc_queue_test>(p);
+    rl::simulate<spsc_queue_test>(p);
 }
 

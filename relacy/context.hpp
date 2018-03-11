@@ -115,7 +115,7 @@ private:
     using base_t::invariant_executing;
 
     static thread_id_t const main_thread_id = -1;
-    static thread_id_t const static_thread_count = test_t::params::static_thread_count;
+    thread_id_t const static_thread_count;
     thread_id_t const thread_count_;
 
     iteration_t                     current_iter_;
@@ -185,6 +185,7 @@ private:
 public:
     context_impl(test_params& params, shared_context_t& sctx, thread_id_t thread_count)
         : base_t(thread_count, params, thread_count)
+        , static_thread_count(params.static_thread_count)
         , thread_count_(thread_count)
         , current_iter_(0)
         , start_iteration_(1)
@@ -1014,25 +1015,11 @@ bool simulate(test_params& params, thread_id_t thread_count)
 template<typename test_t>
 bool simulate(test_params& params)
 {
-    return simulate<test_t>(params, test_t::params::thread_count + params.dynamic_thread_count);
+    return simulate<test_t>(params, params.static_thread_count + params.dynamic_thread_count);
 }
 
-template<typename test_t>
-bool simulate()
-{
-    test_params params;
-    return simulate<test_t>(params, test_t::params::thread_count + params.dynamic_thread_count);
-}
-
-template<typename test_t>
-bool simulate(thread_id_t thread_count)
-{
-    test_params params;
-    return simulate<test_t>(params, thread_count + params.dynamic_thread_count);
-}
-
-template<void(*func)(), size_t thread_count>
-struct simulate_thunk : test_suite<simulate_thunk<func, thread_count>, 1>
+template<void(*func)()>
+struct simulate_thunk : test_suite<simulate_thunk<func> >
 {
     void thread(unsigned)
     {
@@ -1040,19 +1027,10 @@ struct simulate_thunk : test_suite<simulate_thunk<func, thread_count>, 1>
     }
 };
 
-template<void(*func)(), size_t thread_count>
+template<void(*func)()>
 bool execute(test_params& params)
 {
-    params.dynamic_thread_count = thread_count;
-    return simulate<simulate_thunk<func, thread_count> >(params);
-}
-
-template<void(*func)(), size_t thread_count>
-bool execute()
-{
-    test_params params;
-    params.dynamic_thread_count = thread_count;
-    return simulate<simulate_thunk<func, thread_count> >(params);
+    return simulate<simulate_thunk<func> >(params);
 }
 
 typedef bool (*simulate_f)(test_params&);

@@ -23,14 +23,11 @@ namespace rl
 
 template<
     typename derived_t,
-    thread_id_t static_thread_count_param,
     test_result_e result = test_result_success>
 struct test_suite : nocopy<>
 {
     struct params
     {
-        static thread_id_t const static_thread_count = static_thread_count_param;
-        static thread_id_t const thread_count = static_thread_count;
         static test_result_e const expected_result = result;
     };
 

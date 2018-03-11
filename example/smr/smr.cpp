@@ -7,7 +7,7 @@ unsigned const thread_count = 3;
 unsigned const node_count = 6;
 
 
-struct smr_test : rl::test_suite<smr_test, thread_count>
+struct smr_test : rl::test_suite<smr_test>
 {
     struct node
     {
@@ -184,6 +184,7 @@ int main()
     //p.output_history = true;
     //p.initial_state = "991172";
     p.iteration_count = 1000;
+    p.static_thread_count = thread_count;
     rl::simulate<smr_test>(p);
 }
 

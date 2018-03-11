@@ -4,7 +4,7 @@
 
 
 
-struct test_semaphore : rl::test_suite<test_semaphore, 2>
+struct test_semaphore : rl::test_suite<test_semaphore>
 {
     HANDLE sema;
     VAR_T(int) data;
@@ -41,7 +41,7 @@ struct test_semaphore : rl::test_suite<test_semaphore, 2>
 
 
 
-struct test_semaphore_atomic : rl::test_suite<test_semaphore_atomic, 2>
+struct test_semaphore_atomic : rl::test_suite<test_semaphore_atomic>
 {
 	HANDLE sem [2];
 	

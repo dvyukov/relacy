@@ -120,5 +120,7 @@ int main()
     //p.search_type = rl::sched_full;
     //p.context_bound = 5;
     //p.execution_depth_limit = 200;
-    rl::execute<queue_test, 4>(p);
+    p.static_thread_count = 1;
+    p.dynamic_thread_count = 4;
+    rl::execute<queue_test>(p);
 }

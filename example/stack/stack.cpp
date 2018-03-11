@@ -65,7 +65,7 @@ private:
 
 
 
-struct stack_test : rl::test_suite<stack_test, 20>
+struct stack_test : rl::test_suite<stack_test>
 {
     stack s_;
 
@@ -80,9 +80,8 @@ struct stack_test : rl::test_suite<stack_test, 20>
 
     void after()
     {
-        //typedef rl::test_suite<stack_test, 0> base_t;
-        //RL_ASSERT(base_t::params::thread_count == produced_count_);
-        //RL_ASSERT(base_t::params::thread_count == consumed_count_);
+        RL_ASSERT(20 == produced_count_);
+        RL_ASSERT(20 == consumed_count_);
     }
 
     void thread(unsigned /*index*/)
@@ -115,7 +114,9 @@ int main(int argc, char **argv)
             return EINVAL;
         }
 
-        rl::simulate<stack_test>(count_threads);
+        rl::test_params p;
+        p.static_thread_count = count_threads;
+        rl::simulate<stack_test>(p);
     }
     catch(std::exception const & e)
     {

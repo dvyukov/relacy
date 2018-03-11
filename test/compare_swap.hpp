@@ -5,7 +5,7 @@
 
 
 template<int T>
-struct cas_spurious_fail_test : rl::test_suite<cas_spurious_fail_test<T>, 1, rl::test_result_until_condition_hit>
+struct cas_spurious_fail_test : rl::test_suite<cas_spurious_fail_test<T>, rl::test_result_until_condition_hit>
 {
     std::atomic<int> x;
     std::atomic<int> y;

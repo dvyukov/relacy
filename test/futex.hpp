@@ -4,7 +4,7 @@
 
 
 
-struct test_futex : rl::test_suite<test_futex, 2>
+struct test_futex : rl::test_suite<test_futex>
 {
 	rl::atomic<int> state;
 	int wakeres;
@@ -45,7 +45,7 @@ struct test_futex : rl::test_suite<test_futex, 2>
 
 
 
-struct test_futex_deadlock : rl::test_suite<test_futex_deadlock, 1, rl::test_result_deadlock>
+struct test_futex_deadlock : rl::test_suite<test_futex_deadlock, rl::test_result_deadlock>
 {
 	rl::atomic<int> state;
 	
@@ -61,7 +61,7 @@ struct test_futex_deadlock : rl::test_suite<test_futex_deadlock, 1, rl::test_res
 
 
 
-struct test_futex_sync1 : rl::test_suite<test_futex_sync1, 2, rl::test_result_until_condition_hit>
+struct test_futex_sync1 : rl::test_suite<test_futex_sync1, rl::test_result_until_condition_hit>
 {
 	rl::atomic<int> state;
 	VAR_T(int) data;
@@ -97,7 +97,7 @@ struct test_futex_sync1 : rl::test_suite<test_futex_sync1, 2, rl::test_result_un
 
 
 
-struct test_futex_sync2 : rl::test_suite<test_futex_sync2, 2, rl::test_result_until_condition_hit>
+struct test_futex_sync2 : rl::test_suite<test_futex_sync2, rl::test_result_until_condition_hit>
 {
 	rl::atomic<int> state;
 	VAR_T(int) data;
@@ -133,7 +133,7 @@ struct test_futex_sync2 : rl::test_suite<test_futex_sync2, 2, rl::test_result_un
 
 
 
-struct test_futex_intr : rl::test_suite<test_futex_intr, 2, rl::test_result_until_condition_hit>
+struct test_futex_intr : rl::test_suite<test_futex_intr, rl::test_result_until_condition_hit>
 {
 	rl::atomic<int> state;
 	VAR_T(int) data;

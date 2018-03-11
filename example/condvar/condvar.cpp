@@ -131,7 +131,7 @@ void CondVar::Leave()
     } 
 }
 
-struct CondVarTest : rl::test_suite<CondVarTest, 3>
+struct CondVarTest : rl::test_suite<CondVarTest>
 {
     VAR_T(int) stage;
     CondVar cv;
@@ -176,6 +176,8 @@ struct CondVarTest : rl::test_suite<CondVarTest, 3>
 
 int main()
 {
-    rl::simulate<CondVarTest>();
+    rl::test_params p;
+    p.static_thread_count = 3;
+    rl::simulate<CondVarTest>(p);
 }
 

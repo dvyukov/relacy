@@ -129,7 +129,7 @@ private:
 
 
 
-struct ws_deque_test : rl::test_suite<ws_deque_test, 2>
+struct ws_deque_test : rl::test_suite<ws_deque_test>
 {
     ws_deque<int> q;
     bool state [2];
@@ -190,6 +190,8 @@ struct ws_deque_test : rl::test_suite<ws_deque_test, 2>
 
 int main()
 {
-    rl::simulate<ws_deque_test>();
+    rl::test_params p;
+    p.static_thread_count = 2;
+    rl::simulate<ws_deque_test>(p);
 }
 

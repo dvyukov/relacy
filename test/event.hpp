@@ -4,7 +4,7 @@
 
 
 
-struct test_event_auto : rl::test_suite<test_event_auto, 2>
+struct test_event_auto : rl::test_suite<test_event_auto>
 {
     HANDLE ev;
     VAR_T(int) data;
@@ -41,7 +41,7 @@ struct test_event_auto : rl::test_suite<test_event_auto, 2>
 
 
 
-struct test_event_atomic : rl::test_suite<test_event_atomic, 2>
+struct test_event_atomic : rl::test_suite<test_event_atomic>
 {
 	HANDLE ev1;
 	HANDLE ev2;
@@ -81,7 +81,7 @@ struct test_event_atomic : rl::test_suite<test_event_atomic, 2>
 
 
 
-struct test_event_manual : rl::test_suite<test_event_manual, 2>
+struct test_event_manual : rl::test_suite<test_event_manual>
 {
 	HANDLE ev;
 	VAR_T(int) data;
