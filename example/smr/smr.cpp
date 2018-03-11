@@ -7,7 +7,7 @@ unsigned const thread_count = 3;
 unsigned const node_count = 6;
 
 
-struct smr_test : rl::test_suite
+struct smr_test
 {
     struct node
     {
@@ -33,6 +33,8 @@ struct smr_test : rl::test_suite
                 VAR(defer_[i][j]) = 0;
         }
     }
+
+    void invariant() { }
 
     void push(unsigned index, int data)
     {

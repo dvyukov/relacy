@@ -65,7 +65,7 @@ private:
 
 
 
-struct stack_test : rl::test_suite
+struct stack_test
 {
     stack s_;
 
@@ -84,6 +84,8 @@ struct stack_test : rl::test_suite
         RL_ASSERT(4 == consumed_count_);
     }
 
+    void invariant() { }
+
     void thread(unsigned /*index*/)
     {
         s_.push(rand() + 1);
@@ -95,8 +97,12 @@ struct stack_test : rl::test_suite
 };
 
 
-struct test_api : rl::test_suite
+struct test_api
 {
+    void before() { }
+    void after() { }
+    void invariant() { }
+
     void thread(unsigned)
     {
         rl::jvolatile<int> jv1;
@@ -124,13 +130,17 @@ struct test_api : rl::test_suite
     }
 };
 
-struct test_seq_cst_volatiles : rl::test_suite
+struct test_seq_cst_volatiles
 {
     rl::jvolatile<int> flag0;
     rl::jvolatile<int> flag1;
     rl::jvolatile<int> turn;
 
     rl::var<int> data;
+
+    void before() { }
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -155,7 +165,7 @@ struct test_seq_cst_volatiles : rl::test_suite
     }
 };
 
-struct test_seq_cst_volatiles2 : rl::test_suite
+struct test_seq_cst_volatiles2
 {
     rl::jvolatile<int> x;
     rl::jvolatile<int> y;
@@ -166,6 +176,8 @@ struct test_seq_cst_volatiles2 : rl::test_suite
     {
         r1 = r2 = r3 = r4 = 0;
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -196,9 +208,13 @@ struct test_seq_cst_volatiles2 : rl::test_suite
 };
 
 template<int expected>
-struct test_unitialized_var : rl::test_suite
+struct test_unitialized_var
 {
     rl::jvar<rl::jvar<int>*> www;
+
+    void before() { }
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {

@@ -5,7 +5,7 @@
 
 
 template<int T>
-struct cas_spurious_fail_test : rl::test_suite
+struct cas_spurious_fail_test
 {
     std::atomic<int> x;
     std::atomic<int> y;
@@ -15,6 +15,9 @@ struct cas_spurious_fail_test : rl::test_suite
         x.store(0, std::memory_order_relaxed);
         y.store(0, std::memory_order_relaxed);
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned /*index*/)
     {

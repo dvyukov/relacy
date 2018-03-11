@@ -291,10 +291,13 @@ private:
 
 
 
-struct recursive_timed_mutex_test : rl::test_suite // thread count = 3
+struct recursive_timed_mutex_test // thread count = 3
 {
     recursive_timed_mutex mtx;
     VAR_T(int) data;
+
+    void before() { }
+    void invariant() { }
 
     void thread(unsigned idx)
     {

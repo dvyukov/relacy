@@ -4,7 +4,7 @@
 
 
 
-struct test_futex : rl::test_suite
+struct test_futex
 {
 	rl::atomic<int> state;
 	int wakeres;
@@ -23,6 +23,8 @@ struct test_futex : rl::test_suite
 					 || (waitres == EWOULDBLOCK && wakeres == 0)
 					 || (waitres == EINTR && wakeres == 0));
 	}
+
+    void invariant() { }
 	
 	void thread(unsigned index)
 	{
@@ -45,9 +47,13 @@ struct test_futex : rl::test_suite
 
 
 
-struct test_futex_deadlock : rl::test_suite
+struct test_futex_deadlock
 {
 	rl::atomic<int> state;
+
+    void before() { }
+    void after() { }
+    void invariant() { }
 	
 	void thread(unsigned index)
 	{
@@ -61,7 +67,7 @@ struct test_futex_deadlock : rl::test_suite
 
 
 
-struct test_futex_sync1 : rl::test_suite
+struct test_futex_sync1
 {
 	rl::atomic<int> state;
 	VAR_T(int) data;
@@ -71,6 +77,9 @@ struct test_futex_sync1 : rl::test_suite
 		state.store(0, rl::memory_order_relaxed);
 		VAR(data) = 0;
 	}
+
+    void after() { }
+    void invariant() { }
 	
 	void thread(unsigned index)
 	{
@@ -97,7 +106,7 @@ struct test_futex_sync1 : rl::test_suite
 
 
 
-struct test_futex_sync2 : rl::test_suite
+struct test_futex_sync2
 {
 	rl::atomic<int> state;
 	VAR_T(int) data;
@@ -107,6 +116,9 @@ struct test_futex_sync2 : rl::test_suite
 		state.store(0, rl::memory_order_relaxed);
 		VAR(data) = 0;
 	}
+
+    void after() { }
+    void invariant() { }
 	
 	void thread(unsigned index)
 	{
@@ -133,7 +145,7 @@ struct test_futex_sync2 : rl::test_suite
 
 
 
-struct test_futex_intr : rl::test_suite
+struct test_futex_intr
 {
 	rl::atomic<int> state;
 	VAR_T(int) data;
@@ -143,6 +155,9 @@ struct test_futex_intr : rl::test_suite
 		state.store(0, rl::memory_order_relaxed);
 		VAR(data) = 0;
 	}
+
+    void after() { }
+    void invariant() { }
 	
 	void thread(unsigned index)
 	{

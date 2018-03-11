@@ -22,7 +22,6 @@
 #include "atomic.hpp"
 #include "var.hpp"
 #include "thread_local.hpp"
-#include "test_suite.hpp"
 #include "dyn_thread.hpp"
 
 #include "stdlib/mutex.hpp"

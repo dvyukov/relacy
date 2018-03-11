@@ -4,7 +4,7 @@
 
 
 
-struct test_semaphore : rl::test_suite
+struct test_semaphore
 {
     HANDLE sema;
     VAR_T(int) data;
@@ -19,6 +19,8 @@ struct test_semaphore : rl::test_suite
     {
         CloseHandle(sema);
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -41,7 +43,7 @@ struct test_semaphore : rl::test_suite
 
 
 
-struct test_semaphore_atomic : rl::test_suite
+struct test_semaphore_atomic
 {
 	HANDLE sem [2];
 	
@@ -56,6 +58,8 @@ struct test_semaphore_atomic : rl::test_suite
 		CloseHandle(sem[0]);
 		CloseHandle(sem[1]);
 	}
+
+    void invariant() { }
 	
 	void thread(unsigned index)
 	{

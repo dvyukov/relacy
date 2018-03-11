@@ -604,7 +604,7 @@ private:
 
 int x = 0;
 
-struct ws_deque_test : rl::test_suite
+struct ws_deque_test
 {
     ws_deque q;
     pdr p;
@@ -618,6 +618,8 @@ struct ws_deque_test : rl::test_suite
     {
         p.fini();
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {

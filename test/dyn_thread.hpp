@@ -5,7 +5,7 @@
 
 
 
-struct dyn_thread_basic_test : rl::test_suite
+struct dyn_thread_basic_test
 {
     rl::var<int> data1;
     rl::var<int> data2;
@@ -15,6 +15,9 @@ struct dyn_thread_basic_test : rl::test_suite
     {
         data3($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     static void* thread1(void* p)
     {
@@ -68,7 +71,7 @@ struct dyn_thread_basic_test : rl::test_suite
 
 
 
-struct dyn_thread_win32_test : rl::test_suite
+struct dyn_thread_win32_test
 {
     rl::var<int> data1;
     rl::var<int> data2;
@@ -78,6 +81,9 @@ struct dyn_thread_win32_test : rl::test_suite
     {
         data3($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     static unsigned long RL_STDCALL thread1(void* p)
     {
@@ -126,9 +132,13 @@ struct dyn_thread_win32_test : rl::test_suite
 };
 
 
-struct dyn_thread_visibility_test : rl::test_suite
+struct dyn_thread_visibility_test
 {
     rl::var<int> data;
+
+    void before() { }
+    void after() { }
+    void invariant() { }
 
     static unsigned long RL_STDCALL thread(void* p)
     {

@@ -53,9 +53,13 @@ private:
     VAR_T(node*) tail;
 };
 
-struct nonblocking_spsc_queue_test : rl::test_suite
+struct nonblocking_spsc_queue_test
 {
     nonblocking_spsc_queue<int> q;
+
+    void before() { }
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned thread_index)
     {
@@ -175,9 +179,13 @@ private:
 };
 
 
-struct spsc_queue_test : rl::test_suite
+struct spsc_queue_test
 {
     spsc_queue<int> q;
+
+    void before() { }
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned thread_index)
     {

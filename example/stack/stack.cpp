@@ -64,7 +64,7 @@ private:
 
 int count_threads = 0;
 
-struct stack_test : rl::test_suite
+struct stack_test
 {
     stack s_;
 
@@ -82,6 +82,8 @@ struct stack_test : rl::test_suite
         RL_ASSERT(count_threads == produced_count_);
         RL_ASSERT(count_threads == consumed_count_);
     }
+
+    void invariant() { }
 
     void thread(unsigned /*index*/)
     {

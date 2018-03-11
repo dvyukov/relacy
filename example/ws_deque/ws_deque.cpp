@@ -139,7 +139,7 @@ private:
 
 
 
-struct ws_deque_test0 : rl::test_suite
+struct ws_deque_test0
 {
     ws_deque<int> q;
 
@@ -150,6 +150,8 @@ struct ws_deque_test0 : rl::test_suite
     void after()
     {
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -220,7 +222,7 @@ struct ws_deque_test0 : rl::test_suite
 
 
 
-struct ws_deque_test : rl::test_suite
+struct ws_deque_test
 {
     ws_deque<int> q;
     bool state [2];
@@ -236,6 +238,8 @@ struct ws_deque_test : rl::test_suite
         RL_ASSERT(state[0] == false);
         RL_ASSERT(state[1] == false);
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {

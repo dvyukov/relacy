@@ -4,9 +4,13 @@
 
 
 
-struct tls_basic_test : rl::test_suite
+struct tls_basic_test
 {
     rl::thread_local_var<unsigned> x;
+
+    void before() { }
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -17,9 +21,13 @@ struct tls_basic_test : rl::test_suite
 };
 
 
-struct tls_basic_test2 : rl::test_suite
+struct tls_basic_test2
 {
     TLS_T(unsigned) x;
+
+    void before() { }
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -30,9 +38,13 @@ struct tls_basic_test2 : rl::test_suite
 };
 
 
-struct tls_reset_test : rl::test_suite
+struct tls_reset_test
 {
     rl::thread_local_var<unsigned> x;
+
+    void before() { }
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -45,8 +57,12 @@ struct tls_reset_test : rl::test_suite
 
 
 rl::thread_local_var<unsigned> tls_global_test_x;
-struct tls_global_test : rl::test_suite
+struct tls_global_test
 {
+    void before() { }
+    void after() { }
+    void invariant() { }
+
     void thread(unsigned index)
     {
         RL_ASSERT(tls_global_test_x.get($) == 0);
@@ -57,7 +73,7 @@ struct tls_global_test : rl::test_suite
 };
 
 
-struct tls_win32_test : rl::test_suite
+struct tls_win32_test
 {
     unsigned long slot;
 
@@ -70,6 +86,8 @@ struct tls_win32_test : rl::test_suite
     {
         TlsFree(slot);
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {

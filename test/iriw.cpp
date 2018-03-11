@@ -1,6 +1,6 @@
 #include "../relacy/relacy_std.hpp"
 
-struct test : rl::test_suite
+struct test
 {
   std::atomic<int> x_;
   std::atomic<int> y_;
@@ -12,6 +12,8 @@ struct test : rl::test_suite
     y_.store(0, std::memory_order_relaxed);
     r2x = r2y = r3x = r3y = 0;
   }
+
+  void invariant() { }
 
   void thread(unsigned thread_index)
   {

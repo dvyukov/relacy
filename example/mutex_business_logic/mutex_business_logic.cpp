@@ -97,7 +97,7 @@ private:
 
 
 
-struct business_logic_test : rl::test_suite
+struct business_logic_test
 {
     business_logic bl;
 
@@ -111,6 +111,9 @@ struct business_logic_test : rl::test_suite
             RL_ASSERT(rv);
         }
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned /*index*/)
     {

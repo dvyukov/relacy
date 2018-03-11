@@ -193,9 +193,13 @@ private:
 };
 
 
-struct test_mpmc : rl::test_suite // thread count = 6
+struct test_mpmc // thread count = 6
 {
     mpmcq<int> q;
+
+    void before() { }
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned idx)
     {
@@ -439,7 +443,7 @@ struct eventcount
 
 
 
-struct test_ec : rl::test_suite
+struct test_ec
 {
     std::atomic<int> x [2];
     eventcount ec;
@@ -449,6 +453,9 @@ struct test_ec : rl::test_suite
         x[0]($) = 0;
         x[1]($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned idx)
     {

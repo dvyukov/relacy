@@ -4,7 +4,7 @@
 
 
 
-struct livelock_test : rl::test_suite
+struct livelock_test
 {
     std::atomic<int> x;
 
@@ -12,6 +12,9 @@ struct livelock_test : rl::test_suite
     {
         x($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -34,7 +37,7 @@ struct livelock_test : rl::test_suite
 
 
 
-struct yield_livelock_test : rl::test_suite
+struct yield_livelock_test
 {
     std::atomic<int> x, y;
 
@@ -43,6 +46,9 @@ struct yield_livelock_test : rl::test_suite
         x($) = 0;
         y($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -98,7 +104,7 @@ struct yield_livelock_test : rl::test_suite
 
 
 
-struct sched_load_test : rl::test_suite
+struct sched_load_test
 {
     std::recursive_mutex mtx1, mtx2;
     std::condition_variable_any cv1, cv2;
@@ -107,6 +113,9 @@ struct sched_load_test : rl::test_suite
     void before()
     {
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {

@@ -687,8 +687,11 @@ public:
 }; 
 
 
-struct eventcount_test : rl::test_suite
+struct eventcount_test
 {
+    void before() { }
+    void after() { }
+    void invariant() { }
     void thread(unsigned index)
     {
         delete ec_thread::current();

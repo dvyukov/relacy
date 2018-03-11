@@ -3,7 +3,7 @@
 #include "../../relacy/windows.h"
 
 
-struct peterson_mutex_test : rl::test_suite
+struct peterson_mutex_test
 {
     std::atomic<int> flag0;
     std::atomic<int> flag1;
@@ -17,6 +17,9 @@ struct peterson_mutex_test : rl::test_suite
         flag1($) = 0;
         turn($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -50,7 +53,7 @@ struct peterson_mutex_test : rl::test_suite
 
 
 
-struct peterson_mutex_test2 : rl::test_suite
+struct peterson_mutex_test2
 {
     std::atomic<int> flag0;
     std::atomic<int> flag1;
@@ -64,6 +67,9 @@ struct peterson_mutex_test2 : rl::test_suite
         flag1($) = 0;
         turn($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -99,7 +105,7 @@ struct peterson_mutex_test2 : rl::test_suite
 
 
 
-struct peterson_mutex_test3 : rl::test_suite
+struct peterson_mutex_test3
 {
     std::atomic<int> flag0;
     std::atomic<int> flag1;
@@ -113,6 +119,9 @@ struct peterson_mutex_test3 : rl::test_suite
         flag1($) = 0;
         turn($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -150,7 +159,7 @@ struct peterson_mutex_test3 : rl::test_suite
 
 
 // FAILS WITH DATA RACE
-struct peterson_mutex_test4 : rl::test_suite
+struct peterson_mutex_test4
 {
     std::atomic<int> flag0;
     std::atomic<int> flag1;
@@ -164,6 +173,9 @@ struct peterson_mutex_test4 : rl::test_suite
         flag1($) = 0;
         turn($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -311,7 +323,7 @@ private:
 
 
 
-struct signaling_test : rl::test_suite // thread count = 6
+struct signaling_test // thread count = 6
 {
     //rl::HANDLE              var_wait_for_items;
     //rl::CRITICAL_SECTION    mtx_items_avail;
@@ -348,6 +360,8 @@ struct signaling_test : rl::test_suite // thread count = 6
         //rl::CloseHandle(var_wait_for_items, $);
         //rl::DeleteCriticalSection(&mtx_items_avail, $);
     }
+
+    void invariant() { }
 
     struct enqueue_desc
     {

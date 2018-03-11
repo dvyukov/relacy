@@ -4,7 +4,7 @@
 
 
 
-struct test_wfmo_all : rl::test_suite
+struct test_wfmo_all
 {
     HANDLE sema1;
     HANDLE sema2;
@@ -22,6 +22,8 @@ struct test_wfmo_all : rl::test_suite
         CloseHandle(sema1);
         CloseHandle(sema2);
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -44,7 +46,7 @@ struct test_wfmo_all : rl::test_suite
 
 
 
-struct test_wfmo_single : rl::test_suite
+struct test_wfmo_single
 {
     HANDLE sema1;
     HANDLE sema2;
@@ -62,6 +64,8 @@ struct test_wfmo_single : rl::test_suite
         CloseHandle(sema1);
         CloseHandle(sema2);
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -86,7 +90,7 @@ struct test_wfmo_single : rl::test_suite
 
 
 
-struct test_wfmo_timeout : rl::test_suite
+struct test_wfmo_timeout
 {
     HANDLE sema1;
     HANDLE sema2;
@@ -104,6 +108,8 @@ struct test_wfmo_timeout : rl::test_suite
         CloseHandle(sema1);
         CloseHandle(sema2);
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -128,7 +134,7 @@ struct test_wfmo_timeout : rl::test_suite
 
 
 
-struct test_wfmo_try : rl::test_suite
+struct test_wfmo_try
 {
     HANDLE sema1;
     HANDLE sema2;
@@ -149,6 +155,8 @@ struct test_wfmo_try : rl::test_suite
         CloseHandle(sema1);
         CloseHandle(sema2);
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -172,7 +180,7 @@ struct test_wfmo_try : rl::test_suite
 
 
 
-struct test_wfmo_mixed : rl::test_suite
+struct test_wfmo_mixed
 {
 	HANDLE sem [2];
 	
@@ -187,6 +195,8 @@ struct test_wfmo_mixed : rl::test_suite
 		CloseHandle(sem[0]);
 		CloseHandle(sem[1]);
 	}
+
+    void invariant() { }
 	
 	void thread(unsigned index)
 	{
@@ -212,7 +222,7 @@ struct test_wfmo_mixed : rl::test_suite
 
 
 
-struct test_wfmo_mixed2 : rl::test_suite
+struct test_wfmo_mixed2
 {
 	HANDLE sem [2];
 	
@@ -227,6 +237,8 @@ struct test_wfmo_mixed2 : rl::test_suite
 		CloseHandle(sem[0]);
 		CloseHandle(sem[1]);
 	}
+
+    void invariant() { }
 	
 	void thread(unsigned index)
 	{
@@ -252,7 +264,7 @@ struct test_wfmo_mixed2 : rl::test_suite
 
 
 
-struct test_wfmo_event_all : rl::test_suite
+struct test_wfmo_event_all
 {
 	HANDLE ev [2];
 	rl::atomic<int> state;
@@ -269,6 +281,8 @@ struct test_wfmo_event_all : rl::test_suite
 		CloseHandle(ev[0]);
 		CloseHandle(ev[1]);
 	}
+
+    void invariant() { }
 	
 	void thread(unsigned index)
 	{
@@ -290,7 +304,7 @@ struct test_wfmo_event_all : rl::test_suite
 
 
 
-struct test_wfmo_event_any : rl::test_suite
+struct test_wfmo_event_any
 {
 	HANDLE ev [2];
 	rl::atomic<int> state;
@@ -307,6 +321,8 @@ struct test_wfmo_event_any : rl::test_suite
 		CloseHandle(ev[0]);
 		CloseHandle(ev[1]);
 	}
+
+    void invariant() { }
 	
 	void thread(unsigned index)
 	{
@@ -328,7 +344,7 @@ struct test_wfmo_event_any : rl::test_suite
 
 
 
-struct test_wfmo_atomic : rl::test_suite
+struct test_wfmo_atomic
 {
 	HANDLE ev [2];
 	rl::atomic<int> state;
@@ -344,6 +360,8 @@ struct test_wfmo_atomic : rl::test_suite
 		CloseHandle(ev[0]);
 		CloseHandle(ev[1]);
 	}
+
+    void invariant() { }
 	
 	void thread(unsigned index)
 	{

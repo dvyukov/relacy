@@ -54,7 +54,7 @@ rc_object* get_from_channel(rl::atomic<rc_object*>& ch)
 
 
 
-struct ref_counting_test : rl::test_suite
+struct ref_counting_test
 {
     std::atomic<rc_object*> channel;
 
@@ -62,6 +62,9 @@ struct ref_counting_test : rl::test_suite
     {
         channel($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -98,7 +101,7 @@ struct ref_counting_test : rl::test_suite
 
 
 
-struct ref_counting_test2 : rl::test_suite // thread count = 3
+struct ref_counting_test2 // thread count = 3
 {
     std::atomic<rc_object*> channel01;
     std::atomic<rc_object*> channel02;
@@ -112,6 +115,9 @@ struct ref_counting_test2 : rl::test_suite // thread count = 3
         channel12($) = 0;
         channel21($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -215,7 +221,7 @@ struct ref_counting_test2 : rl::test_suite // thread count = 3
 
 
 
-struct ref_counting_test3 : rl::test_suite // thread count = 3
+struct ref_counting_test3 // thread count = 3
 {
     std::atomic<rc_object*> channel;
 
@@ -223,6 +229,9 @@ struct ref_counting_test3 : rl::test_suite // thread count = 3
     {
         channel($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {

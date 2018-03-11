@@ -217,7 +217,7 @@ struct foo_list
     }
 };
 
-struct proxy_collector_test : rl::test_suite
+struct proxy_collector_test
 {
     foo_list m_list;
 
@@ -231,6 +231,8 @@ struct proxy_collector_test : rl::test_suite
         foo_node* node = new foo_node;
         m_list.pc.mutate(&node->pcn);
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {

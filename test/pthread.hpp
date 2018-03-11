@@ -4,9 +4,13 @@
 
 
 
-struct test_pthread_thread : rl::test_suite
+struct test_pthread_thread
 {
     VAR_T(int) data;
+
+    void before() { }
+    void after() { }
+    void invariant() { }
 
     static void* func(void* param)
     {
@@ -37,7 +41,7 @@ struct test_pthread_thread : rl::test_suite
 
 
 
-struct test_pthread_mutex : rl::test_suite
+struct test_pthread_mutex
 {
     pthread_mutex_t mtx;
     VAR_T(int) data;
@@ -56,6 +60,8 @@ struct test_pthread_mutex : rl::test_suite
     {
         pthread_mutex_destroy(&mtx);
     }
+
+    void invariant() { }
 
     void thread(unsigned /*index*/)
     {
@@ -76,7 +82,7 @@ struct test_pthread_mutex : rl::test_suite
 
 
 
-struct test_pthread_condvar : rl::test_suite
+struct test_pthread_condvar
 {
     pthread_cond_t cv;
     pthread_mutex_t mtx;
@@ -95,6 +101,8 @@ struct test_pthread_condvar : rl::test_suite
         pthread_cond_destroy(&cv);
         pthread_mutex_destroy(&mtx);
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -133,7 +141,7 @@ struct test_pthread_condvar : rl::test_suite
 
 
 
-struct test_pthread_condvar2 : rl::test_suite
+struct test_pthread_condvar2
 {
     pthread_cond_t cv1, cv2;
     pthread_mutex_t mtx1, mtx2;
@@ -155,6 +163,8 @@ struct test_pthread_condvar2 : rl::test_suite
         pthread_mutex_destroy(&mtx1);
         pthread_mutex_destroy(&mtx2);
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -178,7 +188,7 @@ struct test_pthread_condvar2 : rl::test_suite
 
 
 
-struct test_pthread_rwlock : rl::test_suite
+struct test_pthread_rwlock
 {
     pthread_rwlock_t mtx;
     VAR_T(int) data;
@@ -197,6 +207,8 @@ struct test_pthread_rwlock : rl::test_suite
     {
         pthread_rwlock_destroy(&mtx);
     }
+
+    void invariant() { }
 
     void thread(unsigned /*index*/)
     {
@@ -225,7 +237,7 @@ struct test_pthread_rwlock : rl::test_suite
 
 
 
-struct test_pthread_sem : rl::test_suite
+struct test_pthread_sem
 {
     sem_t sem1, sem2;
     VAR_T(int) data;
@@ -242,6 +254,8 @@ struct test_pthread_sem : rl::test_suite
         sem_destroy(&sem1);
         sem_destroy(&sem2);
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {

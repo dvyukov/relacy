@@ -4,7 +4,7 @@
 
 
 template<int index, int mo_index>
-struct fence_synch_test : rl::test_suite
+struct fence_synch_test
 {
     std::atomic<int> x;
     rl::var<int> data;
@@ -13,6 +13,9 @@ struct fence_synch_test : rl::test_suite
     {
         x($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned th)
     {
@@ -63,7 +66,7 @@ struct fence_synch_test : rl::test_suite
 
 
 
-struct two_fence_synch_test : rl::test_suite
+struct two_fence_synch_test
 {
     std::atomic<int> x0;
     std::atomic<int> x1;
@@ -75,6 +78,9 @@ struct two_fence_synch_test : rl::test_suite
         x0($) = 0;
         x1($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -110,7 +116,7 @@ struct two_fence_synch_test : rl::test_suite
 
 
 template<int index>
-struct seq_cst_fence_test : rl::test_suite
+struct seq_cst_fence_test
 {
     std::atomic<int> x0;
     std::atomic<int> x1;
@@ -122,6 +128,8 @@ struct seq_cst_fence_test : rl::test_suite
         x0($) = 0;
         x1($) = 0;
     }
+
+    void invariant() { }
 
     void thread(unsigned th)
     {
