@@ -132,7 +132,7 @@ private:
     mutex m_foreignLock;
 };
 
-struct ws_deque_test : rl::test_suite<ws_deque_test, 2>
+struct ws_deque_test
 {
     ws_deque<int> q;
     bool state [2];
@@ -148,6 +148,8 @@ struct ws_deque_test : rl::test_suite<ws_deque_test, 2>
         RL_ASSERT(state[0] == false);
         RL_ASSERT(state[1] == false);
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -190,8 +192,12 @@ struct ws_deque_test : rl::test_suite<ws_deque_test, 2>
 
 
 
-struct test_api : rl::test_suite<test_api, 1>
+struct test_api
 {
+    void before() { }
+    void after() { }
+    void invariant() { }
+
     void thread(unsigned)
     {
         rl::nvar<int> cv1, cv2(3), cv3(cv1($)), cv4(cv1);
@@ -224,7 +230,7 @@ struct test_api : rl::test_suite<test_api, 1>
 
 
 
-struct ws_deque_test0 : rl::test_suite<ws_deque_test0, 4>
+struct ws_deque_test0
 {
     ws_deque<int> q;
 
@@ -235,6 +241,8 @@ struct ws_deque_test0 : rl::test_suite<ws_deque_test0, 4>
     void after()
     {
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -309,7 +317,10 @@ int main()
 {
     rl::test_params p;
     p.iteration_count = 1000;
+    p.static_thread_count = 4;
     rl::simulate<ws_deque_test0>(p);
+    p.static_thread_count = 2;
     rl::simulate<ws_deque_test>(p);
-    rl::simulate<test_api>();
+    p.static_thread_count = 1;
+    rl::simulate<test_api>(p);
 }

@@ -5,10 +5,8 @@
 
 
 
-struct dyn_thread_basic_test : rl::test_suite<dyn_thread_basic_test, 2>
+struct dyn_thread_basic_test
 {
-    static unsigned const dynamic_thread_count = 4;
-
     rl::var<int> data1;
     rl::var<int> data2;
     rl::atomic<int> data3;
@@ -17,6 +15,9 @@ struct dyn_thread_basic_test : rl::test_suite<dyn_thread_basic_test, 2>
     {
         data3($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     static void* thread1(void* p)
     {
@@ -70,10 +71,8 @@ struct dyn_thread_basic_test : rl::test_suite<dyn_thread_basic_test, 2>
 
 
 
-struct dyn_thread_win32_test : rl::test_suite<dyn_thread_win32_test, 2>
+struct dyn_thread_win32_test
 {
-    static unsigned const dynamic_thread_count = 4;
-
     rl::var<int> data1;
     rl::var<int> data2;
     rl::atomic<int> data3;
@@ -82,6 +81,9 @@ struct dyn_thread_win32_test : rl::test_suite<dyn_thread_win32_test, 2>
     {
         data3($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     static unsigned long RL_STDCALL thread1(void* p)
     {
@@ -130,11 +132,13 @@ struct dyn_thread_win32_test : rl::test_suite<dyn_thread_win32_test, 2>
 };
 
 
-struct dyn_thread_visibility_test : rl::test_suite<dyn_thread_visibility_test, 1>
+struct dyn_thread_visibility_test
 {
-    static unsigned const dynamic_thread_count = 1;
-
     rl::var<int> data;
+
+    void before() { }
+    void after() { }
+    void invariant() { }
 
     static unsigned long RL_STDCALL thread(void* p)
     {

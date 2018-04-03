@@ -62,10 +62,9 @@ private:
     stack& operator = (stack const&);
 };
 
+int count_threads = 0;
 
-
-
-struct stack_test : rl::test_suite<stack_test, 4>
+struct stack_test
 {
     stack s_;
 
@@ -80,10 +79,11 @@ struct stack_test : rl::test_suite<stack_test, 4>
 
     void after()
     {
-        typedef rl::test_suite<stack_test, 4> base_t;
-        RL_ASSERT(base_t::params::thread_count == produced_count_);
-        RL_ASSERT(base_t::params::thread_count == consumed_count_);
+        RL_ASSERT(count_threads == produced_count_);
+        RL_ASSERT(count_threads == consumed_count_);
     }
+
+    void invariant() { }
 
     void thread(unsigned /*index*/)
     {
@@ -98,8 +98,34 @@ struct stack_test : rl::test_suite<stack_test, 4>
 
 
 
-int main()
+int main(int argc, char **argv)
 {
-    rl::simulate<stack_test>();
+    if (argc != 2)
+    {
+        std::cerr << "Wrong number of arguments" << std::endl;
+        return EINVAL;
+    }
+
+    try
+    {
+        count_threads = std::atoi(argv[1]);
+        if (count_threads <= 0)
+        {
+            std::cerr << "The number of threads must be a positive number" << std::endl;
+            return EINVAL;
+        }
+
+        rl::test_params p;
+        p.static_thread_count = count_threads;
+        rl::simulate<stack_test>(p);
+    }
+    catch(std::exception const & e)
+    {
+        (void)e;
+        std::cerr << "Wrong argument. The number of threads must be a number" << std::endl;
+        return EINVAL;
+    }
+
+    return 0;
 }
 

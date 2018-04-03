@@ -3,7 +3,7 @@
 #include "../../relacy/windows.h"
 
 
-struct peterson_mutex_test : rl::test_suite<peterson_mutex_test, 2>
+struct peterson_mutex_test
 {
     std::atomic<int> flag0;
     std::atomic<int> flag1;
@@ -17,6 +17,9 @@ struct peterson_mutex_test : rl::test_suite<peterson_mutex_test, 2>
         flag1($) = 0;
         turn($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -50,7 +53,7 @@ struct peterson_mutex_test : rl::test_suite<peterson_mutex_test, 2>
 
 
 
-struct peterson_mutex_test2 : rl::test_suite<peterson_mutex_test2, 2>
+struct peterson_mutex_test2
 {
     std::atomic<int> flag0;
     std::atomic<int> flag1;
@@ -64,6 +67,9 @@ struct peterson_mutex_test2 : rl::test_suite<peterson_mutex_test2, 2>
         flag1($) = 0;
         turn($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -99,7 +105,7 @@ struct peterson_mutex_test2 : rl::test_suite<peterson_mutex_test2, 2>
 
 
 
-struct peterson_mutex_test3 : rl::test_suite<peterson_mutex_test3, 2>
+struct peterson_mutex_test3
 {
     std::atomic<int> flag0;
     std::atomic<int> flag1;
@@ -113,6 +119,9 @@ struct peterson_mutex_test3 : rl::test_suite<peterson_mutex_test3, 2>
         flag1($) = 0;
         turn($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -150,7 +159,7 @@ struct peterson_mutex_test3 : rl::test_suite<peterson_mutex_test3, 2>
 
 
 // FAILS WITH DATA RACE
-struct peterson_mutex_test4 : rl::test_suite<peterson_mutex_test4, 2>
+struct peterson_mutex_test4
 {
     std::atomic<int> flag0;
     std::atomic<int> flag1;
@@ -164,6 +173,9 @@ struct peterson_mutex_test4 : rl::test_suite<peterson_mutex_test4, 2>
         flag1($) = 0;
         turn($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -311,7 +323,7 @@ private:
 
 
 
-struct signaling_test : rl::test_suite<signaling_test, 6>
+struct signaling_test // thread count = 6
 {
     //rl::HANDLE              var_wait_for_items;
     //rl::CRITICAL_SECTION    mtx_items_avail;
@@ -348,6 +360,8 @@ struct signaling_test : rl::test_suite<signaling_test, 6>
         //rl::CloseHandle(var_wait_for_items, $);
         //rl::DeleteCriticalSection(&mtx_items_avail, $);
     }
+
+    void invariant() { }
 
     struct enqueue_desc
     {
@@ -432,7 +446,7 @@ struct signaling_test : rl::test_suite<signaling_test, 6>
 
     void thread(unsigned index)
     {
-        if (index < rl::test_suite<signaling_test, 6>::params::thread_count/2+1)
+        if (index < 6 / 2 + 1)
         {
             enqueue();
         }
@@ -450,16 +464,23 @@ int main()
 {
     rl::test_params p;
     //p.search_type = rl::fair_context_bound_scheduler_type;
-    p.search_type = rl::sched_bound;
+    p.static_thread_count = 2;
     //p.context_bound = 1;
     //p.execution_depth_limit = 100;
     //p.iteration_count = 5000;
     //p.initial_state = "280572";
     //rl::simulate<signaling_test>(p);
 
-    rl::simulate<peterson_mutex_test>();
+    p.search_type = rl::random_scheduler_type;
+    rl::simulate<peterson_mutex_test>(p);
+
+    p.search_type = rl::sched_bound;
     rl::simulate<peterson_mutex_test2>(p);
-    rl::simulate<peterson_mutex_test3>();
+
+    p.search_type = rl::random_scheduler_type;
+    rl::simulate<peterson_mutex_test3>(p);
+
+    p.search_type = rl::sched_bound;
     rl::simulate<peterson_mutex_test4>(p);
 }
 

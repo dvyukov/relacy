@@ -65,7 +65,7 @@ private:
 
 
 
-struct stack_test : rl::test_suite<stack_test, 4>
+struct stack_test
 {
     stack s_;
 
@@ -80,10 +80,11 @@ struct stack_test : rl::test_suite<stack_test, 4>
 
     void after()
     {
-        typedef rl::test_suite<stack_test, 4> base_t;
-        RL_ASSERT(base_t::params::thread_count == produced_count_);
-        RL_ASSERT(base_t::params::thread_count == consumed_count_);
+        RL_ASSERT(4 == produced_count_);
+        RL_ASSERT(4 == consumed_count_);
     }
+
+    void invariant() { }
 
     void thread(unsigned /*index*/)
     {
@@ -96,8 +97,12 @@ struct stack_test : rl::test_suite<stack_test, 4>
 };
 
 
-struct test_api : rl::test_suite<test_api, 1>
+struct test_api
 {
+    void before() { }
+    void after() { }
+    void invariant() { }
+
     void thread(unsigned)
     {
         rl::jvolatile<int> jv1;
@@ -125,13 +130,17 @@ struct test_api : rl::test_suite<test_api, 1>
     }
 };
 
-struct test_seq_cst_volatiles : rl::test_suite<test_seq_cst_volatiles, 2>
+struct test_seq_cst_volatiles
 {
     rl::jvolatile<int> flag0;
     rl::jvolatile<int> flag1;
     rl::jvolatile<int> turn;
 
     rl::var<int> data;
+
+    void before() { }
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -156,7 +165,7 @@ struct test_seq_cst_volatiles : rl::test_suite<test_seq_cst_volatiles, 2>
     }
 };
 
-struct test_seq_cst_volatiles2 : rl::test_suite<test_seq_cst_volatiles2, 4>
+struct test_seq_cst_volatiles2
 {
     rl::jvolatile<int> x;
     rl::jvolatile<int> y;
@@ -167,6 +176,8 @@ struct test_seq_cst_volatiles2 : rl::test_suite<test_seq_cst_volatiles2, 4>
     {
         r1 = r2 = r3 = r4 = 0;
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -197,9 +208,13 @@ struct test_seq_cst_volatiles2 : rl::test_suite<test_seq_cst_volatiles2, 4>
 };
 
 template<int expected>
-struct test_unitialized_var : rl::test_suite<test_unitialized_var<expected>, 2, rl::test_result_until_condition_hit>
+struct test_unitialized_var
 {
     rl::jvar<rl::jvar<int>*> www;
+
+    void before() { }
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -217,17 +232,24 @@ struct test_unitialized_var : rl::test_suite<test_unitialized_var<expected>, 2, 
     }
 };
 
+struct test_info_t
+{
+    rl::simulate_f      f;
+    rl::thread_id_t     static_thread_count;
+    rl::thread_id_t     dynamic_thread_count;
+    rl::test_result_e   expected_result;
+};
 
 int main()
 {
-    rl::simulate_f tests[] = 
+    test_info_t tests[] =
     {
         //!!! broken &rl::simulate<test_unitialized_var<0> >,
-        &rl::simulate<test_unitialized_var<1> >,
-        &rl::simulate<test_seq_cst_volatiles>,
-        &rl::simulate<test_seq_cst_volatiles2>,
-        &rl::simulate<test_api>,
-        &rl::simulate<stack_test>,
+        { &rl::simulate<test_unitialized_var<1> >, 2, 0, rl::test_result_until_condition_hit },
+        { &rl::simulate<test_seq_cst_volatiles>, 2, 0, rl::test_result_success },
+        { &rl::simulate<test_seq_cst_volatiles2>, 4, 0, rl::test_result_success },
+        { &rl::simulate<test_api>, 1, 0, rl::test_result_success },
+        { &rl::simulate<stack_test>, 4, 0, rl::test_result_success }
     };
 
     for (size_t i = 0; i != sizeof(tests)/sizeof(*tests); ++i)
@@ -239,8 +261,11 @@ int main()
         params.progress_stream = &stream;
         params.context_bound = 2;
         params.execution_depth_limit = 500;
+        params.static_thread_count = tests[i].static_thread_count;
+        params.dynamic_thread_count = tests[i].dynamic_thread_count;
+        params.expected_result = tests[i].expected_result;
 
-        if (false == tests[i](params))
+        if (false == tests[i].f(params))
         {
             std::cout << std::endl;
             std::cout << "FAILED" << std::endl;

@@ -217,7 +217,7 @@ struct foo_list
     }
 };
 
-struct proxy_collector_test : rl::test_suite<proxy_collector_test, 4>
+struct proxy_collector_test
 {
     foo_list m_list;
 
@@ -231,6 +231,8 @@ struct proxy_collector_test : rl::test_suite<proxy_collector_test, 4>
         foo_node* node = new foo_node;
         m_list.pc.mutate(&node->pcn);
     }
+
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -313,6 +315,7 @@ int main()
 {
     rl::test_params params;
     params.iteration_count = 1000;
+    params.static_thread_count = 4;
     rl::simulate<proxy_collector_test>(params);
 }
 

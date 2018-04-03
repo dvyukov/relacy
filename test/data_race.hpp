@@ -5,7 +5,7 @@
 
 
 
-struct race_ld_ld_test : rl::test_suite<race_ld_ld_test, 2>
+struct race_ld_ld_test
 {
     rl::var<int> x;
 
@@ -14,6 +14,9 @@ struct race_ld_ld_test : rl::test_suite<race_ld_ld_test, 2>
         x($) = 0;
     }
 
+    void after() { }
+    void invariant() { }
+
     void thread(unsigned index)
     {
         if (index)
@@ -26,7 +29,7 @@ struct race_ld_ld_test : rl::test_suite<race_ld_ld_test, 2>
 
 
 
-struct race_ld_st_test : rl::test_suite<race_ld_st_test, 2, rl::test_result_data_race>
+struct race_ld_st_test
 {
     rl::var<int> x;
 
@@ -35,6 +38,9 @@ struct race_ld_st_test : rl::test_suite<race_ld_st_test, 2, rl::test_result_data
         x($) = 0;
     }
 
+    void after() { }
+    void invariant() { }
+
     void thread(unsigned index)
     {
         if (index)
@@ -47,9 +53,13 @@ struct race_ld_st_test : rl::test_suite<race_ld_st_test, 2, rl::test_result_data
 
 
 
-struct race_st_st_test : rl::test_suite<race_st_st_test, 2, rl::test_result_data_race>
+struct race_st_st_test
 {
     rl::var<int> x;
+
+    void before() { }
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -63,7 +73,7 @@ struct race_st_st_test : rl::test_suite<race_st_st_test, 2, rl::test_result_data
 
 
 
-struct race_seq_ld_ld_test : rl::test_suite<race_seq_ld_ld_test, 2>
+struct race_seq_ld_ld_test
 {
     std::atomic<int> a;
     rl::var<int> x;
@@ -73,6 +83,9 @@ struct race_seq_ld_ld_test : rl::test_suite<race_seq_ld_ld_test, 2>
         a($) = 0;
         x($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -94,7 +107,7 @@ struct race_seq_ld_ld_test : rl::test_suite<race_seq_ld_ld_test, 2>
 
 
 
-struct race_seq_ld_st_test : rl::test_suite<race_seq_ld_st_test, 2, rl::test_result_data_race>
+struct race_seq_ld_st_test
 {
     std::atomic<int> a;
     rl::var<int> x;
@@ -104,6 +117,9 @@ struct race_seq_ld_st_test : rl::test_suite<race_seq_ld_st_test, 2, rl::test_res
         a($) = 0;
         x($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -125,7 +141,7 @@ struct race_seq_ld_st_test : rl::test_suite<race_seq_ld_st_test, 2, rl::test_res
 
 
 
-struct race_seq_st_ld_test : rl::test_suite<race_seq_st_ld_test, 2, rl::test_result_data_race>
+struct race_seq_st_ld_test
 {
     std::atomic<int> a;
     rl::var<int> x;
@@ -134,6 +150,9 @@ struct race_seq_st_ld_test : rl::test_suite<race_seq_st_ld_test, 2, rl::test_res
     {
         a($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -155,7 +174,7 @@ struct race_seq_st_ld_test : rl::test_suite<race_seq_st_ld_test, 2, rl::test_res
 
 
 
-struct race_seq_st_st_test : rl::test_suite<race_seq_st_st_test, 2, rl::test_result_data_race>
+struct race_seq_st_st_test
 {
     std::atomic<int> a;
     rl::var<int> x;
@@ -164,6 +183,9 @@ struct race_seq_st_st_test : rl::test_suite<race_seq_st_st_test, 2, rl::test_res
     {
         a($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -185,7 +207,7 @@ struct race_seq_st_st_test : rl::test_suite<race_seq_st_st_test, 2, rl::test_res
 
 
 
-struct race_uninit_test : rl::test_suite<race_uninit_test, 2, rl::test_result_unitialized_access>
+struct race_uninit_test
 {
     std::atomic<int> a;
     std::atomic<int> x;
@@ -194,6 +216,9 @@ struct race_uninit_test : rl::test_suite<race_uninit_test, 2, rl::test_result_un
     {
         a($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -215,7 +240,7 @@ struct race_uninit_test : rl::test_suite<race_uninit_test, 2, rl::test_result_un
 
 
 
-struct race_indirect_test : rl::test_suite<race_indirect_test, 2, rl::test_result_data_race>
+struct race_indirect_test
 {
     std::atomic<int> a;
     rl::var<int> x;
@@ -225,6 +250,9 @@ struct race_indirect_test : rl::test_suite<race_indirect_test, 2, rl::test_resul
         a($) = 0;
         x($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {

@@ -1,0 +1,13 @@
+cmake_minimum_required(VERSION 2.8.12)
+
+add_subdirectory(cli_ws_deque)
+add_subdirectory(condvar)
+add_subdirectory(java_ws_deque)
+add_subdirectory(mutex_business_logic)
+add_subdirectory(peterson)
+add_subdirectory(proxy_collector)
+add_subdirectory(ref_counting)
+add_subdirectory(smr)
+add_subdirectory(spsc_queue)
+add_subdirectory(ws_deque)
+add_subdirectory(stack)

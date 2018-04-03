@@ -4,7 +4,7 @@
 
 
 
-struct test_addr_hash : rl::test_suite<test_addr_hash, 2>
+struct test_addr_hash
 {
     void* p1;
     void* p2;
@@ -25,6 +25,8 @@ struct test_addr_hash : rl::test_suite<test_addr_hash, 2>
         free(p2);
     }
 
+    void invariant() { }
+
     void thread(unsigned index)
     {
         assert(h1 == rl::hash_ptr(p1, table_size));
@@ -36,7 +38,7 @@ struct test_addr_hash : rl::test_suite<test_addr_hash, 2>
 };
 
 
-struct test_addr_hash2 : rl::test_suite<test_addr_hash2, 2, rl::test_result_until_condition_hit>
+struct test_addr_hash2
 {
     static size_t const table_size = 4;
     std::atomic<int> table [table_size];
@@ -46,6 +48,9 @@ struct test_addr_hash2 : rl::test_suite<test_addr_hash2, 2, rl::test_result_unti
         for (size_t i = 0; i != table_size; i += 1)
             table[i].store(0, std::memory_order_relaxed);
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned)
     {

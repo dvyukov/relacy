@@ -17,7 +17,6 @@
 #include "context_base.hpp"
 #include "dyn_thread_ctx.hpp"
 #include "thread_base.hpp"
-#include "test_suite.hpp"
 #include "memory_order.hpp"
 #include "foreach.hpp"
 
@@ -29,15 +28,23 @@ namespace rl
 
 struct atomic_data;
 struct var_data;
-template<thread_id_t thread_count> struct atomic_data_impl;
-template<thread_id_t thread_count> struct var_data_impl;
+template<typename Void> struct atomic_data_impl;
+struct var_data_impl;
 
-
-template<thread_id_t thread_count>
+template<typename Void = void>
 struct thread_info : thread_info_base
 {
-    thread_info(thread_id_t index = 0)
-        : thread_info_base(index, acq_rel_order_)
+    thread_info(thread_id_t thread_count, thread_id_t index = 0)
+        : thread_info_base(index, static_cast<timestamp_t*>(calloc(thread_count, sizeof(timestamp_t))))
+        , sync_object_(thread_count) 
+        , thread_count_(thread_count)
+        , acq_rel_order_(thread_info_base::acq_rel_order_)
+        , acquire_fence_order_(static_cast<timestamp_t*>(calloc(thread_count, sizeof(timestamp_t))))
+        , release_fence_order_(static_cast<timestamp_t*>(calloc(thread_count, sizeof(timestamp_t))))
+#ifdef RL_IMPROVED_SEQ_CST_FENCE
+        , imp_seq_cst_order_(static_cast<timestamp_t*>(calloc(thread_count, sizeof(timestamp_t))))
+#endif
+
     {
     }
 
@@ -47,7 +54,7 @@ struct thread_info : thread_info_base
         last_yield_ = 0;
         dynamic_thread_func_ = 0;
         dynamic_thread_param_ = 0;
-        for (thread_id_t j = 0; j != thread_count; ++j)
+        for (thread_id_t j = 0; j != thread_count_; ++j)
         {
             acq_rel_order_[j] = 0;
         }
@@ -56,14 +63,16 @@ struct thread_info : thread_info_base
         saved_disable_preemption_ = -1;
     }
 
-    thread_sync_object<thread_count> sync_object_;
+    thread_sync_object sync_object_;
 
-    timestamp_t acq_rel_order_ [thread_count];
-    timestamp_t acquire_fence_order_ [thread_count];
-    timestamp_t release_fence_order_ [thread_count];
+    thread_id_t const thread_count_;
+
+    timestamp_t* acq_rel_order_;
+    timestamp_t* acquire_fence_order_;
+    timestamp_t* release_fence_order_;
 
 #ifdef RL_IMPROVED_SEQ_CST_FENCE
-    timestamp_t imp_seq_cst_order_ [thread_count];
+    timestamp_t* imp_seq_cst_order_;
 #endif
 
     virtual void on_start()
@@ -82,7 +91,8 @@ struct thread_info : thread_info_base
 
     void atomic_thread_fence_acquire()
     {
-        foreach<thread_count>(
+        foreach(
+            thread_count_,
             acq_rel_order_,
             acquire_fence_order_,
             &assign_max);
@@ -90,7 +100,8 @@ struct thread_info : thread_info_base
 
     void atomic_thread_fence_release()
     {
-        foreach<thread_count>(
+        foreach(
+            thread_count_,
             release_fence_order_,
             acq_rel_order_,
             &assign);
@@ -105,17 +116,19 @@ struct thread_info : thread_info_base
     void atomic_thread_fence_seq_cst(timestamp_t* seq_cst_fence_order)
     {
 #ifdef RL_IMPROVED_SEQ_CST_FENCE
-        foreach<thread_count>(acq_rel_order_, imp_seq_cst_order_, assign_max);
+        foreach(thread_count_, acq_rel_order_, imp_seq_cst_order_, assign_max);
 #endif
 
         atomic_thread_fence_acquire();
 
-        foreach<thread_count>(
+        foreach(
+            thread_count_,
             acq_rel_order_,
             seq_cst_fence_order,
             &assign_max);
 
-        foreach<thread_count>(
+        foreach(
+            thread_count_,
             seq_cst_fence_order,
             acq_rel_order_,
             &assign);
@@ -123,7 +136,16 @@ struct thread_info : thread_info_base
         atomic_thread_fence_release();
     }
 
-    virtual ~thread_info() {} // just to calm down gcc
+    virtual ~thread_info()
+    {
+        free(acq_rel_order_);
+        free(acquire_fence_order_);
+        free(release_fence_order_);
+
+    #ifdef RL_IMPROVED_SEQ_CST_FENCE
+        free(imp_seq_cst_order_);
+    #endif
+    }
 
 private:
     thread_info(thread_info const&);
@@ -200,9 +222,9 @@ private:
     }
 
     template<memory_order mo, bool rmw>
-    unsigned get_load_index(atomic_data_impl<thread_count>& var)
+    unsigned get_load_index(atomic_data_impl<Void>& var)
     {
-        typedef typename atomic_data_impl<thread_count>::history_record history_t;
+        typedef typename atomic_data_impl<Void>::history_record history_t;
 
         unsigned index = var.current_index_;
         context& c = ctx();
@@ -230,7 +252,7 @@ private:
                     break;
 
                 bool stop = false;
-                for (thread_id_t i = 0; i != thread_count; ++i)
+                for (thread_id_t i = 0; i != thread_count_; ++i)
                 {
                     timestamp_t acq_rel_order2 = acq_rel_order_[i];
                     if (acq_rel_order2 >= rec.last_seen_order_[i])
@@ -259,10 +281,10 @@ private:
         RL_VERIFY(mo_release != mo || rmw);
         RL_VERIFY(mo_acq_rel != mo || rmw);
 
-        atomic_data_impl<thread_count>& var = 
-            *static_cast<atomic_data_impl<thread_count>*>(data);
+        atomic_data_impl<Void>& var =
+            *static_cast<atomic_data_impl<Void>*>(data);
 
-        typedef typename atomic_data_impl<thread_count>::history_record history_t;
+        typedef typename atomic_data_impl<Void>::history_record history_t;
 
         unsigned index = get_load_index<mo, rmw>(var);
         if ((unsigned)-1 == index)
@@ -282,17 +304,17 @@ private:
 
         timestamp_t* acq_rel_order = (synch ? acq_rel_order_ : acquire_fence_order_);
 
-        foreach<thread_count>(acq_rel_order, rec.acq_rel_order_, assign_max);
+        foreach(thread_count_, acq_rel_order, rec.acq_rel_order_, assign_max);
 
         return index;
     }
 
     virtual unsigned atomic_init(atomic_data* RL_RESTRICT data)
     {
-        atomic_data_impl<thread_count>& var = 
-            *static_cast<atomic_data_impl<thread_count>*>(data);
+        atomic_data_impl<Void>& var =
+            *static_cast<atomic_data_impl<Void>*>(data);
 
-        typedef typename atomic_data_impl<thread_count>::history_record history_t;
+        typedef typename atomic_data_impl<Void>::history_record history_t;
 
         unsigned const idx = ++var.current_index_ % atomic_history_size;
         history_t& rec = var.history_[idx];
@@ -302,7 +324,7 @@ private:
         rec.seq_cst_ = false;
         rec.acq_rel_timestamp_ = 0;
 
-        foreach<thread_count>(rec.acq_rel_order_, assign_zero);
+        foreach(thread_count_, rec.acq_rel_order_, assign_zero);
 
         return idx;
     }
@@ -314,10 +336,10 @@ private:
         RL_VERIFY(mo_acquire != mo || rmw);
         RL_VERIFY(mo_acq_rel != mo || rmw);
 
-        atomic_data_impl<thread_count>& var = 
-            *static_cast<atomic_data_impl<thread_count>*>(data);
+        atomic_data_impl<Void>& var =
+            *static_cast<atomic_data_impl<Void>*>(data);
 
-        typedef typename atomic_data_impl<thread_count>::history_record history_t;
+        typedef typename atomic_data_impl<Void>::history_record history_t;
 
         unsigned const idx = ++var.current_index_ % atomic_history_size;
         history_t& rec = var.history_[idx];
@@ -329,7 +351,7 @@ private:
         own_acq_rel_order_ += 1;
         rec.acq_rel_timestamp_ = own_acq_rel_order_;
 
-        foreach<thread_count>(rec.last_seen_order_, assign<(timestamp_t)-1>);
+        foreach(thread_count_, rec.last_seen_order_, assign<(timestamp_t)-1>);
 
         rec.last_seen_order_[index_] = own_acq_rel_order_;
 
@@ -338,7 +360,7 @@ private:
 
 #ifdef RL_IMPROVED_SEQ_CST_FENCE
         if (val(mo) == mo_release && val(rmw) == false)
-            foreach<thread_count>(imp_seq_cst_order_, prev.acq_rel_order_, assign_max);
+            foreach(thread_count_, imp_seq_cst_order_, prev.acq_rel_order_, assign_max);
 #endif
 
         bool const synch = 
@@ -353,12 +375,12 @@ private:
 
         if (preserve)
         {
-            foreach<thread_count>(rec.acq_rel_order_, prev.acq_rel_order_, assign);
-            foreach<thread_count>(rec.acq_rel_order_, acq_rel_order, assign_max);
+            foreach(thread_count_, rec.acq_rel_order_, prev.acq_rel_order_, assign);
+            foreach(thread_count_, rec.acq_rel_order_, acq_rel_order, assign_max);
         }
         else
         {
-            foreach<thread_count>(rec.acq_rel_order_, acq_rel_order, assign);
+            foreach(thread_count_, rec.acq_rel_order_, acq_rel_order, assign);
         }
 
         return idx;
@@ -367,8 +389,8 @@ private:
     template<memory_order mo>
     unsigned atomic_rmw(atomic_data* RL_RESTRICT data, bool& aba)
     {
-        atomic_data_impl<thread_count>& var = 
-            *static_cast<atomic_data_impl<thread_count>*>(data);
+        atomic_data_impl<Void>& var =
+            *static_cast<atomic_data_impl<Void>*>(data);
         timestamp_t const last_seen = var.history_[var.current_index_ % atomic_history_size].last_seen_order_[index_];
         aba = (last_seen > own_acq_rel_order_);
         atomic_load<mo, true>(data);
@@ -384,8 +406,8 @@ private:
     virtual unpark_reason atomic_wait(atomic_data* RL_RESTRICT data, bool is_timed, bool allow_spurious_wakeup, debug_info_param info)
     {
         context& c = ctx();
-        atomic_data_impl<thread_count>& var = 
-            *static_cast<atomic_data_impl<thread_count>*>(data);
+        atomic_data_impl<Void>& var =
+            *static_cast<atomic_data_impl<Void>*>(data);
         unpark_reason const res = var.futex_ws_.park_current(c, is_timed, allow_spurious_wakeup, false, info);
         if (res == unpark_reason_normal)
             var.futex_sync_.acquire(this);
@@ -395,8 +417,8 @@ private:
     virtual thread_id_t atomic_wake(atomic_data* RL_RESTRICT data, thread_id_t count, debug_info_param info)
     {
         context& c = ctx();
-        atomic_data_impl<thread_count>& var = 
-            *static_cast<atomic_data_impl<thread_count>*>(data);
+        atomic_data_impl<Void>& var =
+            *static_cast<atomic_data_impl<Void>*>(data);
         thread_id_t unblocked = 0;
         for (; count != 0; count -= 1, unblocked += 1)
         {

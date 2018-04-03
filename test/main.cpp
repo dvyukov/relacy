@@ -291,10 +291,13 @@ private:
 
 
 
-struct recursive_timed_mutex_test : rl::test_suite<recursive_timed_mutex_test, 3>
+struct recursive_timed_mutex_test // thread count = 3
 {
     recursive_timed_mutex mtx;
     VAR_T(int) data;
+
+    void before() { }
+    void invariant() { }
 
     void thread(unsigned idx)
     {
@@ -322,6 +325,13 @@ struct recursive_timed_mutex_test : rl::test_suite<recursive_timed_mutex_test, 3
     }
 };
 
+struct test_info_t
+{
+    rl::simulate_f      f;
+    rl::thread_id_t     static_thread_count;
+    rl::thread_id_t     dynamic_thread_count;
+    rl::test_result_e   expected_result;
+};
 
 int main()
 {
@@ -373,134 +383,133 @@ int main()
     //simulate<my_test>();
     //if (rand() <= RAND_MAX) return 0;
 
-    rl::simulate_f tests[] = 
+    test_info_t tests[] =
     {
 #if 1
-        &rl::simulate<test_FlushProcessWriteBuffers>,
-
-        &rl::simulate<test_addr_hash>,
-        &rl::simulate<test_addr_hash2>,
+        { &rl::simulate<test_FlushProcessWriteBuffers>, 2, 0, rl::test_result_success },
+        { &rl::simulate<test_addr_hash>, 2, 0, rl::test_result_success },
+        { &rl::simulate<test_addr_hash2>, 2, 0, rl::test_result_until_condition_hit } ,
         //!!! fails &rl::simulate<sched_load_test>,
-        &rl::simulate<test_memory_allocation>,
+        { &rl::simulate<test_memory_allocation>, 2, 0, rl::test_result_success },
 
         // memory model
-        &rl::simulate<test_pthread_thread>,
-        &rl::simulate<test_pthread_mutex>,
-        &rl::simulate<test_pthread_rwlock>,
-        &rl::simulate<test_pthread_condvar>,
-        &rl::simulate<test_pthread_condvar2>,
-        &rl::simulate<test_pthread_sem>,
+        { &rl::simulate<test_pthread_thread>, 1, 2, rl::test_result_success },
+        { &rl::simulate<test_pthread_mutex>, 2, 0, rl::test_result_success },
+        { &rl::simulate<test_pthread_rwlock>, 3, 0, rl::test_result_success },
+        { &rl::simulate<test_pthread_condvar>, 3, 0, rl::test_result_success },
+        { &rl::simulate<test_pthread_condvar2>, 2, 0, rl::test_result_success },
+        { &rl::simulate<test_pthread_sem>, 2, 0, rl::test_result_success },
         
-        &rl::simulate<order_relaxed_test<0> >,
-        &rl::simulate<order_relaxed_test<1> >,
-        &rl::simulate<order_relaxed_test<2> >,
-        &rl::simulate<order_relaxed_test<3> >,
-        &rl::simulate<order_relaxed_test<4> >,
-        &rl::simulate<reorder_single_var_test>,
-        &rl::simulate<acq_rel_test>,
+        { &rl::simulate<order_relaxed_test<0> >, 2, 0, rl::test_result_success },
+        { &rl::simulate<order_relaxed_test<1> >, 2, 0, rl::test_result_success },
+        { &rl::simulate<order_relaxed_test<2> >, 2, 0, rl::test_result_success },
+        { &rl::simulate<order_relaxed_test<3> >, 2, 0, rl::test_result_success },
+        { &rl::simulate<order_relaxed_test<4> >, 2, 0, rl::test_result_success },
+        { &rl::simulate<reorder_single_var_test>, 2, 0, rl::test_result_success },
+        { &rl::simulate<acq_rel_test>, 2, 0, rl::test_result_success },
 
-        &rl::simulate<seq_cst_test<0> >,
-        &rl::simulate<seq_cst_test<1> >,
+        { &rl::simulate<seq_cst_test<0> >, 4, 0, rl::test_result_until_condition_hit },
+        { &rl::simulate<seq_cst_test<1> >, 4, 0, rl::test_result_success },
 
-        &rl::simulate<reordering_test>,
-        &rl::simulate<reordering_test2>,
+        { &rl::simulate<reordering_test>, 3, 0, rl::test_result_success },
+        { &rl::simulate<reordering_test2>, 3, 0, rl::test_result_until_condition_hit },
 
-        &rl::simulate<test_win_thread>,
-        &rl::simulate<test_win_mutex>,
-        &rl::simulate<test_win_cs>,
-        &rl::simulate<test_win_condvar>,
-        &rl::simulate<test_win_condvar_srw>,
-        &rl::simulate<test_win_sem>,
-        &rl::simulate<test_win_event>,
+        { &rl::simulate<test_win_thread>, 1, 2, rl::test_result_success },
+        { &rl::simulate<test_win_mutex>, 2, 0, rl::test_result_success },
+        { &rl::simulate<test_win_cs>, 2, 0, rl::test_result_success },
+        { &rl::simulate<test_win_condvar>, 3, 0, rl::test_result_success },
+        { &rl::simulate<test_win_condvar_srw>, 2, 0, rl::test_result_success },
+        { &rl::simulate<test_win_sem>, 2, 0, rl::test_result_success },
+        { &rl::simulate<test_win_event>, 2, 0, rl::test_result_success },
 
-        &rl::simulate<modification_order_test>,
-        &rl::simulate<transitive_test>,
-        &rl::simulate<cc_transitive_test>,
-        &rl::simulate<occasional_test>,
+        { &rl::simulate<modification_order_test>, 2, 0, rl::test_result_success },
+        { &rl::simulate<transitive_test>, 3, 0, rl::test_result_success },
+        { &rl::simulate<cc_transitive_test>, 3, 0, rl::test_result_success },
+        { &rl::simulate<occasional_test>, 3, 0, rl::test_result_until_condition_hit },
 
         // fences
-        &rl::simulate<fence_synch_test<0, 0> >,
-        &rl::simulate<fence_synch_test<1, 0> >,
-        &rl::simulate<fence_synch_test<2, 0> >,
-        &rl::simulate<fence_synch_test<0, 1> >,
-        &rl::simulate<fence_synch_test<1, 1> >,
-        &rl::simulate<fence_synch_test<2, 1> >,
+        { &rl::simulate<fence_synch_test<0, 0> >, 2, 0, rl::test_result_success },
+        { &rl::simulate<fence_synch_test<1, 0> >, 2, 0, rl::test_result_success },
+        { &rl::simulate<fence_synch_test<2, 0> >, 2, 0, rl::test_result_success },
+        { &rl::simulate<fence_synch_test<0, 1> >, 2, 0, rl::test_result_success },
+        { &rl::simulate<fence_synch_test<1, 1> >, 2, 0, rl::test_result_success },
+        { &rl::simulate<fence_synch_test<2, 1> >, 2, 0, rl::test_result_success },
   
-        &rl::simulate<two_fence_synch_test>,
-        &rl::simulate<seq_cst_fence_test<0> >,
-        &rl::simulate<seq_cst_fence_test<1> >,
+        { &rl::simulate<two_fence_synch_test>, 3, 0, rl::test_result_success },
+        { &rl::simulate<seq_cst_fence_test<0> >, 2, 0, rl::test_result_success },
+        { &rl::simulate<seq_cst_fence_test<1> >, 2, 0, rl::test_result_until_condition_hit },
 
         // data races
-        &rl::simulate<race_ld_ld_test>,
-        &rl::simulate<race_ld_st_test>,
-        &rl::simulate<race_st_st_test>,
+        { &rl::simulate<race_ld_ld_test>, 2, 0, rl::test_result_success },
+        { &rl::simulate<race_ld_st_test>, 2, 0, rl::test_result_data_race },
+        { &rl::simulate<race_st_st_test>, 2, 0, rl::test_result_data_race },
 
-        &rl::simulate<race_seq_ld_ld_test>,
-        &rl::simulate<race_seq_ld_st_test>,
-        &rl::simulate<race_seq_st_ld_test>,
-        &rl::simulate<race_seq_st_st_test>,
+        { &rl::simulate<race_seq_ld_ld_test>, 2, 0, rl::test_result_success },
+        { &rl::simulate<race_seq_ld_st_test>, 2, 0, rl::test_result_data_race },
+        { &rl::simulate<race_seq_st_ld_test>, 2, 0, rl::test_result_data_race },
+        { &rl::simulate<race_seq_st_st_test>, 2, 0, rl::test_result_data_race },
 
-        &rl::simulate<race_uninit_test>,
-        &rl::simulate<race_indirect_test>,
+        { &rl::simulate<race_uninit_test>, 2, 0, rl::test_result_unitialized_access },
+        { &rl::simulate<race_indirect_test>, 2, 0, rl::test_result_data_race },
 
         // compare_exchange
-        &rl::simulate<cas_spurious_fail_test<0> >,
-        &rl::simulate<cas_spurious_fail_test<1> >,
-        &rl::simulate<cas_spurious_fail_test<2> >,
+        { &rl::simulate<cas_spurious_fail_test<0> >, 1, 0, rl::test_result_until_condition_hit },
+        { &rl::simulate<cas_spurious_fail_test<1> >, 1, 0, rl::test_result_until_condition_hit },
+        { &rl::simulate<cas_spurious_fail_test<2> >, 1, 0, rl::test_result_until_condition_hit },
 
         // mutex
-        &rl::simulate<test_deadlock>,
-        &rl::simulate<test_deadlock2>,
-        &rl::simulate<test_mutex_destuction>,
-        &rl::simulate<test_mutex_destuction2>,
-        &rl::simulate<test_mutex_recursion>,
-        &rl::simulate<test_mutex_recursion_error>,
-        &rl::simulate<test_mutex_unlock_error>,
-        &rl::simulate<test_mutex_leak>,
-        &rl::simulate<test_mutex>,
-        &rl::simulate<test_mutex_try_lock>,
+        { &rl::simulate<test_deadlock>, 2, 0, rl::test_result_deadlock },
+        { &rl::simulate<test_deadlock2>, 2, 0, rl::test_result_deadlock },
+        { &rl::simulate<test_mutex_destuction>, 1, 0, rl::test_result_destroying_owned_mutex },
+        { &rl::simulate<test_mutex_destuction2>, 2, 0, rl::test_result_destroying_owned_mutex },
+        { &rl::simulate<test_mutex_recursion>, 2, 0, rl::test_result_success },
+        { &rl::simulate<test_mutex_recursion_error>, 1, 0, rl::test_result_recursion_on_nonrecursive_mutex },
+        { &rl::simulate<test_mutex_unlock_error>, 1, 0, rl::test_result_unlocking_mutex_wo_ownership },
+        { &rl::simulate<test_mutex_leak>, 1, 0, rl::test_result_resource_leak },
+        { &rl::simulate<test_mutex>, 3, 0, rl::test_result_success },
+        { &rl::simulate<test_mutex_try_lock>, 2, 0, rl::test_result_success },
 	
         // futex
-        &rl::simulate<test_futex>,
-        &rl::simulate<test_futex_deadlock>,
-        &rl::simulate<test_futex_sync1>,
-        &rl::simulate<test_futex_sync2>,
-        &rl::simulate<test_futex_intr>,
+        { &rl::simulate<test_futex>, 2, 0, rl::test_result_success },
+        { &rl::simulate<test_futex_deadlock>, 1, 0, rl::test_result_deadlock },
+        { &rl::simulate<test_futex_sync1>, 2, 0, rl::test_result_until_condition_hit },
+        { &rl::simulate<test_futex_sync2>, 2, 0, rl::test_result_until_condition_hit },
+        { &rl::simulate<test_futex_intr>, 2, 0, rl::test_result_until_condition_hit },
 
         // condition variable
-        &rl::simulate<test_condvar>,
-        &rl::simulate<test_condvar2>,
+        { &rl::simulate<test_condvar>, 2, 0, rl::test_result_success },
+        { &rl::simulate<test_condvar2>, 3, 0, rl::test_result_success },
 
         // semaphore
-        &rl::simulate<test_semaphore>,
-        &rl::simulate<test_semaphore_atomic>,
+        { &rl::simulate<test_semaphore>, 2, 0, rl::test_result_success },
+        { &rl::simulate<test_semaphore_atomic>, 2, 0, rl::test_result_success },
 
         // event
-        &rl::simulate<test_event_auto>,
-        &rl::simulate<test_event_manual>,
-        &rl::simulate<test_event_atomic>,
+        { &rl::simulate<test_event_auto>, 2, 0, rl::test_result_success },
+        { &rl::simulate<test_event_manual>, 2, 0, rl::test_result_success },
+        { &rl::simulate<test_event_atomic>, 2, 0, rl::test_result_success },
 
         //wfmo
-        &rl::simulate<test_wfmo_all>,
-        &rl::simulate<test_wfmo_single>,
-        &rl::simulate<test_wfmo_timeout>,
-        &rl::simulate<test_wfmo_try>,
-        &rl::simulate<test_wfmo_mixed>,
-        &rl::simulate<test_wfmo_mixed2>,
-        &rl::simulate<test_wfmo_event_all>,
-        &rl::simulate<test_wfmo_event_any>,
-        &rl::simulate<test_wfmo_atomic>,
+        { &rl::simulate<test_wfmo_all>, 2, 0, rl::test_result_success },
+        { &rl::simulate<test_wfmo_single>, 2, 0, rl::test_result_until_condition_hit },
+        { &rl::simulate<test_wfmo_timeout>, 2, 0, rl::test_result_until_condition_hit },
+        { &rl::simulate<test_wfmo_try>, 2, 0, rl::test_result_success },
+        { &rl::simulate<test_wfmo_mixed>, 3, 0, rl::test_result_success },
+        { &rl::simulate<test_wfmo_mixed2>, 4, 0, rl::test_result_success },
+        { &rl::simulate<test_wfmo_event_all>, 2, 0, rl::test_result_success },
+        { &rl::simulate<test_wfmo_event_any>, 2, 0, rl::test_result_success },
+        { &rl::simulate<test_wfmo_atomic>, 2, 0, rl::test_result_until_condition_hit },
 
         // thread local storage
-        &rl::simulate<tls_basic_test>,
-        &rl::simulate<tls_reset_test>,
-        &rl::simulate<tls_global_test>,
-        &rl::simulate<tls_win32_test>,
+        { &rl::simulate<tls_basic_test>, 3, 0, rl::test_result_success },
+        { &rl::simulate<tls_reset_test>, 3, 0, rl::test_result_user_assert_failed },
+        { &rl::simulate<tls_global_test>, 3, 0, rl::test_result_user_assert_failed },
+        { &rl::simulate<tls_win32_test>, 3, 0, rl::test_result_success },
 
         // dynamic thread
-        &rl::simulate<dyn_thread_basic_test>,
-        &rl::simulate<dyn_thread_win32_test>,
-        &rl::simulate<dyn_thread_visibility_test>,
+        { &rl::simulate<dyn_thread_basic_test>, 2, 4, rl::test_result_success },
+        { &rl::simulate<dyn_thread_win32_test>, 2, 4, rl::test_result_success },
+        { &rl::simulate<dyn_thread_visibility_test>, 1, 1, rl::test_result_success },
 #endif
     };
 
@@ -512,8 +521,9 @@ int main()
         {
             //!!! make it work under sched_full
             if (sched == rl::sched_full
-                && (tests[i] == (rl::simulate_f)&rl::simulate<test_pthread_condvar>
-                    || tests[i] == (rl::simulate_f)&rl::simulate<test_win_condvar>))
+                && (tests[i].f == (rl::simulate_f)&rl::simulate<test_pthread_condvar>
+                    || tests[i].f == (rl::simulate_f)&rl::simulate<test_win_condvar>
+                    || tests[i].f == (rl::simulate_f)&rl::simulate<test_pthread_rwlock>))
                 continue;
 
             rl::ostringstream stream;
@@ -525,8 +535,11 @@ int main()
             params.progress_stream = &stream;
             params.context_bound = 2;
             params.execution_depth_limit = 500;
+            params.dynamic_thread_count = tests[i].dynamic_thread_count;
+            params.static_thread_count = tests[i].static_thread_count;
+            params.expected_result = tests[i].expected_result;
 
-            if (false == tests[i](params))
+            if (false == tests[i].f(params))
             {
                 std::cout << std::endl;
                 std::cout << "FAILED" << std::endl;
@@ -539,13 +552,14 @@ int main()
                 std::cout << params.test_name << "...OK" << std::endl;
             }
         }
+
         std::cout << std::endl;
     }
 
-    rl::simulate_f scheduler_tests[] = 
+    test_info_t scheduler_tests[] =
     {
-        &rl::simulate<livelock_test>,
-        &rl::simulate<yield_livelock_test>,
+        { &rl::simulate<livelock_test>, 2, 0, rl::test_result_livelock },
+        { &rl::simulate<yield_livelock_test>, 2, 0, rl::test_result_livelock }
     };
 
     std::cout << "full search scheduler tests:" << std::endl;
@@ -558,8 +572,11 @@ int main()
         params.progress_stream = &stream;
         params.context_bound = 2;
         params.execution_depth_limit = 500;
+        params.dynamic_thread_count = tests[i].dynamic_thread_count;
+        params.static_thread_count = tests[i].static_thread_count;
+        params.expected_result = scheduler_tests[i].expected_result;
 
-        if (false == scheduler_tests[i](params))
+        if (false == scheduler_tests[i].f(params))
         {
             std::cout << std::endl;
             std::cout << "FAILED" << std::endl;

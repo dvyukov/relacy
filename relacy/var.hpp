@@ -25,8 +25,6 @@ namespace rl
 template<typename T>
 class var;
 
-
-
 template<typename T>
 class var_proxy_const
 {
@@ -59,9 +57,6 @@ protected:
 private:
     var_proxy_const& operator = (var_proxy_const const&);
 };
-
-
-
 
 template<typename T>
 class var_proxy : public var_proxy_const<T>
@@ -177,9 +172,6 @@ public:
     }
 };
 
-
-
-
 template<typename T>
 struct var_event
 {
@@ -206,9 +198,6 @@ struct var_event
             << (load_ ? "load" : "store") << ", value=" << (typename map_type<T>::result)value_;
     }
 };
-
-
-
 
 template<typename T>
 class var
@@ -325,21 +314,18 @@ private:
     var& operator = (var const& r);
 };
 
-
-
-
-template<thread_id_t thread_count>
 struct var_data_impl : var_data
 {
-    typedef thread_info<thread_count> thread_info_t;
+    timestamp_t* load_acq_rel_timestamp_;
+    timestamp_t* store_acq_rel_timestamp_;
 
-    timestamp_t load_acq_rel_timestamp_ [thread_count];
-    timestamp_t store_acq_rel_timestamp_ [thread_count];
-
-    var_data_impl()
+    var_data_impl(thread_id_t thread_count)
+        : load_acq_rel_timestamp_(static_cast<timestamp_t*>(calloc(thread_count, sizeof(timestamp_t))))
+        , store_acq_rel_timestamp_ (static_cast<timestamp_t*>(calloc(thread_count, sizeof(timestamp_t))))
+        , thread_count_(thread_count)
     {
-        foreach<thread_count>(load_acq_rel_timestamp_, assign_zero);
-        foreach<thread_count>(store_acq_rel_timestamp_, assign_zero);
+        foreach(thread_count, load_acq_rel_timestamp_, assign_zero);
+        foreach(thread_count, store_acq_rel_timestamp_, assign_zero);
     }
 
     virtual void init(thread_info_base& th)
@@ -350,7 +336,7 @@ struct var_data_impl : var_data
 
     virtual bool store(thread_info_base& th)
     {
-        for (thread_id_t i = 0; i != thread_count; ++i)
+        for (thread_id_t i = 0; i != thread_count_; ++i)
         {
             if (th.acq_rel_order_[i] < store_acq_rel_timestamp_[i])
                 return false;
@@ -365,7 +351,7 @@ struct var_data_impl : var_data
 
     virtual bool load(thread_info_base& th)
     {
-        for (thread_id_t i = 0; i != thread_count; ++i)
+        for (thread_id_t i = 0; i != thread_count_; ++i)
         {
             if (th.acq_rel_order_[i] < store_acq_rel_timestamp_[i])
                 return false;
@@ -376,13 +362,16 @@ struct var_data_impl : var_data
         return true;
     }
 
-    virtual ~var_data_impl() {} // just to calm down gcc
+    virtual ~var_data_impl()
+    {
+        free(load_acq_rel_timestamp_);
+        free(store_acq_rel_timestamp_);
+    }
+
+private:
+    thread_id_t const thread_count_;
 };
 
-
-
 }
-
-
 
 #endif

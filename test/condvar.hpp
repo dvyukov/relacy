@@ -4,7 +4,7 @@
 
 
 
-struct test_condvar : rl::test_suite<test_condvar, 2>
+struct test_condvar
 {
     std::mutex mtx;
     std::condition_variable cv;
@@ -14,6 +14,9 @@ struct test_condvar : rl::test_suite<test_condvar, 2>
     {
         data($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -39,7 +42,7 @@ struct test_condvar : rl::test_suite<test_condvar, 2>
 
 
 
-struct test_condvar2 : rl::test_suite<test_condvar2, 3>
+struct test_condvar2
 {
     rl::var<int> stage;
     std::mutex mtx;
@@ -49,6 +52,9 @@ struct test_condvar2 : rl::test_suite<test_condvar2, 3>
     {
         stage($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {

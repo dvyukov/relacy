@@ -765,10 +765,14 @@ public:
 }; 
 
 
-struct queue_test : rl::test_suite<queue_test, 4>
+struct queue_test
 {
     ec_thread threads_ [6];
     queue q_;
+
+    void before() { }
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -787,7 +791,7 @@ struct queue_test : rl::test_suite<queue_test, 4>
     }
 };
 
-struct condvar_test : rl::test_suite<condvar_test, 3>
+struct condvar_test // thread count = 3
 {
     rl::var<int> stage;
     condition_variable cv;
@@ -798,6 +802,9 @@ struct condvar_test : rl::test_suite<condvar_test, 3>
     {
         stage($) = 0;
     }
+
+    void after() { }
+    void invariant() { }
 
     void thread(unsigned index)
     {
@@ -836,6 +843,7 @@ int main()
     p.iteration_count = 100000000;
     //p.initial_state = "30000000";
     //p.search_type = rl::fair_context_bound_scheduler_type;
+    p.static_thread_count = 4;
     rl::simulate<queue_test>(p);
     //rl::simulate<condvar_test>(p);
 }

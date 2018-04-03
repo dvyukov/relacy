@@ -24,20 +24,23 @@
 #include "test_params.hpp"
 #include "random.hpp"
 #include "foreach.hpp"
+#include "stdlib/event.hpp"
+#include "atomic.hpp"
+#include "var.hpp"
+#include "stdlib/condition_variable.hpp"
+#include "stdlib/mutex.hpp"
+#include "test_suite.hpp"
 
-#include "random_scheduler.hpp"
-#include "full_search_scheduler.hpp"
-#include "context_bound_scheduler.hpp"
-
-
+#include "schedulers/random_scheduler.hpp"
+#include "schedulers/full_search_scheduler.hpp"
+#include "schedulers/context_bound_scheduler.hpp"
 
 namespace rl
 {
 
-template<thread_id_t thread_count> class generic_mutex_data_impl;
-template<thread_id_t thread_count> class condvar_data_impl;
-template<thread_id_t thread_count> class sema_data_impl;
-template<thread_id_t thread_count> class event_data_impl;
+class generic_mutex_data_impl;
+class condvar_data_impl;
+class sema_data_impl;
 
 
 struct park_event
@@ -98,16 +101,11 @@ struct context_persistent
 };
 */
 
-
 template<typename test_t, typename scheduler_t>
-class context_impl
-    : thread_local_contxt_impl<context_addr_hash_impl<context, test_t::params::thread_count>, test_t::params::thread_count>
+class context_impl : thread_local_contxt_impl<context_addr_hash_impl<context> >
 {
 private:
-    typedef thread_local_contxt_impl
-        <context_addr_hash_impl<context, test_t::params::thread_count>,
-            test_t::params::thread_count>
-                base_t;
+    typedef thread_local_contxt_impl<context_addr_hash_impl<context> > base_t;
     typedef typename scheduler_t::shared_context_t shared_context_t;
 
     using base_t::params_;
@@ -118,9 +116,8 @@ private:
     using base_t::invariant_executing;
 
     static thread_id_t const main_thread_id = -1;
-    static thread_id_t const static_thread_count = test_t::params::static_thread_count;
-    static thread_id_t const dynamic_thread_count = test_t::params::dynamic_thread_count;
-    static thread_id_t const thread_count = test_t::params::thread_count;
+    thread_id_t const static_thread_count;
+    thread_id_t const thread_count_;
 
     iteration_t                     current_iter_;
     test_result_e                   test_result_;
@@ -136,44 +133,44 @@ private:
     test_t*                         current_test_suite;
     bool                            current_test_suite_constructed;
     bool                            first_thread_;
-    timestamp_t                     seq_cst_fence_order_ [thread_count];
+    timestamp_t*                    seq_cst_fence_order_;
 
-    aligned<thread_info<thread_count> > threads_ [thread_count];
+    thread_info<>* threads_;
 
-    thread_info<thread_count>& threadi()
+    thread_info<>& threadi()
     {
-        return *static_cast<thread_info<thread_count>*>(threadx_);
+        return *static_cast<thread_info<>*>(threadx_);
     }
 
-    slab_allocator<atomic_data_impl<thread_count> >*        atomic_alloc_;
-    slab_allocator<var_data_impl<thread_count> >*           var_alloc_;
-    slab_allocator<generic_mutex_data_impl<thread_count> >* mutex_alloc_;
-    slab_allocator<condvar_data_impl<thread_count> >*       condvar_alloc_;
-    slab_allocator<sema_data_impl<thread_count> >*          sema_alloc_;
-    slab_allocator<event_data_impl<thread_count> >*         event_alloc_;
+    slab_allocator<atomic_data_impl<> >*        atomic_alloc_;
+    slab_allocator<var_data_impl >*           var_alloc_;
+    slab_allocator<generic_mutex_data_impl>* mutex_alloc_;
+    slab_allocator<condvar_data_impl>*       condvar_alloc_;
+    slab_allocator<sema_data_impl>*                         sema_alloc_;
+    slab_allocator<event_data_impl>*                        event_alloc_;
 
     virtual atomic_data* atomic_ctor(void* ctx)
     {
-        return new (atomic_alloc_->alloc(ctx)) atomic_data_impl<thread_count> ();
+        return new (atomic_alloc_->alloc(ctx)) atomic_data_impl<>(thread_count_);
     }
 
     virtual void atomic_dtor(atomic_data* data)
     {
-        static_cast<atomic_data_impl<thread_count>*>(data)->~atomic_data_impl<thread_count>();
-        atomic_alloc_->free(static_cast<atomic_data_impl<thread_count>*>(data));
+        static_cast<atomic_data_impl<>*>(data)->~atomic_data_impl<>();
+        atomic_alloc_->free(static_cast<atomic_data_impl<>*>(data));
     }
 
     virtual var_data* var_ctor()
     {
-        return new (var_alloc_->alloc()) var_data_impl<thread_count> ();
+        return new (var_alloc_->alloc()) var_data_impl(thread_count_);
     }
 
     virtual void var_dtor(var_data* data)
     {
-        static_cast<var_data_impl<thread_count>*>(data)->~var_data_impl<thread_count>();
-        var_alloc_->free(static_cast<var_data_impl<thread_count>*>(data));
+        static_cast<var_data_impl*>(data)->~var_data_impl();
+        var_alloc_->free(static_cast<var_data_impl*>(data));
     }
-	
+
     virtual unpark_reason wfmo_park(void** ws,
                                     win_waitable_object** wo,
                                     size_t count,
@@ -181,18 +178,22 @@ private:
                                     bool is_timed,
                                     debug_info_param info)
     {
-			  return waitset<thread_count>::park_current(*this,
-                                                         reinterpret_cast<waitset<thread_count>**>(ws),
+              return waitset<>::park_current(thread_count_, *this,
+                                                         reinterpret_cast<waitset<>**>(ws),
                                                          wo, count, wait_all, is_timed, true, info);
     }
 
 public:
-    context_impl(test_params& params, shared_context_t& sctx)
-        : base_t(thread_count, params)
+    context_impl(test_params& params, shared_context_t& sctx, thread_id_t thread_count)
+        : base_t(thread_count, params, thread_count)
+        , static_thread_count(params.static_thread_count)
+        , thread_count_(thread_count)
         , current_iter_(0)
         , start_iteration_(1)
-        , sched_(params, sctx, dynamic_thread_count)
+        , sched_(params, sctx, params.dynamic_thread_count, thread_count)
         , sctx_(sctx)
+        , seq_cst_fence_order_(static_cast<timestamp_t*>(calloc(thread_count, sizeof(timestamp_t))))
+        , threads_(static_cast<thread_info<>*>(calloc(thread_count, sizeof(thread_info<>))))
     {
         this->context::seq_cst_fence_order_ = this->seq_cst_fence_order_;
 
@@ -207,25 +208,25 @@ public:
         create_main_fiber(main_fiber_);
         set_low_thread_prio();
 
-        if (0 == val(thread_count))
+        if (0 == val(thread_count_))
         {
             throw std::logic_error("no threads created");
         }
 
-        atomic_alloc_ = new slab_allocator<atomic_data_impl<thread_count> >();
-        var_alloc_ = new slab_allocator<var_data_impl<thread_count> >();
-        mutex_alloc_ = new slab_allocator<generic_mutex_data_impl<thread_count> >();
-        condvar_alloc_ = new slab_allocator<condvar_data_impl<thread_count> >();
-        sema_alloc_ = new slab_allocator<sema_data_impl<thread_count> >();
-        event_alloc_ = new slab_allocator<event_data_impl<thread_count> >();
+        atomic_alloc_ = new slab_allocator<atomic_data_impl<> >();
+        var_alloc_ = new slab_allocator<var_data_impl>();
+        mutex_alloc_ = new slab_allocator<generic_mutex_data_impl>();
+        condvar_alloc_ = new slab_allocator<condvar_data_impl>();
+        sema_alloc_ = new slab_allocator<sema_data_impl>();
+        event_alloc_ = new slab_allocator<event_data_impl>();
 
-        for (thread_id_t i = 0; i != thread_count; ++i)
+        for (thread_id_t i = 0; i != thread_count_; ++i)
         {
-            new (&threads_[i]) thread_info<thread_count> (i);
+            new (&threads_[i]) thread_info<> (thread_count_, i);
             threads_[i].ctx_ = this;
         }
 
-        for (thread_id_t i = 0; i != thread_count; ++i)
+        for (thread_id_t i = 0; i != thread_count_; ++i)
         {
             //threads_[i].fiber_ = persistent.fibers_[i];
             create_fiber(threads_[i].fiber_, &context_impl::fiber_proc, (void*)(intptr_t)i);
@@ -238,7 +239,7 @@ public:
     {
         disable_alloc_ += 1;
 
-        for (thread_id_t i = 0; i != thread_count; ++i)
+        for (thread_id_t i = 0; i != thread_count_; ++i)
         {
             delete_fiber(threads_[i].fiber_);
         }
@@ -256,6 +257,7 @@ public:
         delete condvar_alloc_;
         delete sema_alloc_;
         delete event_alloc_;
+        free(seq_cst_fence_order_);
     }
 
     void construct_current_test_suite()
@@ -350,7 +352,7 @@ public:
             (::free)(p);
             return;
         }
-        
+
         disable_alloc_ += 1;
         debug_info const& info = last_info_;
         RL_HIST_CTX(memory_free_event) {p, false} RL_HIST_END();
@@ -649,17 +651,19 @@ public:
         return test_result_success;
     }
 
-    RL_INLINE static void reset_thread(thread_info<thread_count>& ti)
+    RL_INLINE static void reset_thread(thread_id_t thread_count, thread_info<>& ti)
     {
-        foreach<thread_count>(
+        foreach(
+            thread_count,
             ti.acquire_fence_order_,
             &assign_zero);
-        foreach<thread_count>(
+        foreach(
+            thread_count,
             ti.release_fence_order_,
             &assign_zero);
 
 #ifdef RL_IMPROVED_SEQ_CST_FENCE
-        foreach<thread_count>(ti.imp_seq_cst_order_, &assign_zero);
+        foreach(thread_count, ti.imp_seq_cst_order_, &assign_zero);
 #endif
     }
 
@@ -669,17 +673,19 @@ public:
         disable_preemption_ = 0;
         sched_count_ = 0;
 
-        foreach<thread_count>(
-            threads_,
-            &context_impl::reset_thread);
+        for (thread_id_t i = 0; i != thread_count_; i++)
+        {
+            context_impl::reset_thread(thread_count_, threads_[i]);
+        }
 
-        foreach<thread_count>(
+        foreach(
+            thread_count_,
             seq_cst_fence_order_,
             &assign_zero);
 
         base_t::iteration_begin();
 
-        for (thread_id_t i = 0; i != thread_count; ++i)
+        for (thread_id_t i = 0; i != thread_count_; ++i)
         {
             threads_[i].iteration_begin();
         }
@@ -757,15 +763,15 @@ private:
     void rl_global_fence()
     {
         timestamp_t max_acq_rel = 0;
-        for (thread_id_t i = 0; i != thread_count; ++i)
+        for (thread_id_t i = 0; i != thread_count_; ++i)
         {
             if (threads_[i].acq_rel_order_[i] > max_acq_rel)
                 max_acq_rel = threads_[i].acq_rel_order_[i];
         }
 
-        for (thread_id_t i = 0; i != thread_count; ++i)
+        for (thread_id_t i = 0; i != thread_count_; ++i)
         {
-            for (thread_id_t j = 0; j != thread_count; ++j)
+            for (thread_id_t j = 0; j != thread_count_; ++j)
             {
                 threads_[i].acq_rel_order_[j] = max_acq_rel;
             }
@@ -795,54 +801,54 @@ private:
 
     virtual thread_id_t get_thread_count() const
     {
-        return thread_count;
+        return thread_count_;
     }
 
     virtual generic_mutex_data* mutex_ctor(bool is_rw, bool is_exclusive_recursive, bool is_shared_recursive, bool failing_try_lock)
     {
-        return new (mutex_alloc_->alloc()) generic_mutex_data_impl<thread_count>(is_rw, is_exclusive_recursive, is_shared_recursive, failing_try_lock);
+        return new (mutex_alloc_->alloc()) generic_mutex_data_impl(thread_count_, is_rw, is_exclusive_recursive, is_shared_recursive, failing_try_lock);
     }
 
     virtual void mutex_dtor(generic_mutex_data* m)
     {
-        generic_mutex_data_impl<thread_count>* mm = static_cast<generic_mutex_data_impl<thread_count>*>(m);
-        mm->~generic_mutex_data_impl<thread_count>();
+        generic_mutex_data_impl* mm = static_cast<generic_mutex_data_impl*>(m);
+        mm->~generic_mutex_data_impl();
         mutex_alloc_->free(mm);
     }
 
     virtual condvar_data* condvar_ctor(bool allow_spurious_wakeups)
     {
-        return new (condvar_alloc_->alloc()) condvar_data_impl<thread_count>(allow_spurious_wakeups);
+        return new (condvar_alloc_->alloc()) condvar_data_impl(thread_count_, allow_spurious_wakeups);
     }
 
     virtual void condvar_dtor(condvar_data* cv)
     {
-        condvar_data_impl<thread_count>* mm = static_cast<condvar_data_impl<thread_count>*>(cv);
-        mm->~condvar_data_impl<thread_count>();
+        condvar_data_impl* mm = static_cast<condvar_data_impl*>(cv);
+        mm->~condvar_data_impl();
         condvar_alloc_->free(mm);
     }
 
     virtual sema_data* sema_ctor(bool spurious_wakeups, unsigned initial_count, unsigned max_count)
     {
-        return new (sema_alloc_->alloc()) sema_data_impl<thread_count>(spurious_wakeups, initial_count, max_count);
+        return new (sema_alloc_->alloc()) sema_data_impl(thread_count_, spurious_wakeups, initial_count, max_count);
     }
 
     virtual void sema_dtor(sema_data* cv)
     {
-        sema_data_impl<thread_count>* mm = static_cast<sema_data_impl<thread_count>*>(cv);
-        mm->~sema_data_impl<thread_count>();
+        sema_data_impl* mm = static_cast<sema_data_impl*>(cv);
+        mm->~sema_data_impl();
         sema_alloc_->free(mm);
     }
 
     virtual event_data* event_ctor(bool manual_reset, bool initial_state)
     {
-        return new (event_alloc_->alloc()) event_data_impl<thread_count>(manual_reset, initial_state);
+        return new (event_alloc_->alloc()) event_data_impl(thread_count_, manual_reset, initial_state);
     }
 
     virtual void event_dtor(event_data* cv)
     {
-        event_data_impl<thread_count>* mm = static_cast<event_data_impl<thread_count>*>(cv);
-        mm->~event_data_impl<thread_count>();
+        event_data_impl* mm = static_cast<event_data_impl*>(cv);
+        mm->~event_data_impl();
         event_alloc_->free(mm);
     }
 
@@ -876,7 +882,7 @@ unsigned __stdcall thread_func(void * ctx)
 */
 
 template<typename test_t, typename sched_t>
-test_result_e run_test(test_params& params, std::ostream& oss, bool second)
+test_result_e run_test(test_params& params, std::ostream& oss, bool second, thread_id_t thread_count)
 {
     typedef context_impl<test_t, sched_t> context_t;
     typedef typename sched_t::shared_context_t shared_context_t;
@@ -901,7 +907,7 @@ test_result_e run_test(test_params& params, std::ostream& oss, bool second)
     //if (second == false)
     {
         istringstream iss (params.initial_state);
-        res = context_t(params, sctx).simulate(oss, iss, second);
+        res = context_t(params, sctx, thread_count).simulate(oss, iss, second);
     }
     //else
     //{
@@ -941,10 +947,10 @@ test_result_e run_test(test_params& params, std::ostream& oss, bool second)
 
 
 template<typename test_t>
-bool simulate(test_params& params)
+bool simulate(test_params& params, thread_id_t thread_count)
 {
     char const* test_name = typeid(test_t).name();
-		while (test_name[0] >= '0' && test_name[0] <= '9')
+    while (test_name[0] >= '0' && test_name[0] <= '9')
         test_name += 1;
     params.test_name = test_name;
     *params.output_stream << params.test_name << std::endl;
@@ -957,11 +963,11 @@ bool simulate(test_params& params)
     //istringstream iss (params.initial_state);
     test_result_e res = test_result_success;
     if (random_scheduler_type == params.search_type)
-        res = run_test<test_t, random_scheduler<test_t::params::thread_count> >(params, oss, false);
+        res = run_test<test_t, random_scheduler >(params, oss, false, thread_count);
     else if (fair_full_search_scheduler_type == params.search_type)
-        res = run_test<test_t, full_search_scheduler<test_t::params::thread_count> >(params, oss, false);
+        res = run_test<test_t, full_search_scheduler>(params, oss, false, thread_count);
     else if (fair_context_bound_scheduler_type == params.search_type)
-        res = run_test<test_t, context_bound_scheduler<test_t::params::thread_count> >(params, oss, false);
+        res = run_test<test_t, context_bound_scheduler>(params, oss, false, thread_count);
     else
         RL_VERIFY(false);
 
@@ -986,11 +992,11 @@ bool simulate(test_params& params)
         iteration_t const stop_iter = params.stop_iteration;
         test_result_e res2 = test_result_success;
         if (random_scheduler_type == params.search_type)
-            res2 = run_test<test_t, random_scheduler<test_t::params::thread_count> >(params, oss2, true);
+            res2 = run_test<test_t, random_scheduler >(params, oss2, true, thread_count);
         else if (fair_full_search_scheduler_type == params.search_type)
-            res2 = run_test<test_t, full_search_scheduler<test_t::params::thread_count> >(params, oss2, true);
+            res2 = run_test<test_t, full_search_scheduler>(params, oss2, true, thread_count);
         else if (fair_context_bound_scheduler_type == params.search_type)
-            res2 = run_test<test_t, context_bound_scheduler<test_t::params::thread_count> >(params, oss2, true);
+            res2 = run_test<test_t, context_bound_scheduler>(params, oss2, true, thread_count);
         else
             RL_VERIFY(false);
 
@@ -1004,36 +1010,84 @@ bool simulate(test_params& params)
         (void)stop_iter;
         (void)res2;
     }
-    return test_t::params::expected_result == res;
+    return params.expected_result == res;
+}
+
+template<bool B, class T = void>
+struct enable_if
+{
+};
+
+template<class T>
+struct enable_if<true, T>
+{
+    typedef T type;
+};
+
+template <typename T, typename U = void>
+struct has_params
+{
+    static const bool value = false;
+};
+
+template <typename T>
+struct has_params <T, typename T::params>
+{
+    static const bool value = true;
+};
+
+template<typename test_t>
+typename enable_if<has_params<test_t>::value && test_t::params::static_thread_count >= 0 && test_t::params::dynamic_thread_count >= 0 && test_t::params::thread_count >= 1, bool>::type
+simulate(test_params& params)
+{
+    params.static_thread_count = test_t::params::static_thread_count;
+    params.dynamic_thread_count = test_t::params::dynamic_thread_count;
+    params.expected_result = test_t::params::expected_result;
+    return simulate<test_t>(params, test_t::params::thread_count);
+}
+
+template<typename test_t>
+typename enable_if<!has_params<test_t>::value, bool>::type
+simulate(test_params& params)
+{
+    return simulate<test_t>(params, params.static_thread_count + params.dynamic_thread_count);
 }
 
 template<typename test_t>
 bool simulate()
 {
     test_params params;
-    return simulate<test_t>(params);
+    params.static_thread_count = test_t::params::static_thread_count;
+    params.dynamic_thread_count = test_t::params::dynamic_thread_count;
+    params.expected_result = test_t::params::expected_result;
+    return simulate<test_t>(params, test_t::params::thread_count);
 }
 
-template<void(*func)(), size_t thread_count>
-struct simulate_thunk : test_suite<simulate_thunk<func, thread_count>, 1>
+template<void(*func)()>
+struct simulate_thunk
 {
-    static size_t const dynamic_thread_count = thread_count;
     void thread(unsigned)
     {
         func();
     }
+
+    void before() { }
+    void after() { }
+    void invariant() { }
 };
 
 template<void(*func)(), size_t thread_count>
 bool execute(test_params& params)
 {
-    return simulate<simulate_thunk<func, thread_count> >(params);
+    params.dynamic_thread_count = thread_count;
+    params.static_thread_count = 1;
+    return simulate<simulate_thunk<func> >(params);
 }
 
-template<void(*func)(), size_t thread_count>
-bool execute()
+template<void(*func)()>
+bool execute(test_params& params)
 {
-    return simulate<simulate_thunk<func, thread_count> >();
+    return simulate<simulate_thunk<func> >(params);
 }
 
 typedef bool (*simulate_f)(test_params&);
@@ -1215,6 +1269,11 @@ inline void systemwide_fence(debug_info_param info)
 } // namespace rl
 
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Winline-new-delete"
+#endif
+
 #ifndef RL_GC
 inline void* operator new (size_t size, rl::debug_info_param info)
 {
@@ -1284,6 +1343,10 @@ inline void operator delete [] (void* p) throw()
     else
         (::free)(p);
 }
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 #define RL_NEW_PROXY rl::new_proxy($) % new
 #define RL_DELETE_PROXY rl::delete_proxy($) , delete

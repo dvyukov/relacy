@@ -660,33 +660,55 @@ typedef atomic<ptrdiff_t> atomic_ptrdiff_t;
 //typedef atomic<intmax_t> atomic_intmax_t;
 //typedef atomic<uintmax_t> atomic_uintmax_t;
 
-
-
-
-template<thread_id_t thread_count>
+template<typename Void = void>
 struct atomic_data_impl : atomic_data
 {
-    typedef thread_info<thread_count> thread_info_t;
+    typedef thread_info<Void> thread_info_t;
 
     struct history_record
     {
-        timestamp_t acq_rel_order_ [thread_count];
-        timestamp_t last_seen_order_ [thread_count];
+        timestamp_t* acq_rel_order_;
+        timestamp_t* last_seen_order_;
 
         bool busy_;
         bool seq_cst_;
         thread_id_t thread_id_;
         timestamp_t acq_rel_timestamp_;
+
+        history_record(thread_id_t thread_count)
+            : acq_rel_order_(static_cast<timestamp_t*>(calloc(thread_count, sizeof(timestamp_t))))
+            , last_seen_order_(static_cast<timestamp_t*>(calloc(thread_count, sizeof(timestamp_t))))
+        {
+        }
+
+        ~history_record()
+        {
+            //free(acq_rel_order_);
+            //free(last_seen_order_);
+        }
+
+    private:
+        history_record(const history_record&);
+        history_record& operator=(const history_record&);
+
     };
 
     static size_t const history_size = atomic_history_size;
-    aligned<history_record> history_ [history_size];
+    history_record* history_;
     unsigned current_index_;
-    waitset<thread_count> futex_ws_;
-    sync_var<thread_count> futex_sync_;
+    waitset<>              futex_ws_;
+    sync_var               futex_sync_;
 
-    atomic_data_impl()
+    atomic_data_impl(thread_id_t thread_count)
+        : history_(static_cast<history_record*>(calloc(history_size, sizeof(history_record))))
+        , futex_ws_(thread_count)
+        , futex_sync_(thread_count)
     {
+        for (int i = 0; i != history_size; i++)
+        {
+            new (history_ + i) history_record (thread_count);
+        }
+
         current_index_ = 0;
         history_record& rec = history_[0];
         history_[atomic_history_size - 1].busy_ = false;
@@ -696,8 +718,16 @@ struct atomic_data_impl : atomic_data
         rec.thread_id_ = (thread_id_t)-1;
     }
 
-    atomic_data_impl(thread_info_t& th)
+    atomic_data_impl(thread_id_t thread_count, thread_info_t& th)
+        : history_(static_cast<history_record*>(calloc(history_size, sizeof(history_record))))
+        , futex_ws_(thread_count)
+        , futex_sync_(thread_count)
     {
+        for (int i = 0; i != history_size; i++)
+        {
+            new (history_ + i) history_record(thread_count);
+        }
+
         current_index_ = 0;
         history_[atomic_history_size - 1].busy_ = false;
 
@@ -709,12 +739,24 @@ struct atomic_data_impl : atomic_data
         th.own_acq_rel_order_ += 1;
         rec.acq_rel_timestamp_ = th.own_acq_rel_order_;
 
-        foreach<thread_count>(rec.acq_rel_order_, assign_zero);
-        foreach<thread_count>(rec.last_seen_order_, assign<(timestamp_t)-1>);
+        foreach(thread_count, rec.acq_rel_order_, assign_zero);
+        foreach(thread_count, rec.last_seen_order_, assign<(timestamp_t)-1>);
         rec.last_seen_order_[th.index_] = th.own_acq_rel_order_;
     }
-};
 
+    ~atomic_data_impl()
+    {
+        for (int i = 0; i != history_size; i++)
+        {
+            history_[i].~history_record();
+        }
+        //free(history_);
+    }
+
+private:
+    atomic_data_impl(const atomic_data_impl&);
+    atomic_data_impl& operator = (const atomic_data_impl&);
+};
 
 }
 

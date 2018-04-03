@@ -60,12 +60,17 @@ struct test_params
     unsigned                    context_bound;
     unsigned                    execution_depth_limit;
     string                      initial_state;
+    test_result_e               expected_result;
 
     // output params
     test_result_e               test_result;
     iteration_t                 stop_iteration;
     string                      test_name;
     string                      final_state;
+
+    // threads
+    thread_id_t                 dynamic_thread_count;
+    thread_id_t                 static_thread_count;
 
     test_params()
     {
@@ -78,9 +83,12 @@ struct test_params
         search_type             = random_scheduler_type;
         context_bound           = 1;
         execution_depth_limit   = 2000;
+        expected_result         = test_result_success;
 
         test_result             = test_result_success;
         stop_iteration          = 0;
+        dynamic_thread_count    = 0;
+        static_thread_count     = 0;
     }
 };
 

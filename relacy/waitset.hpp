@@ -17,18 +17,33 @@
 #include "thread_base.hpp"
 #include "context_base.hpp"
 
-
 namespace rl
 {
 
-
-template<thread_id_t thread_count>
+template<typename Void = void>
 class waitset
 {
+    struct thread_desc
+    {
+        thread_info_base*       th_;
+        unsigned                count_;     // 0 - wfso, !0 - wfmo
+        waitset**               ws_;        // 0 - wfso, !0 - wfmo
+        win_waitable_object**   wo_;        // 0 - wfso, !0 - wfmo
+        bool                    wait_all_;
+        bool                    do_switch_;
+    };
+
 public:
-    waitset()
+    waitset(thread_id_t thread_count)
+        : thread_count_(thread_count)
+        , set_(static_cast<thread_desc*>(calloc(thread_count, sizeof(thread_desc))))
     {
         size_ = 0;
+    }
+
+    virtual ~waitset()
+    {
+        free(set_);
     }
 
     unpark_reason park_current(context& c,
@@ -37,7 +52,7 @@ public:
                                bool do_switch,
                                debug_info_param info)
     {
-        RL_VERIFY(size_ < thread_count);
+        RL_VERIFY(size_ < thread_count_);
         thread_info_base* th = c.threadx_;
         thread_desc desc = {th, 0, 0, 0, false, do_switch};
         set_[size_] = desc;
@@ -57,7 +72,8 @@ public:
         return reason;
     }
 
-    static unpark_reason park_current(context& c,
+    static unpark_reason park_current(thread_id_t thread_count,
+                                      context& c,
                                       waitset** ws,
                                       win_waitable_object** wo,
                                       size_t count,
@@ -66,6 +82,7 @@ public:
                                       bool do_switch,
                                       debug_info_param info)
     {
+        (void)thread_count;
         thread_info_base* th = c.threadx_;
         thread_desc desc = {th, (unsigned)count, ws, wo, wait_all, do_switch};
         for (unsigned wsi = 0; wsi != count; ++wsi)
@@ -130,17 +147,11 @@ public:
     }
 
 private:
-    struct thread_desc
-    {
-        thread_info_base*       th_;
-        unsigned                count_;     // 0 - wfso, !0 - wfmo
-        waitset**               ws_;        // 0 - wfso, !0 - wfmo
-        win_waitable_object**   wo_;        // 0 - wfso, !0 - wfmo
-        bool                    wait_all_;
-        bool                    do_switch_;
-    };
+    waitset(const waitset&);
+    waitset& operator=(const waitset&);
 
-    thread_desc                 set_ [thread_count];
+    thread_id_t const           thread_count_;
+    thread_desc*                set_;
     thread_id_t                 size_;
 
     bool try_remove(context& c, thread_id_t const idx, debug_info_param info)
