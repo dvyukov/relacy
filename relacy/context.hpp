@@ -29,6 +29,7 @@
 #include "var.hpp"
 #include "stdlib/condition_variable.hpp"
 #include "stdlib/mutex.hpp"
+#include "test_suite.hpp"
 
 #include "schedulers/random_scheduler.hpp"
 #include "schedulers/full_search_scheduler.hpp"
@@ -351,7 +352,7 @@ public:
             (::free)(p);
             return;
         }
-        
+
         disable_alloc_ += 1;
         debug_info const& info = last_info_;
         RL_HIST_CTX(memory_free_event) {p, false} RL_HIST_END();
@@ -949,7 +950,7 @@ template<typename test_t>
 bool simulate(test_params& params, thread_id_t thread_count)
 {
     char const* test_name = typeid(test_t).name();
-		while (test_name[0] >= '0' && test_name[0] <= '9')
+    while (test_name[0] >= '0' && test_name[0] <= '9')
         test_name += 1;
     params.test_name = test_name;
     *params.output_stream << params.test_name << std::endl;
@@ -1012,10 +1013,54 @@ bool simulate(test_params& params, thread_id_t thread_count)
     return params.expected_result == res;
 }
 
+template<bool B, class T = void>
+struct enable_if
+{
+};
+
+template<class T>
+struct enable_if<true, T>
+{
+    typedef T type;
+};
+
+template <typename T, typename U = void>
+struct has_params
+{
+    static const bool value = false;
+};
+
+template <typename T>
+struct has_params <T, typename T::params>
+{
+    static const bool value = true;
+};
+
 template<typename test_t>
-bool simulate(test_params& params)
+typename enable_if<has_params<test_t>::value && test_t::params::static_thread_count >= 0 && test_t::params::dynamic_thread_count >= 0 && test_t::params::thread_count >= 1, bool>::type
+simulate(test_params& params)
+{
+    params.static_thread_count = test_t::params::static_thread_count;
+    params.dynamic_thread_count = test_t::params::dynamic_thread_count;
+    params.expected_result = test_t::params::expected_result;
+    return simulate<test_t>(params, test_t::params::thread_count);
+}
+
+template<typename test_t>
+typename enable_if<!has_params<test_t>::value, bool>::type
+simulate(test_params& params)
 {
     return simulate<test_t>(params, params.static_thread_count + params.dynamic_thread_count);
+}
+
+template<typename test_t>
+bool simulate()
+{
+    test_params params;
+    params.static_thread_count = test_t::params::static_thread_count;
+    params.dynamic_thread_count = test_t::params::dynamic_thread_count;
+    params.expected_result = test_t::params::expected_result;
+    return simulate<test_t>(params, test_t::params::thread_count);
 }
 
 template<void(*func)()>
@@ -1030,6 +1075,14 @@ struct simulate_thunk
     void after() { }
     void invariant() { }
 };
+
+template<void(*func)(), size_t thread_count>
+bool execute(test_params& params)
+{
+    params.dynamic_thread_count = thread_count;
+    params.static_thread_count = 1;
+    return simulate<simulate_thunk<func> >(params);
+}
 
 template<void(*func)()>
 bool execute(test_params& params)
