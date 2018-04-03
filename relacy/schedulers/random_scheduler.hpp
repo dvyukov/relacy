@@ -24,8 +24,8 @@ class random_scheduler : public scheduler<random_scheduler, scheduler_thread_inf
 {
 public:
     typedef scheduler<random_scheduler, scheduler_thread_info> base_t;
-    typedef typename base_t::thread_info_t thread_info_t;
-    typedef typename base_t::shared_context_t shared_context_t;
+    typedef base_t::thread_info_t thread_info_t;
+    typedef base_t::shared_context_t shared_context_t;
 
     struct task_t
     {

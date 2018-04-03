@@ -44,8 +44,8 @@ class context_bound_scheduler
 {
 public:
     typedef tree_search_scheduler<context_bound_scheduler, context_bound_scheduler_thread_info> base_t;
-    typedef typename base_t::thread_info_t thread_info_t;
-    typedef typename base_t::shared_context_t shared_context_t;
+    typedef base_t::thread_info_t thread_info_t;
+    typedef base_t::shared_context_t shared_context_t;
 
     context_bound_scheduler(test_params& params, shared_context_t& ctx, thread_id_t dynamic_thread_count, thread_id_t thread_count)
         : base_t(params, ctx, dynamic_thread_count, thread_count)
