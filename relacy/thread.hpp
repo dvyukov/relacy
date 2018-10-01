@@ -372,7 +372,7 @@ private:
         atomic_data_impl<thread_count>& var = 
             *static_cast<atomic_data_impl<thread_count>*>(data);
         timestamp_t const first_seen = var.history_[var.current_index_ % atomic_history_size].first_seen_order_[index_];
-        aba = (first_seen > own_acq_rel_order_);
+        aba = ((timestamp_t)-1 == first_seen);
         atomic_load<mo, true>(data);
         unsigned result = atomic_store<mo, true>(data);
 
