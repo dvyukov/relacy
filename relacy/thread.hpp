@@ -273,9 +273,8 @@ private:
         RL_VERIFY(rec.busy_);
 
         own_acq_rel_order_ += 1;
-        if ((timestamp_t)-1 == rec.first_seen_order_[index_]) {
+        if ((timestamp_t)-1 == rec.first_seen_order_[index_])
             rec.first_seen_order_[index_] = own_acq_rel_order_;
-        }
 
         bool const synch =
             (mo_acquire == mo
