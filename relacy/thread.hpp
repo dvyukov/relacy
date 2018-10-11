@@ -229,6 +229,12 @@ private:
                 if (acq_rel_order >= rec.acq_rel_timestamp_)
                     break;
 
+                //  This check ensures read-read coherence, 1.10/16:
+                //  If a value computation A of an atomic object M happens before a value
+                //  computation B of M, and A takes its value from a side effect X on M,
+                //  then the value computed by B shall either be the value stored by X or
+                //  the value stored by a side effect Y on M, where Y follows X in the
+                //  modification order of M. 
                 bool stop = false;
                 for (thread_id_t i = 0; i != thread_count; ++i)
                 {
