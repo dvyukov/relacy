@@ -1,0 +1,37 @@
+script:
+  - make
+  - make check
+
+install:
+  - CXX="${RELACY_CXX}"; export CXX; unset RELACY_CXX; export RELACY_CXX
+  - ${CXX} --version
+
+matrix:
+  include:
+    - addons: { apt: { packages: ["g++-6"], sources: ["ubuntu-toolchain-r-test"] } }
+      env: RELACY_CXX=g++-6
+      os: linux
+
+    - addons: { apt: { packages: ["g++-7"], sources: ["ubuntu-toolchain-r-test"] } }
+      env: RELACY_CXX=g++-7
+      os: linux
+
+    - addons: { apt: { packages: ["g++-8"], sources: ["ubuntu-toolchain-r-test"] } }
+      env: RELACY_CXX=g++-8
+      os: linux
+
+    - addons: { apt: { packages: ["clang-5.0"], sources: ["llvm-toolchain-trusty-5.0", "ubuntu-toolchain-r-test"] } }
+      env: RELACY_CXX=clang++-5.0
+      os: linux
+
+    - addons: { apt: { packages: ["clang-6.0"], sources: ["llvm-toolchain-trusty-6.0", "ubuntu-toolchain-r-test"] } }
+      env: RELACY_CXX=clang++-6.0
+      os: linux
+
+    - addons: { apt: { packages: ["clang-7"], sources: ["llvm-toolchain-trusty-7", "ubuntu-toolchain-r-test"] } }
+      env: RELACY_CXX=clang++-7
+      os: linux
+
+dist: trusty
+language: cpp
+sudo: false
