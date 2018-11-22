@@ -3,7 +3,7 @@ script:
   - make check
 
 install:
-  - CXX="${RELACY_CXX}"; export CXX; unset RELACY_CXX; export RELACY_CXX
+  - CXX="${RELACY_CXX:-${CXX}}"; export CXX; unset RELACY_CXX; export RELACY_CXX
   - ${CXX} --version
 
 matrix:
@@ -31,6 +31,15 @@ matrix:
     - addons: { apt: { packages: ["clang-7"], sources: ["llvm-toolchain-trusty-7", "ubuntu-toolchain-r-test"] } }
       env: RELACY_CXX=clang++-7
       os: linux
+
+    - os: osx
+      osx_image: xcode8.3
+
+    - os: osx
+      osx_image: xcode9.4
+
+    - os: osx
+      osx_image: xcode10.1
 
 dist: trusty
 language: cpp
