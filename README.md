@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/dvyukov/relacy.svg?branch=master)](https://travis-ci.org/dvyukov/relacy)
+
 # Relacy Race Detector
 Meticulous synchronization algorithm verifier for relaxed memory models
 
