@@ -89,7 +89,7 @@ public:
             return true;
 
 #ifndef RL_GC
-        map<void*, size_t>::type::iterator iter = allocs_.find(pp);
+        map<void* const, size_t>::type::iterator iter = allocs_.find(pp);
         if (allocs_.end() == iter)
             return false;
 
@@ -152,8 +152,8 @@ public:
     void output_allocs(std::ostream& stream)
     {
         stream << "memory allocations:" << std::endl;
-        map<void*, size_t>::type::iterator iter = allocs_.begin();
-        map<void*, size_t>::type::iterator end = allocs_.end();
+        map<void* const, size_t>::type::iterator iter = allocs_.begin();
+        map<void* const, size_t>::type::iterator end = allocs_.end();
         for (; iter != end; ++iter)
         {
             stream << iter->first << " [" << (unsigned)iter->second << "]" << std::endl;
@@ -175,7 +175,7 @@ private:
     size_t deferred_free_size_ [deferred_count];
 
 #ifndef RL_GC
-    map<void*, size_t>::type allocs_;
+    map<void* const, size_t>::type allocs_;
 #else
     struct alloc_desc_t
     {
