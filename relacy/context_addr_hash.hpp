@@ -51,16 +51,16 @@ private:
         uintptr_t       ptr_;
         size_t          hash_;
     };
-    typedef map<void const*, size_t>::type  hash_map_t;
+    typedef map<void* const, size_t>::type  hash_map_t;
     hash_map_t                              hash_map_;
     size_t                                  hash_seq_;
 
-    virtual size_t      get_addr_hash               (void const* p)
+    virtual size_t      get_addr_hash               (const void* p)
     {
         //!!! accept 'table size' to do 'hash % table_size'
         // will give more information for state exploration
 
-        hash_map_t::iterator iter (hash_map_.find(p));
+        hash_map_t::iterator iter (hash_map_.find(const_cast<void*>(p)));
         if (iter != hash_map_.end() && iter->first == p)
         {
             return iter->second;
@@ -69,7 +69,7 @@ private:
         {
             //!!! distribute hashes more randomly, use rand()
             size_t hash = hash_seq_++;
-            hash_map_.insert(std::make_pair(p, hash));
+            hash_map_.insert(std::make_pair(const_cast<void*>(p), hash));
             return hash;
         }
     }
