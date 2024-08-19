@@ -1,6 +1,6 @@
 # User-customizable variables:
 CXX ?= c++
-CXXFLAGS ?=
+CXXFLAGS ?= -I relacy/fakestd -O1
 DEPFLAGS ?= -MD -MF $(@).d -MP -MT $(@)
 build_dir = build
 
@@ -11,8 +11,9 @@ test_programs = ntest/ntest
 
 example_exe_files = $(foreach name,$(example_programs),$(build_dir)/example/$(name)/$(name))
 test_exe_files = $(foreach name,$(test_programs),$(build_dir)/test/$(name))
+main_test_exe_files = $(build_dir)/test/main
 
-exe_files = $(example_exe_files) $(test_exe_files)
+exe_files = $(example_exe_files) $(test_exe_files) $(main_test_exe_files)
 o_files = $(exe_files:=.cpp.o)
 
 ansi_term_csi = [
@@ -25,11 +26,12 @@ COMPILE.cpp = $(CXX) $(DEPFLAGS) $(CXXFLAGS) -c
 LINK.cpp = $(CXX) $(CXXFLAGS)
 
 .PHONY: all
-all: examples tests
+all: examples tests main_test
 
 .PHONY: examples tests
 examples: $(example_exe_files)
 tests: $(test_exe_files)
+main_test: $(main_test_exe_files)
 
 .PHONY: check
 check: check-examples check-tests
