@@ -110,10 +110,10 @@ T val(T x)
 
 template <class From, class To, template <class> class CheckTrait, template <class> class AddTrait>
 struct copy_trait_impl {
-    using type = std::conditional_t<
+    using type = typename std::conditional<
         CheckTrait<From>::value,
         typename AddTrait<To>::type,
-        To>;
+        To>::type;
 };
 
 template <class From, class To>

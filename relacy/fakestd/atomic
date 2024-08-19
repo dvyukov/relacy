@@ -1,1 +1,16 @@
-#include "../relacy_std.hpp"
+// -*-C++-*-
+
+#ifndef INCLUDED_RL_ATOMIC
+#define INCLUDED_RL_ATOMIC
+
+namespace rl {
+template <class T>
+struct atomic;
+}
+
+namespace std
+{
+    using rl::atomic;
+}
+
+#endif
