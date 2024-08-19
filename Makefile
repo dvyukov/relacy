@@ -1,6 +1,7 @@
 # User-customizable variables:
 CXX ?= c++
-CXXFLAGS ?= -I relacy/fakestd -O1
+CXX_STD ?= c++11
+CXXFLAGS ?= -I relacy/fakestd -O1 -std=$(CXX_STD)
 DEPFLAGS ?= -MD -MF $(@).d -MP -MT $(@)
 build_dir = build
 

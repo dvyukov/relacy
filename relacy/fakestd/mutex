@@ -1,0 +1,12 @@
+// -*-C++-*-
+
+#ifndef INCLUDED_RL_MUTEX
+#define INCLUDED_RL_MUTEX
+
+namespace std {
+
+struct once_flag {};
+
+} // namespace std
+
+#endif

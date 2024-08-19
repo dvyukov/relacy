@@ -47,6 +47,7 @@
 #include <set>
 #include <map>
 #include <new>
+#include <type_traits>
 
 #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #   define RL_WIN
