@@ -108,6 +108,21 @@ T val(T x)
     return x;
 }
 
+template <class From, class To, template <class> class CheckTrait, template <class> class AddTrait>
+struct copy_trait_impl {
+    using type = std::conditional_t<
+        CheckTrait<From>::value,
+        typename AddTrait<To>::type,
+        To>;
+};
+
+template <class From, class To>
+using copy_volatile_t = typename copy_trait_impl<From, To, std::is_volatile, std::add_volatile>::type;
+template <class From, class To>
+using copy_const_t = typename copy_trait_impl<From, To, std::is_const, std::add_const>::type;
+template <class From, class To>
+using copy_cv_t = copy_volatile_t<From, copy_const_t<From, To>>;
+
 }
 
 

@@ -412,4 +412,29 @@ struct occasional_test : rl::test_suite<occasional_test, 3, rl::test_result_unti
 };
 
 
+struct ensure_atomic_pointer_stores_compile {
+    static void test() {
+        // Ensure the below atomic store expression compile.
+        {
+            rl::atomic<int*> x;
+            int* p = nullptr;
+            x($).store(p);
+        }
+        {
+            rl::atomic<const int*> x;
+            int* p = nullptr;
+            x($).store(p);
+        }
+        {
+            rl::atomic<volatile int*> x;
+            int* p = nullptr;
+            x($).store(p);
+        }
+        {
+            rl::atomic<volatile const int*> x;
+            int* p = nullptr;
+            x($).store(p);
+        }
+    }
+};
 

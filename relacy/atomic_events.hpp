@@ -35,7 +35,7 @@ template<typename T>
 struct atomic_add_type<T*>
 {
     typedef ptrdiff_t type;
-    typedef void* output_type;
+    typedef copy_cv_t<T, void>* output_type;
 };
 
 
