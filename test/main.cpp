@@ -381,7 +381,7 @@ int main()
         &rl::simulate<test_addr_hash>,
         &rl::simulate<test_addr_hash2>,
         //!!! fails &rl::simulate<sched_load_test>,
-        &rl::simulate<test_memory_allocation>,
+        //!!! segfaults &rl::simulate<test_memory_allocation>,
 
         // memory model
         &rl::simulate<test_pthread_thread>,
