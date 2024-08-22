@@ -44,7 +44,7 @@ public:
     {
     }
 
-    T load(memory_order mo = mo_seq_cst) const
+    T load(memory_order mo = mo_seq_cst) const noexcept
     {
         return var_.load(mo, info_);
     }
@@ -75,108 +75,108 @@ public:
     {
     }
 
-    void store(T value, memory_order mo = mo_seq_cst)
+    void store(T value, memory_order mo = mo_seq_cst) noexcept
     {
         this->var_.store(value, mo, this->info_);
     }
 
-    bool compare_exchange_weak(T& cmp, T xchg, memory_order mo = mo_seq_cst)
+    bool compare_exchange_weak(T& cmp, T xchg, memory_order mo = mo_seq_cst) noexcept
     {
         return this->var_.compare_exchange(bool_t<true>(), cmp, xchg, mo, this->info_);
     }
 
-    bool compare_exchange_weak(T& cmp, T xchg, memory_order mo, memory_order failure_mo)
+    bool compare_exchange_weak(T& cmp, T xchg, memory_order mo, memory_order failure_mo) noexcept
     {
         return this->var_.compare_exchange(bool_t<true>(), cmp, xchg, mo, failure_mo, this->info_);
     }
 
-    bool compare_exchange_strong(T& cmp, T xchg, memory_order mo = mo_seq_cst)
+    bool compare_exchange_strong(T& cmp, T xchg, memory_order mo = mo_seq_cst) noexcept
     {
         return this->var_.compare_exchange(bool_t<false>(), cmp, xchg, mo, this->info_);
     }
 
-    bool compare_exchange_strong(T& cmp, T xchg, memory_order mo, memory_order failure_mo)
+    bool compare_exchange_strong(T& cmp, T xchg, memory_order mo, memory_order failure_mo) noexcept
     {
         return this->var_.compare_exchange(bool_t<false>(), cmp, xchg, mo, failure_mo, this->info_);
     }
 
-    T exchange(T xchg, memory_order mo = mo_seq_cst)
+    T exchange(T xchg, memory_order mo = mo_seq_cst) noexcept
     {
         return this->var_.rmw(rmw_type_t<rmw_type_swap>(), xchg, mo, this->info_);
     }
 
-    T fetch_add(add_type value, memory_order mo = mo_seq_cst)
+    T fetch_add(add_type value, memory_order mo = mo_seq_cst) noexcept
     {
         return this->var_.rmw(rmw_type_t<rmw_type_add>(), value, mo, this->info_);
     }
 
-    T fetch_sub(add_type value, memory_order mo = mo_seq_cst)
+    T fetch_sub(add_type value, memory_order mo = mo_seq_cst) noexcept
     {
         return this->var_.rmw(rmw_type_t<rmw_type_sub>(), value, mo, this->info_);
     }
 
-    T fetch_and(T value, memory_order mo = mo_seq_cst)
+    T fetch_and(T value, memory_order mo = mo_seq_cst) noexcept
     {
         return this->var_.rmw(rmw_type_t<rmw_type_and>(), value, mo, this->info_);
     }
 
-    T fetch_or(T value, memory_order mo = mo_seq_cst)
+    T fetch_or(T value, memory_order mo = mo_seq_cst) noexcept
     {
         return this->var_.rmw(rmw_type_t<rmw_type_or>(), value, mo, this->info_);
     }
 
-    T fetch_xor(T value, memory_order mo = mo_seq_cst)
+    T fetch_xor(T value, memory_order mo = mo_seq_cst) noexcept
     {
         return this->var_.rmw(rmw_type_t<rmw_type_xor>(), value, mo, this->info_);
     }
 
-    T operator = (T value)
+    T operator = (T value) noexcept
     {
         store(value);
         return value;
     }
 
-    T operator ++ (int)
+    T operator ++ (int) noexcept
     {
         return fetch_add(1);
     }
 
-    T operator -- (int)
+    T operator -- (int) noexcept
     {
         return fetch_sub(1);
     }
 
-    T operator ++ ()
+    T operator ++ () noexcept
     {
         return fetch_add(1) + 1;
     }
 
-    T operator -- ()
+    T operator -- () noexcept
     {
         return fetch_sub(1) - 1;
     }
 
-    T operator += (add_type value)
+    T operator += (add_type value) noexcept
     {
         return fetch_add(value) + value;
     }
 
-    T operator -= (add_type value)
+    T operator -= (add_type value) noexcept
     {
         return fetch_sub(value) + value;
     }
 
-    T operator &= (T value)
+    T operator &= (T value) noexcept
     {
         return fetch_and(value) & value;
     }
 
-    T operator |= (T value)
+    T operator |= (T value) noexcept
     {
         return fetch_or(value) | value;
     }
 
-    T operator ^= (T value)
+    T operator ^= (T value) noexcept
     {
         return fetch_xor(value) ^ value;
     }
@@ -223,7 +223,7 @@ public:
     }
 
     RL_INLINE
-    T load(memory_order mo, debug_info_param info) const
+    T load(memory_order mo DEFAULTED_ATOMIC_OP_MO, debug_info_param info DEFAULTED_DEBUG_INFO) const noexcept
     {
         RL_VERIFY(mo_release != mo);
         RL_VERIFY(mo_acq_rel != mo);
@@ -242,7 +242,7 @@ public:
     }
 
     RL_INLINE
-    void store(T v, memory_order mo, debug_info_param info)
+    void store(T v, memory_order mo DEFAULTED_ATOMIC_OP_MO, debug_info_param info DEFAULTED_DEBUG_INFO) noexcept
     {
         RL_VERIFY(mo_acquire != mo);
         RL_VERIFY(mo_acq_rel != mo);
@@ -259,32 +259,32 @@ public:
     }
 
     RL_INLINE
-    bool compare_exchange_weak(T& cmp, T xchg, memory_order mo, debug_info_param info)
+    bool compare_exchange_weak(T& cmp, T xchg, memory_order mo DEFAULTED_ATOMIC_OP_MO, debug_info_param info DEFAULTED_DEBUG_INFO) noexcept
     {
         return compare_exchange(bool_t<true>(), cmp, xchg, mo, info);
     }
 
     RL_INLINE
-    bool compare_exchange_strong(T& cmp, T xchg, memory_order mo, debug_info_param info)
+    bool compare_exchange_strong(T& cmp, T xchg, memory_order mo DEFAULTED_ATOMIC_OP_MO, debug_info_param info DEFAULTED_DEBUG_INFO) noexcept
     {
         return compare_exchange(bool_t<false>(), cmp, xchg, mo, info);
     }
 
     RL_INLINE
-    bool compare_exchange_weak(T& cmp, T xchg, memory_order mo, debug_info_param info, memory_order failure_mo, debug_info_param)
+    bool compare_exchange_weak(T& cmp, T xchg, memory_order mo, debug_info_param info, memory_order failure_mo, debug_info_param DEFAULTED_DEBUG_INFO) noexcept
     {
         return compare_exchange(bool_t<true>(), cmp, xchg, mo, failure_mo, info);
     }
 
     RL_INLINE
-    bool compare_exchange_strong(T& cmp, T xchg, memory_order mo, debug_info_param info, memory_order failure_mo, debug_info_param)
+    bool compare_exchange_strong(T& cmp, T xchg, memory_order mo, debug_info_param info, memory_order failure_mo, debug_info_param DEFAULTED_DEBUG_INFO) noexcept
     {
         return compare_exchange(bool_t<false>(), cmp, xchg, mo, failure_mo, info);
     }
 
     template<bool spurious_failures>
     RL_INLINE
-    bool compare_exchange(bool_t<spurious_failures>, T& cmp, T xchg, memory_order mo, debug_info_param info)
+    bool compare_exchange(bool_t<spurious_failures>, T& cmp, T xchg, memory_order mo, debug_info_param info) noexcept
     {
         switch (mo)
         {
@@ -366,32 +366,32 @@ public:
         return false;
     }
 
-    T exchange(T xchg, memory_order mo, debug_info_param info)
+    T exchange(T xchg, memory_order mo DEFAULTED_ATOMIC_OP_MO, debug_info_param info DEFAULTED_DEBUG_INFO) noexcept
     {
         return rmw(rmw_type_t<rmw_type_swap>(), xchg, mo, info);
     }
 
-    T fetch_add(typename atomic_add_type<T>::type value, memory_order mo, debug_info_param info)
+    T fetch_add(typename atomic_add_type<T>::type value, memory_order mo DEFAULTED_ATOMIC_OP_MO, debug_info_param info DEFAULTED_DEBUG_INFO) noexcept
     {
         return rmw(rmw_type_t<rmw_type_add>(), value, mo, info);
     }
 
-    T fetch_sub(typename atomic_add_type<T>::type value, memory_order mo, debug_info_param info)
+    T fetch_sub(typename atomic_add_type<T>::type value, memory_order mo DEFAULTED_ATOMIC_OP_MO, debug_info_param info DEFAULTED_DEBUG_INFO) noexcept
     {
         return rmw(rmw_type_t<rmw_type_sub>(), value, mo, info);
     }
 
-    T fetch_and(T value, memory_order mo, debug_info_param info)
+    T fetch_and(T value, memory_order mo DEFAULTED_ATOMIC_OP_MO, debug_info_param info DEFAULTED_DEBUG_INFO) noexcept
     {
         return rmw(rmw_type_t<rmw_type_and>(), value, mo, info);
     }
 
-    T fetch_or(T value, memory_order mo, debug_info_param info)
+    T fetch_or(T value, memory_order mo DEFAULTED_ATOMIC_OP_MO, debug_info_param info DEFAULTED_DEBUG_INFO) noexcept
     {
         return rmw(rmw_type_t<rmw_type_or>(), value, mo, info);
     }
 
-    T fetch_xor(T value, memory_order mo, debug_info_param info)
+    T fetch_xor(T value, memory_order mo DEFAULTED_ATOMIC_OP_MO, debug_info_param info DEFAULTED_DEBUG_INFO) noexcept
     {
         return rmw(rmw_type_t<rmw_type_xor>(), value, mo, info);
     }
@@ -582,7 +582,12 @@ private:
 
 
 template<typename T>
+#if __cplusplus >= 202002L
+// atomic's default constructor value initializes since C++20
+class atomic : public generic_atomic<T, true>
+#else
 class atomic : public generic_atomic<T, false>
+#endif
 {
 public:
     atomic()

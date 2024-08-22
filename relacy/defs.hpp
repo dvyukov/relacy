@@ -13,6 +13,7 @@
 #   pragma once
 #endif
 
+#include <source_location>
 
 namespace rl
 {
@@ -58,6 +59,16 @@ struct debug_info
         , line_(line)
     {
     }
+
+#if __cplusplus >= 202002L
+    debug_info(std::source_location sl) noexcept
+        : func_(sl.function_name())
+        , file_(sl.file_name())
+        , line_(sl.line())
+    {
+    }
+#endif
+
 };
 
 typedef debug_info const& debug_info_param;

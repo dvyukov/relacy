@@ -311,49 +311,49 @@ public:
         condvar<tag_t>::deinit($);
     }
 
-    void notify_one(debug_info_param info)
+    void notify_one(debug_info_param info DEFAULTED_DEBUG_INFO)
     {
         condvar<tag_t>::notify_one(info);
     }
 
-    void notify_all(debug_info_param info)
+    void notify_all(debug_info_param info DEFAULTED_DEBUG_INFO)
     {
         condvar<tag_t>::notify_all(info);
     }
 
     template<typename lock_t>
-    void wait(lock_t& lock, debug_info_param info)
+    void wait(lock_t& lock, debug_info_param info DEFAULTED_DEBUG_INFO)
     {
         condvar<tag_t>::wait(lock, false, info);
     }
 
     template<typename lock_t, typename pred_t>
-    void wait(lock_t& lock, pred_t pred, debug_info_param info)
+    void wait(lock_t& lock, pred_t pred, debug_info_param info DEFAULTED_DEBUG_INFO)
     {
         condvar<tag_t>::wait(lock, pred, false, info);
     }
 
     template<typename lock_t, typename abs_time_t>
-    bool wait_until(lock_t& lock, abs_time_t const&, debug_info_param info)
+    bool wait_until(lock_t& lock, abs_time_t const&, debug_info_param info DEFAULTED_DEBUG_INFO)
     {
         return condvar<tag_t>::wait(lock, true, info);
     }
 
     template<typename lock_t, typename abs_time_t, typename pred_t>
-    bool wait_until(lock_t& lock, abs_time_t const&, pred_t pred, debug_info_param info)
+    bool wait_until(lock_t& lock, abs_time_t const&, pred_t pred, debug_info_param info DEFAULTED_DEBUG_INFO)
     {
         return condvar<tag_t>::wait(lock, pred, true, info);
     }
     
     template<typename lock_t, typename rel_time_t>
-    bool wait_for(lock_t& lock, rel_time_t const&, debug_info_param info)
+    bool wait_for(lock_t& lock, rel_time_t const&, debug_info_param info DEFAULTED_DEBUG_INFO)
     {
         sema_wakeup_reason reason = condvar<tag_t>::wait(lock, true, info);
         return reason == sema_wakeup_reason_success;
     }
 
     template<typename lock_t, typename rel_time_t, typename pred_t>
-    bool wait_for(lock_t& lock, rel_time_t const&, pred_t pred, debug_info_param info)
+    bool wait_for(lock_t& lock, rel_time_t const&, pred_t pred, debug_info_param info DEFAULTED_DEBUG_INFO)
     {
         return condvar<tag_t>::wait(lock, pred, true, info);
     }
