@@ -341,7 +341,8 @@ inline rl_HANDLE rl_CreateThread(void* security, unsigned stack_size, rl_WIN_STA
         new (mem) win32_thread_helper<rl_WIN_START_ROUTINE>;
     arg->fn = fn;
     arg->param = param;
-    win_waitable_object* handle = ctx().create_thread(&win32_thread_helper<rl_WIN_START_ROUTINE>::thread, arg);
+    thread_id_t tid;
+    win_waitable_object* handle = ctx().create_thread(&win32_thread_helper<rl_WIN_START_ROUTINE>::thread, arg, &tid);
     return handle;
 }
 
@@ -358,7 +359,8 @@ inline uintptr_t rl_beginthreadex(void *security, unsigned stack_size, rl_MSVCR_
         new (mem) win32_thread_helper<rl_MSVCR_THREAD_ROUTINE>;
     arg->fn = start_address;
     arg->param = arglist;
-    win_waitable_object* handle = ctx().create_thread(&win32_thread_helper<rl_MSVCR_THREAD_ROUTINE>::thread, arg);
+    thread_id_t tid;
+    win_waitable_object* handle = ctx().create_thread(&win32_thread_helper<rl_MSVCR_THREAD_ROUTINE>::thread, arg, &tid);
     return (uintptr_t)handle;
 }
 

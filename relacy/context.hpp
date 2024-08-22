@@ -537,10 +537,11 @@ public:
         }
     }
 
-    virtual win_waitable_object* create_thread(void*(*fn)(void*), void* ctx)
+    virtual win_waitable_object* create_thread(void*(*fn)(void*), void* ctx, thread_id_t* tid)
     {
         RL_VERIFY(fn);
         thread_id_t id = sched_.create_thread();
+        if (tid) *tid = id;
         threads_[id].dynamic_thread_func_ = fn;
         threads_[id].dynamic_thread_param_ = ctx;
         threads_[id].sync_object_.on_create();
