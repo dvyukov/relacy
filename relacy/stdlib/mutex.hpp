@@ -645,17 +645,17 @@ public:
         generic_mutex<tag>::deinit($);
     }
 
-    void lock(debug_info_param info)
+    void lock(debug_info_param info DEFAULTED_DEBUG_INFO)
     {
         generic_mutex<tag>::lock_exclusive(info);
     }
 
-    bool try_lock(debug_info_param info)
+    bool try_lock(debug_info_param info DEFAULTED_DEBUG_INFO)
     {
         return generic_mutex<tag>::try_lock_exclusive(info);
     }
 
-    void unlock(debug_info_param info)
+    void unlock(debug_info_param info DEFAULTED_DEBUG_INFO)
     {
         generic_mutex<tag>::unlock_exclusive(info);
     }

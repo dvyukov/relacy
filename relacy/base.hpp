@@ -128,6 +128,13 @@ using copy_cv_t = copy_volatile_t<From, copy_const_t<From, To>>;
 
 #include "defs.hpp"
 
+#if __cplusplus >= 202002L
+#define DEFAULTED_DEBUG_INFO = std::source_location::current()
+#define DEFAULTED_ATOMIC_OP_MO = mo_seq_cst
+#else
+#define DEFAULTED_DEBUG_INFO
+#define DEFAULTED_ATOMIC_OP_MO
+#endif
 
 #define RL_INFO ::rl::debug_info(__FUNCTION__, __FILE__, __LINE__)
 #define $ RL_INFO

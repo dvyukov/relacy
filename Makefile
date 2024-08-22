@@ -8,7 +8,7 @@ build_dir = build
 .SECONDARY:
 
 example_programs = cli_ws_deque
-test_programs = ntest/ntest
+test_programs = ntest/ntest defaulted_debug_info atomic_init
 
 example_exe_files = $(foreach name,$(example_programs),$(build_dir)/example/$(name)/$(name))
 test_exe_files = $(foreach name,$(test_programs),$(build_dir)/test/$(name))
