@@ -158,7 +158,7 @@ public:
 
     virtual unsigned rand(unsigned limit, sched_type t) = 0;
 
-    virtual win_waitable_object* create_thread(void*(*fn)(void*), void* ctx) = 0;
+    virtual win_waitable_object* create_thread(void*(*fn)(void*), void* ctx, thread_id_t* tid) = 0;
 
     virtual unpark_reason wfmo_park(void** ws,
                                     win_waitable_object** wo,

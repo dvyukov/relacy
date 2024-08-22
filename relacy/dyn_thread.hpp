@@ -33,7 +33,8 @@ public:
     void start(void*(*fn)(void*), void* arg)
     {
         RL_VERIFY(handle_ == 0);
-        handle_ = ctx().create_thread(fn, arg);
+        thread_id_t tid;
+        handle_ = ctx().create_thread(fn, arg, &tid);
     }
 
     void join()

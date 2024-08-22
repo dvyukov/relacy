@@ -1,0 +1,77 @@
+#ifndef RL_THREAD
+#define RL_THREAD
+
+#include "../relacy.hpp"
+#include "../pthread.h"
+
+#include <memory>
+
+namespace std {
+
+struct thread_impl {
+    pthread_t handle;
+    rl::thread_id_t tid;
+    std::function<void(void)> fn;
+};
+
+struct thread {
+    struct id {
+        bool operator==(const id& other) const {
+            return id_ == other.id_;
+        }
+        long id_;
+    };
+    static unsigned int hardware_concurrency() noexcept { return 1; }
+
+    thread::id get_id() const noexcept {
+        return thread::id{impl_->tid};
+    }
+    template <class F> thread(F&& fn, rl::debug_info info DEFAULTED_DEBUG_INFO) {
+        impl_ = (thread_impl*)malloc(sizeof(thread_impl));
+        impl_->fn = (F&&)fn;
+        rl_pthread_create(&impl_->handle, nullptr, thread_fn, impl_, info, &impl_->tid);
+    }
+    thread() noexcept {}
+    thread(thread&& other) : impl_(rl::exchange(other.impl_, nullptr)) {
+    }
+    thread& operator=(thread&& other) noexcept {
+        if (this == &other) {
+            impl_ = rl::exchange(other.impl_, nullptr);
+        }
+        return *this;
+    }
+    ~thread() {
+        if (impl_) {
+            free(impl_);
+        }
+    }
+
+    static void* thread_fn(void* data) {
+        thread_impl* self = (thread_impl*)data;
+        self->fn();
+        return nullptr;
+    }
+
+    void join() {
+        if (impl_) {
+            void* ret;
+            pthread_join(impl_->handle, &ret);
+        }
+    }
+
+    thread_impl* impl_ = nullptr;
+};
+namespace this_thread {
+    static thread::id get_id() {
+        return thread::id{rl::ctx().current_thread()};
+    }
+    static void yield() { pthread_yield(); }
+
+    template <class T>
+    static void sleep_for(T) {/* NOT IMPLEMENTED*/}
+}
+
+} // namespace std
+
+#endif
+// vim: ft=cpp

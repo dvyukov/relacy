@@ -136,6 +136,19 @@ using copy_cv_t = copy_volatile_t<From, copy_const_t<From, To>>;
 #define DEFAULTED_ATOMIC_OP_MO
 #endif
 
+namespace rl {
+#if __cplusplus >= 201402L
+using std::exchange;
+#else
+template <class T, class U = T>
+T exchange(T& orig, U&& new_value) {
+    T other = std::move(orig);
+    orig = std::forward<U>(new_value);
+    return other;
+}
+#endif
+}
+
 #define RL_INFO ::rl::debug_info(__FUNCTION__, __FILE__, __LINE__)
 #define $ RL_INFO
 

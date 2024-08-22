@@ -42,12 +42,12 @@ inline void rl_sched_yield(debug_info_param info)
 typedef win_waitable_object* rl_pthread_t;
 typedef void* rl_pthread_attr_t;
 
-inline int rl_pthread_create(rl_pthread_t* th, rl_pthread_attr_t* attr, void* (*func) (void*), void* arg, debug_info_param info)
+inline int rl_pthread_create(rl_pthread_t* th, rl_pthread_attr_t* attr, void* (*func) (void*), void* arg, debug_info_param info, thread_id_t* tid = nullptr)
 {
     (void)attr;
     (void)info;//!!!
     RL_VERIFY(th && func);
-    th[0] = ctx().create_thread(func, arg);
+    th[0] = ctx().create_thread(func, arg, tid);
     return 0;
 }
 
