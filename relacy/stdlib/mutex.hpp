@@ -23,7 +23,50 @@
 #include "../foreach.hpp"
 #include "semaphore.hpp"
 
+namespace std {
 
+    template <class T>
+    struct lock_guard {
+        T& mtx_;
+        rl::debug_info_param info_;
+        lock_guard(const lock_guard&) = delete;
+        lock_guard& operator=(const lock_guard&) = delete;
+        lock_guard(T& mtx, rl::debug_info_param info DEFAULTED_DEBUG_INFO) : mtx_(mtx), info_(info) {
+            mtx_.lock(info_);
+        }
+        ~lock_guard() {
+            mtx_.unlock(info_);
+        }
+    };
+
+    template <class T>
+    struct unique_lock {
+        T& mtx_;
+        rl::debug_info_param info_;
+        bool locked_ = true;
+        unique_lock(const unique_lock&) = delete;
+        unique_lock& operator=(const unique_lock&) = delete;
+        unique_lock(T& mtx, rl::debug_info_param info DEFAULTED_DEBUG_INFO) : mtx_(mtx), info_(info) {
+            mtx_.lock(info);
+        }
+        void lock(rl::debug_info_param info) {
+            mtx_.lock(info);
+            locked_ = true;
+        }
+        void unlock(rl::debug_info_param info DEFAULTED_DEBUG_INFO) {
+            mtx_.unlock(info);
+            locked_ = false;
+        }
+        ~unique_lock() {
+            if (locked_)
+                mtx_.unlock(info_);
+        }
+
+        bool owns_lock() const noexcept { return locked_; }
+        operator bool() const noexcept { return locked_; }
+    };
+
+}
 
 namespace rl
 {
