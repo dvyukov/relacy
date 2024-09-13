@@ -1,7 +1,8 @@
 # User-customizable variables:
 CXX ?= c++
 CXX_STD ?= c++11
-CXXFLAGS ?= -I relacy/fakestd -O1 -std=$(CXX_STD)
+#CXXFLAGS ?= -I relacy/fakestd -O1 -std=$(CXX_STD)
+CXXFLAGS ?= -I relacy/fakestd -O0 -std=$(CXX_STD) -I stdexec/include -I stdexec/test -g -fsanitize=memory -fsanitize-memory-track-origins -fno-omit-frame-pointer  -nostdinc -I/opt/rh/devtoolset-11/root/usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11 -I/opt/rh/devtoolset-11/root/usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11/x86_64-redhat-linux -I/opt/rh/devtoolset-11/root/usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11/backward -I/opt/rh/devtoolset-11/root/usr/lib/gcc/x86_64-redhat-linux/11/include -I/usr/local/include -I/opt/rh/devtoolset-11/root/usr/include -I/usr/include
 DEPFLAGS ?= -MD -MF $(@).d -MP -MT $(@)
 build_dir = build
 
