@@ -198,6 +198,8 @@ public:
         value_ = T();
         already_failed_ = false;
 
+        memset(history_, 0, sizeof(history_));
+
         if (val(strong_init))
         {
             unsigned const index = c.threadx_->atomic_init(impl_);
@@ -692,6 +694,8 @@ struct atomic_data_impl : atomic_data
 
     atomic_data_impl()
     {
+        memset(history_, 0, sizeof(history_));
+
         current_index_ = 0;
         history_record& rec = history_[0];
         history_[atomic_history_size - 1].busy_ = false;

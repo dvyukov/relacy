@@ -19,6 +19,9 @@ struct thread {
         bool operator==(const id& other) const {
             return id_ == other.id_;
         }
+        bool operator!=(const id& other) const {
+            return !(*this == other);
+        }
         long id_;
     };
     static unsigned int hardware_concurrency() noexcept { return 1; }
@@ -28,6 +31,7 @@ struct thread {
     }
     template <class F> thread(F&& fn, rl::debug_info info DEFAULTED_DEBUG_INFO) {
         impl_ = (thread_impl*)malloc(sizeof(thread_impl));
+        new (impl_) thread_impl{};
         impl_->fn = (F&&)fn;
         rl_pthread_create(&impl_->handle, nullptr, thread_fn, impl_, info, &impl_->tid);
     }
@@ -35,7 +39,7 @@ struct thread {
     thread(thread&& other) : impl_(rl::exchange(other.impl_, nullptr)) {
     }
     thread& operator=(thread&& other) noexcept {
-        if (this == &other) {
+        if (this != &other) {
             impl_ = rl::exchange(other.impl_, nullptr);
         }
         return *this;
