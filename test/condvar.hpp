@@ -36,6 +36,34 @@ struct test_condvar : rl::test_suite<test_condvar, 2>
     }
 };
 
+struct test_condvar_wait_pred : rl::test_suite<test_condvar_wait_pred, 2>
+{
+    std::mutex mtx;
+    std::condition_variable cv;
+    rl::var<int> data;
+
+    void before()
+    {
+        data($) = 0;
+    }
+
+    void thread(unsigned index)
+    {
+        if (0 == index)
+        {
+            mtx.lock($);
+            data($) += 1;
+            mtx.unlock($);
+            cv.notify_one($);
+        }
+        else
+        {
+            std::unique_lock lock(mtx, $);
+            cv.wait(mtx, [&] { return 0 != data($); }, $);
+        }
+    }
+};
+
 
 
 

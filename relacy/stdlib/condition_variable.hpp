@@ -278,7 +278,7 @@ public:
     }
 
     template<typename lock_t, typename pred_t>
-    bool wait(mutex_wrapper const& lock, pred_wrapper const& pred, bool is_timed, debug_info_param info)
+    bool wait(lock_t& lock, pred_t& pred, bool is_timed, debug_info_param info)
     {
         check(info);
         return impl_->wait(mutex_wrapper_impl<lock_t>(lock), pred_wrapper_impl<pred_t>(pred), is_timed, info);
@@ -331,6 +331,17 @@ public:
     void wait(lock_t& lock, pred_t pred, debug_info_param info DEFAULTED_DEBUG_INFO)
     {
         condvar<tag_t>::wait(lock, pred, false, info);
+    }
+
+    void wait(std::unique_lock<rl::mutex>& lock, debug_info_param info DEFAULTED_DEBUG_INFO)
+    {
+        wait(lock.mtx_, info);
+    }
+
+    template<typename pred_t>
+    void wait(std::unique_lock<rl::mutex>& lock, pred_t pred, debug_info_param info DEFAULTED_DEBUG_INFO)
+    {
+        wait(lock.mtx_, pred, info);
     }
 
     template<typename lock_t, typename abs_time_t>
