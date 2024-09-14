@@ -46,6 +46,7 @@ struct thread {
     }
     ~thread() {
         if (impl_) {
+            impl_->~thread_impl();
             free(impl_);
         }
     }
