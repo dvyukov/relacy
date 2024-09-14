@@ -28,7 +28,7 @@ namespace std {
     template <class T>
     struct lock_guard {
         T& mtx_;
-        rl::debug_info_param info_;
+        rl::debug_info info_;
         lock_guard(const lock_guard&) = delete;
         lock_guard& operator=(const lock_guard&) = delete;
         lock_guard(T& mtx, rl::debug_info_param info DEFAULTED_DEBUG_INFO) : mtx_(mtx), info_(info) {
@@ -42,7 +42,7 @@ namespace std {
     template <class T>
     struct unique_lock {
         T& mtx_;
-        rl::debug_info_param info_;
+        rl::debug_info info_;
         bool locked_ = true;
         unique_lock(const unique_lock&) = delete;
         unique_lock& operator=(const unique_lock&) = delete;

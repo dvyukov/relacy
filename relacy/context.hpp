@@ -1278,6 +1278,16 @@ inline void operator delete (void* p) throw()
         (::free)(p);
 }
 
+#ifdef __cpp_sized_deallocation
+inline void operator delete (void* p, size_t sz) noexcept
+{
+    if (rl::is_ctx())
+        rl::ctx().free(p);
+    else
+        (::free)(p);
+}
+#endif
+
 inline void operator delete [] (void* p) throw()
 {
     if (rl::is_ctx())
@@ -1285,6 +1295,16 @@ inline void operator delete [] (void* p) throw()
     else
         (::free)(p);
 }
+
+#ifdef __cpp_sized_deallocation
+inline void operator delete [] (void* p, size_t sz) noexcept
+{
+    if (rl::is_ctx())
+        rl::ctx().free(p);
+    else
+        (::free)(p);
+}
+#endif
 
 #define RL_NEW_PROXY rl::new_proxy($) % new
 #define RL_DELETE_PROXY rl::delete_proxy($) , delete
