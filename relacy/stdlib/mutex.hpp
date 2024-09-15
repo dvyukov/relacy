@@ -49,7 +49,7 @@ namespace std {
         unique_lock(T& mtx, rl::debug_info_param info DEFAULTED_DEBUG_INFO) : mtx_(mtx), info_(info) {
             mtx_.lock(info);
         }
-        void lock(rl::debug_info_param info) {
+        void lock(rl::debug_info_param info DEFAULTED_DEBUG_INFO) {
             mtx_.lock(info);
             locked_ = true;
         }

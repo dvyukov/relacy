@@ -53,8 +53,14 @@
 #define memory_order_seq_cst mo_seq_cst, $
 #endif
 
+// The 'delete' keyword can be used to remove compiler provided methods,
+// e.g., 'SomeClass() = delete;' and does not play well when defining
+// the macro below. Use RELACY_ENABLE_NEW_DELETE_PROXY to enable
+// the new/delete proxies.
+#ifdef RELACY_ENABLE_NEW_DELETE_PROXY
 #define new                 RL_NEW_PROXY
 #define delete              RL_DELETE_PROXY
+#endif
 #define malloc(sz)          rl::rl_malloc((sz), $)
 #define calloc(sz, cnt)     rl::rl_calloc((sz), (cnt), $)
 #define realloc(p, sz)      rl::rl_realloc((p), (sz), $)
