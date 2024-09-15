@@ -53,7 +53,7 @@ struct debug_info
     char const* file_;
     unsigned line_;
 
-    debug_info(char const* func = "", char const* file = "", unsigned line = 0)
+    debug_info(char const* func = "", char const* file = "", unsigned line = 0) noexcept
         : func_(func)
         , file_(file)
         , line_(line)

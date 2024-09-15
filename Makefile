@@ -8,7 +8,13 @@ build_dir = build
 .SECONDARY:
 
 example_programs = cli_ws_deque
-test_programs = ntest/ntest defaulted_debug_info atomic_init cxx11_thread new_delete
+test_programs = \
+	ntest/ntest \
+	defaulted_debug_info \
+	atomic_init \
+	cxx11_thread \
+	new_delete \
+	debug_info
 
 example_exe_files = $(foreach name,$(example_programs),$(build_dir)/example/$(name)/$(name))
 test_exe_files = $(foreach name,$(test_programs),$(build_dir)/test/$(name))
