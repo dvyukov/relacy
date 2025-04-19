@@ -11,6 +11,7 @@ struct atomic;
 namespace std
 {
     using rl::atomic;
+    using rl::atomic_flag;
 }
 
 #endif

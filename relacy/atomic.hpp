@@ -724,6 +724,27 @@ struct atomic_data_impl : atomic_data
     }
 };
 
+struct atomic_flag {
+
+    atomic_flag& operator=(const atomic_flag&) = delete;
+
+    void clear(memory_order mo DEFAULTED_ATOMIC_OP_MO, debug_info_param info DEFAULTED_DEBUG_INFO) noexcept {
+        flg.store(false, mo);
+    }
+
+    bool test_and_set(memory_order mo DEFAULTED_ATOMIC_OP_MO, debug_info_param info DEFAULTED_DEBUG_INFO) {
+        return flg.exchange(true, mo);
+    }
+
+    bool test(memory_order mo DEFAULTED_ATOMIC_OP_MO, debug_info_param info DEFAULTED_DEBUG_INFO) {
+        return flg.load(mo);
+    }
+
+private:
+    rl::atomic<bool> flg;
+
+};
+
 
 }
 
