@@ -333,13 +333,13 @@ public:
         condvar<tag_t>::wait(lock, pred, false, info);
     }
 
-    void wait(std::unique_lock<rl::mutex>& lock, debug_info_param info DEFAULTED_DEBUG_INFO)
+    void wait(rl::unique_lock<rl::mutex>& lock, debug_info_param info DEFAULTED_DEBUG_INFO)
     {
         wait(lock.mtx_, info);
     }
 
     template<typename pred_t>
-    void wait(std::unique_lock<rl::mutex>& lock, pred_t pred, debug_info_param info DEFAULTED_DEBUG_INFO)
+    void wait(rl::unique_lock<rl::mutex>& lock, pred_t pred, debug_info_param info DEFAULTED_DEBUG_INFO)
     {
         wait(lock.mtx_, pred, info);
     }
@@ -355,7 +355,7 @@ public:
     {
         return condvar<tag_t>::wait(lock, pred, true, info);
     }
-    
+
     template<typename lock_t, typename rel_time_t>
     bool wait_for(lock_t& lock, rel_time_t const&, debug_info_param info DEFAULTED_DEBUG_INFO)
     {

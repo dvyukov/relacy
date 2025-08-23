@@ -77,6 +77,9 @@ namespace std
     using rl::recursive_mutex;
     using rl::condition_variable;
     using rl::condition_variable_any;
+
+    using rl::lock_guard;
+    using rl::unique_lock;
 }
 
 #endif
