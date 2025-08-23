@@ -197,7 +197,7 @@ struct test_api : rl::test_suite<test_api, 1>
         rl::nvar<int> cv1, cv2(3), cv3(cv1($)), cv4(cv1);
         cv1($) = cv2($);
         cv1($) = 1;
-        (int)cv1($);
+        (void)cv1($);
         cv1($) += 1;
         cv1($) -= 1;
         cv1($)++;

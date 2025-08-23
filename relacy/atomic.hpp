@@ -478,7 +478,7 @@ private:
         sign_.check(info);
 
         unsigned const index = (c.threadx_->*impl)(impl_);
-        
+
         T const prev = value_;
         last_index_ = index;
         history_[index] = v;
@@ -729,15 +729,15 @@ struct atomic_flag {
     atomic_flag& operator=(const atomic_flag&) = delete;
 
     void clear(memory_order mo DEFAULTED_ATOMIC_OP_MO, debug_info_param info DEFAULTED_DEBUG_INFO) noexcept {
-        flg.store(false, mo);
+        flg.store(false, mo, info);
     }
 
     bool test_and_set(memory_order mo DEFAULTED_ATOMIC_OP_MO, debug_info_param info DEFAULTED_DEBUG_INFO) {
-        return flg.exchange(true, mo);
+        return flg.exchange(true, mo, info);
     }
 
     bool test(memory_order mo DEFAULTED_ATOMIC_OP_MO, debug_info_param info DEFAULTED_DEBUG_INFO) {
-        return flg.load(mo);
+        return flg.load(mo, info);
     }
 
 private:
