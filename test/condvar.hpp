@@ -58,7 +58,7 @@ struct test_condvar_wait_pred : rl::test_suite<test_condvar_wait_pred, 2>
         }
         else
         {
-            std::unique_lock lock(mtx, $);
+            std::unique_lock<std::mutex> lock(mtx, $);
             cv.wait(mtx, [&] { return 0 != data($); }, $);
         }
     }
