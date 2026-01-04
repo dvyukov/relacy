@@ -1,5 +1,5 @@
-#include "../../relacy/relacy_std.hpp"
-#include "../../relacy/relacy_cli.hpp"
+#include "../relacy/relacy_std.hpp"
+#include "../relacy/relacy_cli.hpp"
 
 #include <vector>
 

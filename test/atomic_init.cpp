@@ -23,7 +23,6 @@ struct atomic_init_test : rl::test_suite<atomic_init_test, 1, rl::test_result_un
 int main()
 {
     rl::test_params p;
-    p.iteration_count = 1;
-    rl::simulate<atomic_init_test>();
-    return 0;
+    p.iteration_count = 100;
+    return rl::simulate<atomic_init_test>();
 }

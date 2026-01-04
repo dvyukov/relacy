@@ -1,9 +1,12 @@
 # User-customizable variables:
 CXX ?= c++
 CXX_STD ?= c++11
-CXXFLAGS ?= -I relacy/fakestd -O1 -std=$(CXX_STD)
+CXXFLAGS ?= -O1 -std=$(CXX_STD)
 DEPFLAGS ?= -MD -MF $(@).d -MP -MT $(@)
-build_dir = build
+build_dir ?= build
+
+# Programs that need the fakestd include path
+programs_needing_fakestd = atomic_wait_notify atomic_init cxx11_thread main
 
 .SECONDARY:
 
@@ -12,6 +15,7 @@ test_programs = \
 	ntest/ntest \
 	defaulted_debug_info \
 	atomic_init \
+	atomic_wait_notify \
 	cxx11_thread \
 	new_delete \
 	debug_info
@@ -65,7 +69,7 @@ $(build_dir)/%: $(build_dir)/%.cpp.o
 
 $(build_dir)/%.cpp.o: %.cpp
 	@mkdir -p $(dir $(@))
-	$(COMPILE.cpp) -o $(@) $(<)
+	$(if $(findstring $(notdir $(basename $(*))).,$(addsuffix .,$(programs_needing_fakestd))),$(COMPILE.cpp) -I relacy/fakestd -o $(@) $(<),$(COMPILE.cpp) -o $(@) $(<))
 
 .PHONY: clean
 clean:

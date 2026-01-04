@@ -49,7 +49,7 @@ public:
         return var_.load(mo, info_);
     }
 
-    operator T () const
+    operator T () const noexcept
     {
         return load();
     }
@@ -180,6 +180,23 @@ public:
     {
         return fetch_xor(value) ^ value;
     }
+    
+#if __cplusplus >= 202002L
+    void wait(T old, memory_order mo = mo_seq_cst) const noexcept
+    {
+        return this->var_.wait(old, mo, this->info_);
+    }
+
+    void notify_one() noexcept
+    {
+        return this->var_.notify_one(this->info_);
+    }
+
+    void notify_all() noexcept
+    {
+        return this->var_.notify_all(this->info_);
+    }
+#endif
 };
 
 
@@ -272,6 +289,21 @@ public:
         return compare_exchange(bool_t<false>(), cmp, xchg, mo, info);
     }
 
+    RL_INLINE
+    bool compare_exchange_weak(T& cmp, T xchg, memory_order mo, memory_order failure_mo, debug_info_param info DEFAULTED_DEBUG_INFO) noexcept
+    {
+        return compare_exchange(bool_t<true>(), cmp, xchg, mo, failure_mo, info);
+    }
+
+    RL_INLINE
+    bool compare_exchange_strong(T& cmp, T xchg, memory_order mo, memory_order failure_mo, debug_info_param info DEFAULTED_DEBUG_INFO) noexcept
+    {
+        return compare_exchange(bool_t<false>(), cmp, xchg, mo, failure_mo, info);
+    }
+
+    // Below overloads support RELACY_ENABLE_MEMORY_ORDER_DEBUG_INFO_DEFAULTING mode,
+    // where the author writes 'a.compare_exchange_weak(cmp, 1, std::memory_order_seq_cst, std::memory_order_seq_cst)'
+    // and relies on '$' being inserted via the memory order macros.
     RL_INLINE
     bool compare_exchange_weak(T& cmp, T xchg, memory_order mo, debug_info_param info, memory_order failure_mo, debug_info_param DEFAULTED_DEBUG_INFO) noexcept
     {
@@ -416,6 +448,7 @@ public:
         return T();
     }
 
+    // Internal wait/wake methods for futex-style operations (used by pthread.hpp)
     unpark_reason wait(context& c, bool is_timed, bool allow_spurious_wakeup, debug_info_param info)
     {
         sign_.check(info);
@@ -427,6 +460,57 @@ public:
         sign_.check(info);
         return c.threadx_->atomic_wake(impl_, count, info);
     }
+
+#if __cplusplus >= 202002L
+    void wait(T expected, memory_order mo DEFAULTED_ATOMIC_OP_MO, debug_info_param info = std::source_location::current()) const noexcept
+    {
+        context& c = ctx();
+        sign_.check(info);
+        
+        for (;;)
+        {
+            // See rl_int_futex_impl for a similar implementation.
+
+            c.sched();
+            c.atomic_thread_fence_seq_cst();
+
+            T current;
+            {
+                preemption_disabler pd(c);
+                current = this->load(mo, info);
+            }
+            
+            // If value has changed, we're done
+            if (current != expected)
+                break;
+            
+            // Value still matches expected, so park (this may spuriously wake)
+            // Park allows scheduling and may wake spuriously or due to notify
+            const_cast<generic_atomic*>(this)->wait(c, false, true, info);
+            
+            // After waking (spurious or real), loop back to check again
+        }
+    }
+
+    void notify_one(debug_info_param info = std::source_location::current()) noexcept
+    {
+        context& c = ctx();
+        c.sched();
+        c.atomic_thread_fence_seq_cst();
+        
+        // Wake one waiting thread from the waitset
+        this->wake(c, 1, info);
+    }
+
+    void notify_all(debug_info_param info = std::source_location::current()) noexcept
+    {
+        context& c = ctx();
+        c.sched();
+        
+        // Wake all waiting threads from the waitset
+        this->wake(c, thread_id_t(-1), info);
+    }
+#endif
 
 private:
     T value_;
@@ -592,26 +676,29 @@ class atomic : public generic_atomic<T, false>
 #endif
 {
 public:
-    atomic()
-    {
-    }
+    atomic() noexcept = default;
 
-    /*explicit*/ atomic(T value)
+    /*explicit*/ atomic(T value) noexcept (std::is_nothrow_default_constructible<T>::value)
     {
         this->store(value, mo_relaxed, $);
     }
 
-    atomic_proxy_const<T> operator () (debug_info_param info) const /*volatile*/
+    atomic_proxy_const<T> operator () (debug_info_param info) const noexcept /*volatile*/
     {
         return atomic_proxy_const<T>(*this, info);
     }
 
-    atomic_proxy<T> operator () (debug_info_param info) /*volatile*/
+    atomic_proxy<T> operator () (debug_info_param info) noexcept /*volatile*/
     {
         return atomic_proxy<T>(*this, info);
     }
 
-    bool is_lock_free() const /*volatile*/
+    operator T () const noexcept
+    {
+        return (*this)($).load();
+    }
+
+    bool is_lock_free() const noexcept /*volatile*/
     {
         return true;
     }
@@ -621,8 +708,6 @@ public:
 
     RL_NOCOPY(atomic);
 };
-
-
 
 
 typedef atomic<bool> atomic_bool;

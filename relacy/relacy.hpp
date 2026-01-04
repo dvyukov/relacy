@@ -37,6 +37,21 @@
 #define TLS_T(T) rl::thread_local_var<T>
 #define VAR(x) x($)
 
+// Before C++20, to simplify atomic store/load operations without having to specify the
+// '$' debug info macro, the memory_order_* names are defined as macros which specify
+// the '$' macro as the final argument.
+//
+// std::atomicint> a;
+// a.store(memory_order_relaxed); // Will automatically capture $ as the last parameter.
+//
+// Since C++20, relacy's atomic store/load default the debug information without requiring
+// any macros via std::source_location. With C++20 more common, to allow code to use
+// 'std::memory_order_relaxed` without interference from the same name being a macro,
+// by default, the memory_order_* names are not defined as macros. To enable the older
+// behavior, define the RELACY_ENABLE_MEMORY_ORDER_DEBUG_INFO_DEFAULTING macro in the
+// build.
+#ifdef RELACY_ENABLE_MEMORY_ORDER_DEBUG_INFO_DEFAULTING
+
 #ifndef RL_FORCE_SEQ_CST
 #define memory_order_relaxed mo_relaxed, $
 #define memory_order_consume mo_consume, $
@@ -51,6 +66,8 @@
 #define memory_order_release mo_seq_cst, $
 #define memory_order_acq_rel mo_seq_cst, $
 #define memory_order_seq_cst mo_seq_cst, $
+#endif
+
 #endif
 
 // The 'delete' keyword can be used to remove compiler provided methods,

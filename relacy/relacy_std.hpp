@@ -13,6 +13,7 @@
 #   pragma once
 #endif
 
+#include "relacy_prologue.hpp"
 
 #include "relacy.hpp"
 
@@ -20,6 +21,16 @@
 namespace std
 {
     using rl::memory_order;
+    
+#ifndef RELACY_ENABLE_MEMORY_ORDER_DEBUG_INFO_DEFAULTING
+    using rl::memory_order_relaxed;
+    using rl::memory_order_consume;
+    using rl::memory_order_acquire;
+    using rl::memory_order_release;
+    using rl::memory_order_acq_rel;
+    using rl::memory_order_seq_cst;
+#endif
+
     using rl::mo_relaxed;
     using rl::mo_consume;
     using rl::mo_acquire;

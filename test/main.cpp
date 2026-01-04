@@ -1,6 +1,11 @@
+#include "../relacy/fakestd/prologue.hpp"
 #include "stdafx.h"
 
 //#define RL_MSVC_OUTPUT
+
+#if __cplusplus < 202002L
+#define RELACY_ENABLE_MEMORY_ORDER_DEBUG_INFO_DEFAULTING
+#endif
 
 #include "../relacy/relacy_std.hpp"
 #include "memory_order.hpp"
@@ -441,7 +446,10 @@ int main()
         &rl::simulate<race_seq_st_ld_test>,
         &rl::simulate<race_seq_st_st_test>,
 
+        #if __cplusplus < 202002L
+        // C++20 std::atomic are always initialized, so this test is not applicable in C++20 or newer
         &rl::simulate<race_uninit_test>,
+        #endif
         &rl::simulate<race_indirect_test>,
 
         // compare_exchange

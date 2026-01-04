@@ -38,7 +38,7 @@ struct atomic_fence_event
 
 
 RL_INLINE
-void atomic_thread_fence(memory_order mo, debug_info_param info)
+void atomic_thread_fence(memory_order mo, debug_info_param info DEFAULTED_DEBUG_INFO)
 {
     context& c = ctx();
     RL_VERIFY(false == c.invariant_executing);
