@@ -1,3 +1,12 @@
+Jan 7, 2026
+ - Added more support for GCC12, 13, and 14 with libstdc++
+ - Added support for C++20's std::atomic wait/notify* APIs.
+ - Relacy no longer defines memory_order_* macros to insert the rl::debug_info
+   with the current file/line information. In C++20 mode, Relacy uses
+   std::source_location to do this automatically without relying on macros.
+   As of this release, Relacy introduces RELACY_ENABLE_MEMORY_ORDER_DEBUG_INFO_DEFAULTING
+   to allow using the older behavior, which should only be needed in pre-C++20.
+
 Version 2.4
 Features:
 + Support for futex(FUTEX_WAIT/FUTEX_WAKE) 

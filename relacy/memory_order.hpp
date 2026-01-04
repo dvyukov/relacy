@@ -19,19 +19,46 @@
 namespace rl
 {
 
+    #if __cplusplus >= 202002L
+    
+    enum class memory_order : int
+    {
+        relaxed, consume, acquire, release, acq_rel, seq_cst
+    };
+    inline constexpr memory_order memory_order_relaxed = memory_order::relaxed;
+    inline constexpr memory_order memory_order_consume = memory_order::consume;
+    inline constexpr memory_order memory_order_acquire = memory_order::acquire;
+    inline constexpr memory_order memory_order_release = memory_order::release;
+    inline constexpr memory_order memory_order_acq_rel = memory_order::acq_rel;
+    inline constexpr memory_order memory_order_seq_cst = memory_order::seq_cst;
 
-enum memory_order
-{
-    mo_relaxed,
-    mo_consume,
-    mo_acquire,
-    mo_release,
-    mo_acq_rel,
-    mo_seq_cst,
-};
+    inline constexpr memory_order mo_relaxed = memory_order_relaxed;
+    inline constexpr memory_order mo_consume = memory_order_consume;
+    inline constexpr memory_order mo_acquire = memory_order_acquire;
+    inline constexpr memory_order mo_release = memory_order_release;
+    inline constexpr memory_order mo_acq_rel = memory_order_acq_rel;
+    inline constexpr memory_order mo_seq_cst = memory_order_seq_cst;
 
+    #else
 
+    enum memory_order
+    {
+        memory_order_relaxed,
+        memory_order_consume,
+        memory_order_acquire,
+        memory_order_release,
+        memory_order_acq_rel,
+        memory_order_seq_cst,
+        
+        mo_relaxed = memory_order_relaxed,
+        mo_consume = memory_order_consume,
+        mo_acquire = memory_order_acquire,
+        mo_release = memory_order_release,
+        mo_acq_rel = memory_order_acq_rel,
+        mo_seq_cst = memory_order_seq_cst
+    };
 
+    #endif
 
 inline char const* format(memory_order mo)
 {

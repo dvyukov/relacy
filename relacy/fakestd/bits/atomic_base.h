@@ -1,6 +1,8 @@
 #ifndef RL_BITS_ATOMIC_BASE
 #define RL_BITS_ATOMIC_BASE
 
+// For C
+
 enum memory_order {
     memory_order_relaxed,
     memory_order_consume,
