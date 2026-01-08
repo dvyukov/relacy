@@ -14,4 +14,6 @@ namespace std
     using rl::atomic_flag;
 }
 
+#define ATOMIC_FLAG_INIT RL_ATOMIC_FLAG_INIT
+
 #endif
