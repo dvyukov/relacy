@@ -810,8 +810,25 @@ struct atomic_data_impl : atomic_data
 };
 
 struct atomic_flag {
+    
+    struct _private_constructor_tag {};
 
     atomic_flag& operator=(const atomic_flag&) = delete;
+    
+    atomic_flag() noexcept = default;
+    
+#if __cplusplus >= 201703L
+    atomic_flag(const atomic_flag&) = delete;
+#else
+    // Before C++17's guaranteed copy elision, we allow the copy ctor to be called
+    // so that ATOMIC_FLAG_INIT can work correctly.
+    atomic_flag(const atomic_flag& other) noexcept {
+        flg.store(other.flg.load(mo_relaxed, $), mo_relaxed, $);
+    }
+#endif
+    
+    // Not standard; used to support ATOMIC_FLAG_INIT
+    atomic_flag(_private_constructor_tag, bool initial) noexcept : flg(initial) {}
 
     void clear(memory_order mo DEFAULTED_ATOMIC_OP_MO, debug_info_param info DEFAULTED_DEBUG_INFO) noexcept {
         flg.store(false, mo, info);
@@ -821,15 +838,38 @@ struct atomic_flag {
         return flg.exchange(true, mo, info);
     }
 
+#if __cplusplus >= 202002L
+
     bool test(memory_order mo DEFAULTED_ATOMIC_OP_MO, debug_info_param info DEFAULTED_DEBUG_INFO) {
         return flg.load(mo, info);
     }
+
+    void wait(bool old, memory_order mo = mo_seq_cst, debug_info_param info = std::source_location::current()) const noexcept
+    {
+        flg.wait(old, mo, info);
+    }
+
+    void notify_one(debug_info_param info = std::source_location::current()) noexcept
+    {
+        flg.notify_one(info);
+    }
+
+    void notify_all(debug_info_param info = std::source_location::current()) noexcept
+    {
+        flg.notify_all(info);
+    }
+
+#endif
 
 private:
     rl::atomic<bool> flg;
 
 };
 
+// Note: std::atomic_flag is an aggregate type (at least in libstdc++), allowing it to be
+// initialized with a brace-enclosed initializer. However, to allow implementing rl::atomic_flag
+// in terms of rl::atomic, rl::atomic_flag is not an aggregate.
+#define RL_ATOMIC_FLAG_INIT rl::atomic_flag(rl::atomic_flag::_private_constructor_tag{}, false)
 
 }
 

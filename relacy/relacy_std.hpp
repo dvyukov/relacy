@@ -13,7 +13,7 @@
 #   pragma once
 #endif
 
-#include "relacy_prologue.hpp"
+#include "fakestd/prologue.hpp"
 
 #include "relacy.hpp"
 
