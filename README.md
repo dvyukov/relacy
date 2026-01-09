@@ -13,7 +13,7 @@ been recently (Aug 2024) tested and confirmed to work
 
  - Linux x86_64
     - GCC-11-14, C++11-20
-      Clang-18
+    - Clang-18-21
  - Mac x86_64 (Clang-15)
 
 ## Overriding `std::` types
