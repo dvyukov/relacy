@@ -39,7 +39,9 @@ public:
     ~signature()
     {
         check(RL_INFO);
-        magic_ = 0;
+        // Ensure the write to magic_ is not optimized away to to help detect code that
+        // later tries to use the same signature object after destruction.
+        *static_cast<volatile unsigned*>(&magic_) = 0;
     }
 
     void check(debug_info_param info) const

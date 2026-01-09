@@ -6,15 +6,15 @@ DEPFLAGS ?= -MD -MF $(@).d -MP -MT $(@)
 build_dir ?= build
 
 # Programs that need the fakestd include path
-programs_needing_fakestd = atomic_flag atomic_init atomic_wait_notify cxx11_thread main with_std_overrides
+programs_needing_fakestd = atomic_flag atomic atomic_wait_notify cxx11_thread main with_std_overrides
 
 .SECONDARY:
 
 example_programs = cli_ws_deque
 test_programs = \
 	atomic_flag \
-	atomic_init \
 	atomic_wait_notify \
+	atomic \
 	cxx11_thread \
 	debug_info \
 	defaulted_debug_info \

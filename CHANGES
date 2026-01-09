@@ -1,5 +1,6 @@
 Jan 8, 2026
  - Added wait/notify* APIs to rl::atomic_flag
+ - Improve use-after-free detection in signature object
 
 Jan 7, 2026
  - Added more support for GCC12, 13, and 14 with libstdc++
