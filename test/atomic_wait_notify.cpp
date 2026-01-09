@@ -483,6 +483,8 @@ int main()
     CHECK(rl::simulate<test_atomic_notify_all_empty>(params));
     CHECK(rl::simulate<test_atomic_three_threads_in_chain>(params));
     
+    std::cout << "All atomic_flag tests passed!" << std::endl;
+
     return 0;
 }
 
