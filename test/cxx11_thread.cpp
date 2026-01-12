@@ -36,13 +36,25 @@ struct cxx11_thread_basic_ops_test : rl::test_suite<cxx11_thread_basic_ops_test,
         }
 
         {
-            // Verify move ctor and move assignment.
+            // Verify move ctor and move assignment, and comparison ops.
             std::thread a{[] {}, $};
             RL_ASSERT(std::this_thread::get_id() != a.get_id());
+            std::size_t hash1 = std::hash<std::thread::id>{}(a.get_id());
+            RL_ASSERT(hash1 != std::hash<std::thread::id>{}(std::this_thread::get_id()));
+
             std::thread b = std::move(a);
             RL_ASSERT(std::this_thread::get_id() != b.get_id());
+            std::size_t hash2 = std::hash<std::thread::id>{}(b.get_id());
+            RL_ASSERT(hash1 == hash2);
+
             a = std::move(b);
             RL_ASSERT(std::this_thread::get_id() != a.get_id());
+        }
+
+        {
+            // Verify get_id works on an empty thread.
+            std::thread t;
+            RL_ASSERT(t.get_id() == std::thread::id{});
         }
     }
 };
