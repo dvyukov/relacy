@@ -13,7 +13,6 @@
 #   pragma once
 #endif
 
-
 #include "base.hpp"
 #include "context.hpp"
 #include "context_base_impl.hpp"

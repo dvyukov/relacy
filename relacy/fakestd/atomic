@@ -6,6 +6,7 @@
 namespace rl {
 template <class T>
 struct atomic;
+struct atomic_flag;
 }
 
 namespace std

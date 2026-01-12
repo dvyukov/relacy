@@ -30,7 +30,7 @@ struct atomic_use_after_scope_detected : rl::test_suite<atomic_use_after_scope_d
           std::atomic<int> i{0};
           ip = &i;
       }
-      ip->store(5);
+      (*ip)($).store(5);
   }
 };
 
