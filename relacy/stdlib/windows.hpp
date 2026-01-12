@@ -47,7 +47,7 @@ inline void rl_Sleep(unsigned long milliseconds, debug_info_param info)
 
 inline unsigned long rl_WaitForSingleObjectEx(rl_HANDLE obj, unsigned long timeout, int alertable, debug_info_param info)
 {
-    (void)alertable; //!!! not yet supported – support it!
+    (void)alertable; //!!! not yet supported - support it!
     //!!! support WAIT_IO_COMPLETION
     RL_VERIFY(false == alertable && "Alertable wait is not supported in WaitForSingleObject() yet");
 
