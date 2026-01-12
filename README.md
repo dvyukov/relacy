@@ -9,12 +9,12 @@ Meticulous synchronization algorithm verifier for relaxed memory models
 ## Compilers known to work
 
 At a minimum, a C++11 compiler is assumed. The below compilers have
-been recently (Aug 2024) tested and confirmed to work
+been recently (Jan 2026) tested and confirmed to work
 
  - Linux x86_64
     - GCC-11-14, C++11-20
     - Clang-18-21
- - Mac x86_64 (Clang-15)
+ - Mac x86_64 (Clang-15, 17)
 
 ## Overriding `std::` types
 
