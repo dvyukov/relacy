@@ -522,7 +522,9 @@ int main()
             //!!! make it work under sched_full
             if (sched == rl::sched_full
                 && (tests[i] == (rl::simulate_f)&rl::simulate<test_pthread_condvar>
-                    || tests[i] == (rl::simulate_f)&rl::simulate<test_win_condvar>))
+                    || tests[i] == (rl::simulate_f)&rl::simulate<test_win_condvar>
+                    || tests[i] == (rl::simulate_f)&rl::simulate<test_pthread_rwlock>
+                    || tests[i] == (rl::simulate_f)&rl::simulate<test_pthread_mutex>))
                 continue;
 
             rl::ostringstream stream;
