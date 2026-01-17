@@ -1,0 +1,121 @@
+# 
+# Makefile for building and testing *all* supported compilers and C++ standard
+# versions. The actual build is handled by CMake; this Makefile knows how to
+# configure and build all combinations.
+
+# Default target
+help:
+	@echo "Relacy Race Detector - CMake-based Makefile to assist in verifying all"
+	@echo "supported build modes/C++ standards work with Relacy."
+	echo ""
+	echo "For developer edit/compile/test workflows, please use CMake directly (see"
+	echo "the README.md for more)"
+	echo ""
+	@echo "Quick Start:"
+	@echo "  make all                    - Configure and build all combinations"
+	@echo "  make config-all             - Configure all CMake build directories"
+	@echo "  make build-all              - Build all configured directories"
+	@echo "  make test-all               - Run tests in all build directories"
+	@echo "  make list-configs           - List all build configurations"
+	@echo "  make clean-all              - Remove all build directories"
+	@echo ""
+	@echo "Build all for one compiler:"
+	@echo "  make build-all-g++          - Build all configurations for g++"
+	@echo "  make build-all-clang        - Build all configurations for clang++"
+	@echo ""
+	@echo "Individual Targets:"
+	@echo "  make build-g++-20-config    - Configure specific build"
+	@echo "  make build-g++-20-build     - Build specific configuration"
+	@echo "  make build-g++-20-test      - Test specific configuration"
+	@echo "  make build-g++-20-clean     - Clean specific build directory"
+	@echo ""
+	@echo "Examples:"
+	@echo "  make all COMPILERS='g++' STD_VERSIONS='20 23'"
+	@echo "  make build CMAKE_BUILD_TYPE=Release"
+	@echo "  make test COMPILERS='clang++'"
+	@echo ""
+
+
+# Configuration
+ifeq ($(shell uname),Linux)
+COMPILERS ?= g++ clang++
+else ifeq ($(shell uname),Darwin)
+COMPILERS ?= clang++
+else
+$(error Unsupported OS)
+endif
+
+STD_VERSIONS ?= 11 14 17 20 23
+CMAKE_BUILD_TYPE ?= RelWithDebInfo
+CMAKE_GENERATOR ?= Unix Makefiles
+
+# Generate explicit rules for each compiler/std combination
+define GEN_RULES
+build-$(1)-$(2)-config:
+	@echo "Configuring build-$(1)-$(2) ($(1), C++$(2))..."
+	if ! command -v $(1) >/dev/null 2>&1; then \
+		echo "Error: $(1) not found, skipping"; \
+		exit 1; \
+	fi
+	mkdir -p build-$(1)-$(2)
+	cmake -S . -B build-$(1)-$(2) \
+		-DCMAKE_CXX_COMPILER=$(1) \
+		-DCMAKE_CXX_STANDARD=$(2) \
+		-DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE) \
+		-G "$(CMAKE_GENERATOR)"
+
+build-$(1)-$(2)-build: build-$(1)-$(2)-config
+	@echo "Building build-$(1)-$(2)..."
+	+cmake --build build-$(1)-$(2) -- $(MAKEFLAGS)
+
+build-$(1)-$(2)-test: build-$(1)-$(2)-build
+	@echo "Testing build-$(1)-$(2)..."
+	cd build-$(1)-$(2) && ctest --output-on-failure
+
+build-$(1)-$(2)-clean:
+	@echo "Cleaning build-$(1)-$(2)..."
+	rm -rf build-$(1)-$(2)
+
+.PHONY: build-$(1)-$(2)-config build-$(1)-$(2)-build build-$(1)-$(2)-test build-$(1)-$(2)-clean
+endef
+
+$(foreach compiler,$(COMPILERS),\
+	$(foreach std,$(STD_VERSIONS),\
+		$(eval $(call GEN_RULES,$(compiler),$(std)))))
+
+.PHONY: help all config-all build-all test-all clean-all list-configs
+
+all: build-all
+
+config-all:
+	$(MAKE) -f Makefile.all $(foreach compiler,$(COMPILERS),$(foreach std,$(STD_VERSIONS),build-$(compiler)-$(std)-config))
+
+build-all:
+	$(MAKE) -f Makefile.all $(foreach compiler,$(COMPILERS),$(foreach std,$(STD_VERSIONS),build-$(compiler)-$(std)-build))
+
+# Generate build-all-<compiler> targets for each compiler
+define GEN_COMPILER_RULES
+build-all-$(1):
+	$$(MAKE) -f Makefile.all $$(foreach std,$$(STD_VERSIONS),build-$(1)-$$(std)-build)
+test-all-$(1):
+	$$(MAKE) -f Makefile.all $$(foreach std,$$(STD_VERSIONS),build-$(1)-$$(std)-test)
+
+.PHONY: build-all-$(1) test-all-$(1)
+endef
+
+$(foreach compiler,$(COMPILERS),\
+	$(eval $(call GEN_COMPILER_RULES,$(compiler))))
+
+test-all:
+	$(MAKE) -f Makefile.all $(foreach compiler,$(COMPILERS),$(foreach std,$(STD_VERSIONS),build-$(compiler)-$(std)-test))
+
+clean-all:
+	$(MAKE) -f Makefile.all $(foreach compiler,$(COMPILERS),$(foreach std,$(STD_VERSIONS),build-$(compiler)-$(std)-clean))
+
+list-configs:
+	@echo "Build configurations:"
+	@for compiler in $(COMPILERS); do \
+		for std in $(STD_VERSIONS); do \
+			echo "  build-$$compiler-$$std"; \
+		done; \
+	done

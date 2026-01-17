@@ -108,6 +108,12 @@ struct raw_allocator : std::allocator<T>
         return (T*)(::malloc)(count * sizeof(T));
     }
 
+#ifdef __cpp_lib_allocate_at_least
+    std::allocation_result<T*, std::size_t> allocate_at_least(std::size_t count) {
+      return {allocate(count), count};
+    }
+#endif
+
     void deallocate(T* p, size_t)
     {
         (::free)(p);
