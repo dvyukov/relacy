@@ -88,17 +88,17 @@ $(foreach compiler,$(COMPILERS),\
 all: build-all
 
 config-all:
-	$(MAKE) -f Makefile.all $(foreach compiler,$(COMPILERS),$(foreach std,$(STD_VERSIONS),build-$(compiler)-$(std)-config))
+	$(MAKE) -f Makefile $(foreach compiler,$(COMPILERS),$(foreach std,$(STD_VERSIONS),build-$(compiler)-$(std)-config))
 
 build-all:
-	$(MAKE) -f Makefile.all $(foreach compiler,$(COMPILERS),$(foreach std,$(STD_VERSIONS),build-$(compiler)-$(std)-build))
+	$(MAKE) -f Makefile $(foreach compiler,$(COMPILERS),$(foreach std,$(STD_VERSIONS),build-$(compiler)-$(std)-build))
 
 # Generate build-all-<compiler> targets for each compiler
 define GEN_COMPILER_RULES
 build-all-$(1):
-	$$(MAKE) -f Makefile.all $$(foreach std,$$(STD_VERSIONS),build-$(1)-$$(std)-build)
+	$$(MAKE) -f Makefile $$(foreach std,$$(STD_VERSIONS),build-$(1)-$$(std)-build)
 test-all-$(1):
-	$$(MAKE) -f Makefile.all $$(foreach std,$$(STD_VERSIONS),build-$(1)-$$(std)-test)
+	$$(MAKE) -f Makefile $$(foreach std,$$(STD_VERSIONS),build-$(1)-$$(std)-test)
 
 .PHONY: build-all-$(1) test-all-$(1)
 endef
@@ -107,10 +107,10 @@ $(foreach compiler,$(COMPILERS),\
 	$(eval $(call GEN_COMPILER_RULES,$(compiler))))
 
 test-all:
-	$(MAKE) -f Makefile.all $(foreach compiler,$(COMPILERS),$(foreach std,$(STD_VERSIONS),build-$(compiler)-$(std)-test))
+	$(MAKE) -f Makefile $(foreach compiler,$(COMPILERS),$(foreach std,$(STD_VERSIONS),build-$(compiler)-$(std)-test))
 
 clean-all:
-	$(MAKE) -f Makefile.all $(foreach compiler,$(COMPILERS),$(foreach std,$(STD_VERSIONS),build-$(compiler)-$(std)-clean))
+	$(MAKE) -f Makefile $(foreach compiler,$(COMPILERS),$(foreach std,$(STD_VERSIONS),build-$(compiler)-$(std)-clean))
 
 list-configs:
 	@echo "Build configurations:"
