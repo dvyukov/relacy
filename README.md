@@ -30,8 +30,8 @@ unit tests on all build configurations. This should be done before submitting
 pull requests (at least until we can setup CI to run on pull requests).
 
 ```
-make -f Makefile.all build-all -j 8
-make -f Makefile.all test-all -j 8
+make build-all -j 8
+make test-all -j 8
 ```
 
 ## Toolchains known to work
