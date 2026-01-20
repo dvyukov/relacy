@@ -13,6 +13,12 @@
 #   pragma once
 #endif
 
+#if defined(_GLIBCXX_RELEASE) || defined(_LIBCPP_VERSION)
+#error "Detected that standard library headers were included before relacy_std.hpp - \
+please ensure relacy_std.hpp is the first header included in the .cpp. \
+See https://github.com/dvyukov/relacy/blob/master/README.md#overriding-std-types."
+#endif
+
 #include "fakestd/prologue.hpp"
 
 #include "relacy.hpp"
