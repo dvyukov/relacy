@@ -1,13 +1,14 @@
-#include "../relacy/fakestd/prologue.hpp"
-#include "stdafx.h"
-
-//#define RL_MSVC_OUTPUT
-
 #if __cplusplus < 202002L
 #define RELACY_ENABLE_MEMORY_ORDER_DEBUG_INFO_DEFAULTING
 #endif
 
 #include "../relacy/relacy_std.hpp"
+
+#include "stdafx.h"
+
+//#define RL_MSVC_OUTPUT
+
+
 #include "memory_order.hpp"
 #include "fence.hpp"
 #include "data_race.hpp"
