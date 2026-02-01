@@ -157,7 +157,7 @@ public:
         assert(owner == -1 && recursion_count == 0);
         sema.deinit($);
     }
-    
+
     void lock(rl::debug_info_param info)
     {
         rl::context& c = rl::ctx();
@@ -267,7 +267,7 @@ public:
     {
         CloseHandle(mtx);
     }
-    
+
     void lock(rl::debug_info_param info)
     {
         rl::rl_WaitForSingleObject(mtx, INFINITE, info);
@@ -379,9 +379,10 @@ int main()
     //simulate<my_test>();
     //if (rand() <= RAND_MAX) return 0;
 
-    rl::simulate_f tests[] = 
+    rl::simulate_f tests[] =
     {
 #if 1
+
         &rl::simulate<test_FlushProcessWriteBuffers>,
 
         &rl::simulate<test_addr_hash>,
@@ -396,7 +397,7 @@ int main()
         &rl::simulate<test_pthread_condvar>,
         &rl::simulate<test_pthread_condvar2>,
         &rl::simulate<test_pthread_sem>,
-        
+
         &rl::simulate<coherent_read_read_test>,
         &rl::simulate<order_relaxed_test<0> >,
         &rl::simulate<order_relaxed_test<1> >,
@@ -432,7 +433,7 @@ int main()
         &rl::simulate<fence_synch_test<0, 1> >,
         &rl::simulate<fence_synch_test<1, 1> >,
         &rl::simulate<fence_synch_test<2, 1> >,
-  
+
         &rl::simulate<two_fence_synch_test>,
         &rl::simulate<seq_cst_fence_test<0> >,
         &rl::simulate<seq_cst_fence_test<1> >,
@@ -451,6 +452,7 @@ int main()
         // C++20 std::atomic are always initialized, so this test is not applicable in C++20 or newer
         &rl::simulate<race_uninit_test>,
         #endif
+
         &rl::simulate<race_indirect_test>,
 
         // compare_exchange
@@ -469,7 +471,7 @@ int main()
         &rl::simulate<test_mutex_leak>,
         &rl::simulate<test_mutex>,
         &rl::simulate<test_mutex_try_lock>,
-	
+
         // futex
         &rl::simulate<test_futex>,
         &rl::simulate<test_futex_deadlock>,
@@ -506,6 +508,7 @@ int main()
         &rl::simulate<tls_reset_test>,
         &rl::simulate<tls_global_test>,
         &rl::simulate<tls_win32_test>,
+        &rl::simulate<tls_cxx_test>,
 
         // dynamic thread
         &rl::simulate<dyn_thread_basic_test>,
@@ -554,7 +557,7 @@ int main()
         std::cout << std::endl;
     }
 
-    rl::simulate_f scheduler_tests[] = 
+    rl::simulate_f scheduler_tests[] =
     {
         &rl::simulate<livelock_test>,
         &rl::simulate<yield_livelock_test>,

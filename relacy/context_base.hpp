@@ -23,6 +23,7 @@
 #include "foreach.hpp"
 #include "thread_base.hpp"
 #include "context_addr_hash.hpp"
+#include "thread_local_ctx.hpp"
 
 
 #ifdef RL_DEBUGBREAK_ON_ASSERT
@@ -74,7 +75,7 @@ struct user_msg_event
     void output(std::ostream& s) const
     {
         s << msg_;
-    }            
+    }
 };
 
 class context;
@@ -166,7 +167,7 @@ public:
                                     bool wait_all,
                                     bool is_timed,
                                     debug_info_param info) = 0;
-	
+
     int get_errno();
     void set_errno(int value);
 
@@ -241,7 +242,7 @@ protected:
         RL_VERIFY(this == context_holder<>::instance_);
         context_holder<>::instance_ = 0;
     }
-    
+
 private:
     bool is_random_sched_;
     unsigned ctx_seq_;
