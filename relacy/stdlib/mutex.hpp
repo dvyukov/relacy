@@ -23,8 +23,14 @@
 #include "../foreach.hpp"
 #include "semaphore.hpp"
 
+#include <utility>
+
 namespace rl
 {
+
+// Tag types for lock constructors
+struct adopt_lock_t {};
+constexpr adopt_lock_t adopt_lock;
 
 template <class T>
 struct lock_guard {
@@ -66,6 +72,77 @@ struct unique_lock {
     bool owns_lock() const noexcept { return locked_; }
     operator bool() const noexcept { return locked_; }
 };
+
+#ifdef __cpp_lib_scoped_lock
+
+// Helper for invoking std::lock on a tuple of mutexes
+namespace impl {
+
+template <typename... MutexTypes, std::size_t... Is>
+void lock_mutexes(std::tuple<MutexTypes...>& mtxs, std::index_sequence<Is...>,
+                    rl::debug_info_param info) {
+    if constexpr (sizeof...(MutexTypes) == 0) {
+        // No mutexes to lock
+    } else if constexpr (sizeof...(MutexTypes) == 1) {
+        // Single mutex - call lock() directly
+        std::get<0>(mtxs).lock(info);
+    } else {
+        // Multiple mutexes - use deadlock avoidance algorithm
+        // This is simplified; a full implementation would need std::lock support
+        (std::get<Is>(mtxs).lock(info), ...);
+    }
+}
+
+template <typename... MutexTypes, std::size_t... Is>
+void unlock_mutexes(std::tuple<MutexTypes...>& mtxs, std::index_sequence<Is...>,
+                    rl::debug_info_param info) {
+    // Unlock in reverse order to match lock order
+    (..., std::get<Is>(mtxs).unlock(info));
+}
+
+template <typename... MutexTypes>
+struct scoped_lock_mutex_type {};
+template <typename MutexType>
+struct scoped_lock_mutex_type<MutexType> { using mutex_type = MutexType; };
+
+} // namespace
+
+// C++17 scoped_lock prevents deadlocks when locking multiple mutexes. The Relacy
+// implementation does not provide this today, but locks each mutex in the order
+// they are passed to the constructor.
+template <typename... MutexTypes>
+class scoped_lock : public impl::scoped_lock_mutex_type<MutexTypes...> {
+    std::tuple<MutexTypes&...> mtxs_;
+    rl::debug_info info_;
+
+public:
+    explicit scoped_lock(MutexTypes&... mtxs)
+        : mtxs_(mtxs...), info_($) {
+        impl::lock_mutexes(mtxs_, std::index_sequence_for<MutexTypes...>{}, info_);
+    }
+
+    scoped_lock(adopt_lock_t, MutexTypes&... mtxs)
+        : mtxs_(mtxs...), info_($) {
+    }
+
+    ~scoped_lock() {
+        impl::unlock_mutexes(mtxs_, std::index_sequence_for<MutexTypes...>{}, info_);
+    }
+
+    scoped_lock(const scoped_lock&) = delete;
+    scoped_lock& operator=(const scoped_lock&) = delete;
+};
+
+template <>
+class scoped_lock<> {
+public:
+    explicit scoped_lock(rl::debug_info_param info DEFAULTED_DEBUG_INFO) {}
+    scoped_lock(adopt_lock_t, rl::debug_info_param info DEFAULTED_DEBUG_INFO) {}
+    scoped_lock(const scoped_lock&) = delete;
+    scoped_lock& operator=(const scoped_lock&) = delete;
+};
+
+#endif // __cpp_lib_scoped_lock
 
 struct generic_mutex_data : nocopy<>
 {

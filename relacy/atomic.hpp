@@ -21,7 +21,6 @@
 #include "waitset.hpp"
 #include "rmw.hpp"
 
-
 namespace rl
 {
 
@@ -466,6 +465,9 @@ public:
     {
         context& c = ctx();
         sign_.check(info);
+
+        int spurious_wakeups = 0;
+        constexpr int spurious_wakeup_limit = 5;
         
         for (;;)
         {
@@ -486,7 +488,10 @@ public:
             
             // Value still matches expected, so park (this may spuriously wake)
             // Park allows scheduling and may wake spuriously or due to notify
-            const_cast<generic_atomic*>(this)->wait(c, false, true, info);
+            bool allow_spurious_wakeup = spurious_wakeups < spurious_wakeup_limit;
+            auto r = const_cast<generic_atomic*>(this)->wait(c, false, allow_spurious_wakeup, info);
+            if (r == unpark_reason_spurious)
+                ++spurious_wakeups;
             
             // After waking (spurious or real), loop back to check again
         }
@@ -676,9 +681,16 @@ class atomic : public generic_atomic<T, false>
 #endif
 {
 public:
-    atomic() noexcept = default;
 
-    /*explicit*/ atomic(T value) noexcept (std::is_nothrow_default_constructible<T>::value)
+#if __cplusplus >= 202002L
+#define RL_ATOMIC_CONSTEXPR constexpr
+#else
+#define RL_ATOMIC_CONSTEXPR
+#endif
+
+    RL_ATOMIC_CONSTEXPR atomic() noexcept (std::is_nothrow_default_constructible<T>::value) = default;
+
+    /*explicit*/ RL_ATOMIC_CONSTEXPR atomic(T value) noexcept
     {
         this->store(value, mo_relaxed, $);
     }
