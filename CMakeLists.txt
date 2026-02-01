@@ -60,6 +60,7 @@ if(RELACY_BUILD_TESTS)
     add_relacy_test(atomic_wait_notify test/atomic_wait_notify.cpp USE_FAKESTD)
     add_relacy_test(cxx11_thread test/cxx11_thread.cpp USE_FAKESTD)
     add_relacy_test(main_test test/main.cpp USE_FAKESTD)
+    add_relacy_test(stdmutex_test test/stdmutex.cpp USE_FAKESTD)
     
     add_relacy_test(debug_info test/debug_info.cpp)
     add_relacy_test(defaulted_debug_info test/defaulted_debug_info.cpp)

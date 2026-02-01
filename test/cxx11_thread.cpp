@@ -59,11 +59,45 @@ struct cxx11_thread_basic_ops_test : rl::test_suite<cxx11_thread_basic_ops_test,
     }
 };
 
+#if __cplusplus >= 202002L
+struct thread_variadic_args : rl::test_suite<thread_variadic_args, 1>
+{
+    static size_t const dynamic_thread_count = 2;
+
+    void thread(unsigned index)
+    {
+        if (index == 0) {
+            std::atomic<int> i{0};
+
+            std::thread t{[&](int a) {
+                i.fetch_add(a);
+            }, 10};
+            i.fetch_add(1);
+            t.join();
+
+            t = std::thread{[&](int a, int b) {
+                i.fetch_add(a);
+                i.fetch_add(b);
+            }, 20, 30};
+            i.fetch_add(1);
+            t.join();
+
+            RL_ASSERT(i($).load() == 62);
+        }
+    }
+};
+#endif
+
 int main()
 {
+#define CHECK(x) if (!(x)) { std::cout << "Test failed at line " << __LINE__ << std::endl; return 1; }
+
     rl::test_params p;
     p.iteration_count = 1000;
-    rl::simulate<cxx11_thread_tests>(p);
-    rl::simulate<cxx11_thread_basic_ops_test>(p);
+    CHECK(rl::simulate<cxx11_thread_tests>(p));
+    CHECK(rl::simulate<cxx11_thread_basic_ops_test>(p));
+#if __cplusplus >= 202002L
+    CHECK(rl::simulate<thread_variadic_args>(p));
+#endif
     return 0;
 }
