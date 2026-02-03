@@ -78,3 +78,31 @@ struct tls_win32_test : rl::test_suite<tls_win32_test, 3>
         RL_ASSERT(TlsGetValue(slot) == (void*)(uintptr_t)(index + 10));
     }
 };
+
+struct complex_init
+#ifdef __cpp_guaranteed_copy_elision
+: rl::nocopy<>
+#endif
+{
+    explicit complex_init(unsigned x) : value(x) {}
+
+    unsigned value = 0;
+};
+
+struct tls_cxx_test : rl::test_suite<tls_cxx_test, 3>
+{
+  rl::cxx_thread_local_var<complex_init> x;
+
+  void thread(unsigned index)
+  {
+    if (index == 3) {
+        return; // check that not accessing the tls is fine
+    }
+    auto factory = [&] { return complex_init{index + 2}; };
+    auto& v1 = x.get(factory, $);
+    RL_ASSERT(index + 2 == v1.value);
+
+    v1.value = index + 5;
+    RL_ASSERT(index + 5 == x.get(factory, $).value);
+  }
+};

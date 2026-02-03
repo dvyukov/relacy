@@ -150,6 +150,60 @@ private:
 };
 
 
+template<typename T>
+class cxx_thread_local_var : generic_thread_local
+{
+public:
+    cxx_thread_local_var()
+        : ctx_seq_()
+    {
+    }
+
+    ~cxx_thread_local_var()
+    {
+        if (is_ctx() && ctx_seq_ == ctx().get_ctx_seq())
+        {
+            generic_thread_local::deinit($);
+        }
+    }
+
+    template<typename F>
+    T& get(F&& factory, debug_info_param info DEFAULTED_DEBUG_INFO)
+    {
+        ensure_initialized(info);
+        T* ptr = get_ptr(info);
+        if (!ptr)
+        {
+            ptr = new T(factory());
+            generic_thread_local::set(reinterpret_cast<intptr_t>(ptr), info);
+        }
+        return *ptr;
+    }
+
+private:
+    unsigned ctx_seq_;
+
+    void ensure_initialized(debug_info_param info)
+    {
+        if (ctx_seq_ != ctx().get_ctx_seq())
+        {
+            ctx_seq_ = ctx().get_ctx_seq();
+            generic_thread_local::init(&cxx_thread_local_var::destructor, info);
+        }
+    }
+
+    T* get_ptr(debug_info_param info)
+    {
+        return reinterpret_cast<T*>(generic_thread_local::get(info));
+    }
+
+    static void destructor(intptr_t value)
+    {
+        delete reinterpret_cast<T*>(value);
+    }
+};
+
+
 inline unsigned long rl_TlsAlloc(debug_info_param info)
 {
 #ifndef RL_GC
