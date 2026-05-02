@@ -10,6 +10,7 @@
 #include <compare>
 #endif
 
+#include <iosfwd>
 #include <memory>
 #include <tuple>
 
@@ -41,6 +42,9 @@ struct thread {
             return !(*this == other);
         }
 #endif
+        friend std::ostream& operator<<(std::ostream& os, const id& id) {
+            return os << "thread::id{" << id.id_ << "}";
+        }
         long id_;
     };
     static unsigned int hardware_concurrency() noexcept { return 1; }
