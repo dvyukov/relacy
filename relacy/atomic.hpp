@@ -179,7 +179,7 @@ public:
     {
         return fetch_xor(value) ^ value;
     }
-    
+
 #if __cplusplus >= 202002L
     void wait(T old, memory_order mo = mo_seq_cst) const noexcept
     {
@@ -468,7 +468,7 @@ public:
 
         int spurious_wakeups = 0;
         constexpr int spurious_wakeup_limit = 5;
-        
+
         for (;;)
         {
             // See rl_int_futex_impl for a similar implementation.
@@ -481,18 +481,18 @@ public:
                 preemption_disabler pd(c);
                 current = this->load(mo, info);
             }
-            
+
             // If value has changed, we're done
             if (current != expected)
                 break;
-            
+
             // Value still matches expected, so park (this may spuriously wake)
             // Park allows scheduling and may wake spuriously or due to notify
             bool allow_spurious_wakeup = spurious_wakeups < spurious_wakeup_limit;
             auto r = const_cast<generic_atomic*>(this)->wait(c, false, allow_spurious_wakeup, info);
             if (r == unpark_reason_spurious)
                 ++spurious_wakeups;
-            
+
             // After waking (spurious or real), loop back to check again
         }
     }
@@ -502,7 +502,7 @@ public:
         context& c = ctx();
         c.sched();
         c.atomic_thread_fence_seq_cst();
-        
+
         // Wake one waiting thread from the waitset
         this->wake(c, 1, info);
     }
@@ -511,7 +511,7 @@ public:
     {
         context& c = ctx();
         c.sched();
-        
+        c.atomic_thread_fence_seq_cst();
         // Wake all waiting threads from the waitset
         this->wake(c, thread_id_t(-1), info);
     }
@@ -822,13 +822,13 @@ struct atomic_data_impl : atomic_data
 };
 
 struct atomic_flag {
-    
+
     struct _private_constructor_tag {};
 
     atomic_flag& operator=(const atomic_flag&) = delete;
-    
+
     atomic_flag() noexcept = default;
-    
+
 #if __cplusplus >= 201703L
     atomic_flag(const atomic_flag&) = delete;
 #else
@@ -838,7 +838,7 @@ struct atomic_flag {
         flg.store(other.flg.load(mo_relaxed, $), mo_relaxed, $);
     }
 #endif
-    
+
     // Not standard; used to support ATOMIC_FLAG_INIT
     atomic_flag(_private_constructor_tag, bool initial) noexcept : flg(initial) {}
 

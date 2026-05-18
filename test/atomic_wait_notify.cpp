@@ -110,7 +110,7 @@ struct test_atomic_wait_notify_cycles : rl::test_suite<test_atomic_wait_notify_c
         {
             data.wait(0);
             RL_ASSERT(data.load() == 1);
-            
+
             data.store(2);
             data.notify_one();
         }
@@ -118,7 +118,7 @@ struct test_atomic_wait_notify_cycles : rl::test_suite<test_atomic_wait_notify_c
         {
             data.store(1);
             data.notify_one();
-            
+
             data.wait(1);
             RL_ASSERT(data.load() == 2);
         }
@@ -167,7 +167,7 @@ struct test_atomic_wait_memory_order : rl::test_suite<test_atomic_wait_memory_or
         if (0 == index)
         {
             flag.wait(0);
-            
+
             int val = shared_data($);
             RL_ASSERT(val == 123);
         }
@@ -403,6 +403,37 @@ struct test_atomic_double_wait : rl::test_suite<test_atomic_double_wait, 2, rl::
     }
 };
 
+template <bool UseNotifyAll, int NumWaiters>
+struct test_relaxed_wait_notify : rl::test_suite<test_relaxed_wait_notify<UseNotifyAll, NumWaiters>, NumWaiters + 1>
+{
+    std::atomic<bool> flag;
+
+    void before()
+    {
+        flag.store(true);
+    }
+
+    void thread(unsigned index)
+    {
+        if (0 == index)
+        {
+            flag.store(false, rl::memory_order_relaxed);
+            if constexpr (UseNotifyAll)
+                flag.notify_all();
+            else
+                flag.notify_one();
+        }
+        else
+        {
+            flag.wait(true, rl::memory_order_relaxed);
+        }
+    }
+};
+
+struct test_relaxed_notify_one_1_waiter  : test_relaxed_wait_notify<false /*UseNotifyAll*/, 1> {};
+struct test_relaxed_notify_all_1_waiter  : test_relaxed_wait_notify<true  /*UseNotifyAll*/, 1> {};
+struct test_relaxed_notify_all_2_waiters : test_relaxed_wait_notify<true  /*UseNotifyAll*/, 2> {};
+
 struct test_atomic_notify_all_empty : rl::test_suite<test_atomic_notify_all_empty, 1>
 {
     std::atomic<int> data;
@@ -482,7 +513,11 @@ int main()
     CHECK(rl::simulate<test_atomic_double_wait>(params));
     CHECK(rl::simulate<test_atomic_notify_all_empty>(params));
     CHECK(rl::simulate<test_atomic_three_threads_in_chain>(params));
-    
+
+    CHECK(rl::simulate<test_relaxed_notify_one_1_waiter>(params));
+    CHECK(rl::simulate<test_relaxed_notify_all_1_waiter>(params));
+    CHECK(rl::simulate<test_relaxed_notify_all_2_waiters>(params));
+
     std::cout << "All atomic_flag tests passed!" << std::endl;
 
     return 0;
