@@ -172,6 +172,18 @@ struct test_wfmo_try : rl::test_suite<test_wfmo_try, 2>
 
 
 
+struct test_wfmo_count_bounds : rl::test_suite<test_wfmo_count_bounds, 1>
+{
+    void thread(unsigned)
+    {
+        HANDLE handles[MAXIMUM_WAIT_OBJECTS + 1] = {};
+        unsigned long const rv = WaitForMultipleObjects(MAXIMUM_WAIT_OBJECTS + 1, handles, 0, 0);
+        assert(rv == WAIT_FAILED);
+    }
+};
+
+
+
 struct test_wfmo_mixed : rl::test_suite<test_wfmo_mixed, 3>
 {
 	HANDLE sem [2];
