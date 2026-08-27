@@ -495,6 +495,7 @@ int main()
         &rl::simulate<test_wfmo_single>,
         &rl::simulate<test_wfmo_timeout>,
         &rl::simulate<test_wfmo_try>,
+        &rl::simulate<test_wfmo_count_bounds>,
         &rl::simulate<test_wfmo_mixed>,
         &rl::simulate<test_wfmo_mixed2>,
         &rl::simulate<test_wfmo_event_all>,
