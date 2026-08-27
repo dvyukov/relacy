@@ -182,7 +182,7 @@ private:
                                     debug_info_param info)
     {
 			  return waitset<thread_count>::park_current(*this,
-                                                         reinterpret_cast<waitset<thread_count>**>(ws),
+                                                         ws,
                                                          wo, count, wait_all, is_timed, true, info);
     }
 
