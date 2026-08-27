@@ -13,15 +13,6 @@
 #   pragma once
 #endif
 
-// Code built with GCC 16.2.1 and -O3 crashes in test_wfmo_try when
-// ipa-cp-clone is enabled. Disable only that optimization while compiling
-// Relacy's headers, then restore the compiler options so including Relacy
-// does not change optimization settings for user code.
-#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 16
-#   pragma GCC push_options
-#   pragma GCC optimize ("no-ipa-cp-clone")
-#endif
-
 #include "base.hpp"
 #include "context.hpp"
 #include "context_base_impl.hpp"
@@ -40,10 +31,6 @@
 
 #include "stdlib/windows.hpp"
 #include "stdlib/pthread.hpp"
-
-#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 16
-#   pragma GCC pop_options
-#endif
 
 #define VAR_T(x) rl::var<x>
 #define TLS_T(T) rl::thread_local_var<T>
