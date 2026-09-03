@@ -77,7 +77,7 @@ inline unsigned long rl_WaitForMultipleObjectsEx(unsigned long count, rl_HANDLE*
 
     bool try_wait = (timeout == 0);
     bool is_timed = (timeout != rl_INFINITE);
-    if (count > wfmo_max_objects)
+    if (count == 0 || count > wfmo_max_objects)
         return rl_WAIT_FAILED;
     win_waitable_object* obj[wfmo_max_objects];
     for (size_t i = 0; i != count; ++i)
