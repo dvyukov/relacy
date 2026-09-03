@@ -183,12 +183,6 @@ struct test_wfmo_count_bounds : rl::test_suite<test_wfmo_count_bounds, 1, rl::te
         handles[MAXIMUM_WAIT_OBJECTS] = 0;
     }
 
-    void after()
-    {
-        for (unsigned long i = 0; i != MAXIMUM_WAIT_OBJECTS; ++i)
-            CloseHandle(handles[i]);
-    }
-
     void thread(unsigned)
     {
         unsigned long const zero_rv = WaitForMultipleObjects(0, 0, 0, 0);
@@ -199,6 +193,8 @@ struct test_wfmo_count_bounds : rl::test_suite<test_wfmo_count_bounds, 1, rl::te
 
         unsigned long const too_many_rv = WaitForMultipleObjects(MAXIMUM_WAIT_OBJECTS + 1, handles, 0, 0);
         assert(too_many_rv == WAIT_FAILED);
+        for (unsigned long i = 0; i != MAXIMUM_WAIT_OBJECTS; ++i)
+            CloseHandle(handles[i]);
         RL_UNTIL(true);
     }
 };
